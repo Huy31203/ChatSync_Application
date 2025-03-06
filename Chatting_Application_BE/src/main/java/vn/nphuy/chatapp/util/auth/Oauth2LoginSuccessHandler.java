@@ -2,6 +2,9 @@ package vn.nphuy.chatapp.util.auth;
 
 import java.io.IOException;
 
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.http.ResponseCookie;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
@@ -10,18 +13,33 @@ import org.springframework.transaction.annotation.Transactional;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.RequiredArgsConstructor;
 import vn.nphuy.chatapp.domain.Profile;
 import vn.nphuy.chatapp.domain.ProfileConnectedAccount;
+import vn.nphuy.chatapp.domain.response.ResLoginDTO;
+import vn.nphuy.chatapp.domain.response.ResLoginDTO.UserLogin;
 import vn.nphuy.chatapp.repository.ProfileConnectedAccountRepository;
 import vn.nphuy.chatapp.repository.ProfileRepository;
+import vn.nphuy.chatapp.util.SecurityUtil;
 
 @Component
-@RequiredArgsConstructor
 public class Oauth2LoginSuccessHandler implements AuthenticationSuccessHandler {
+
+	@Value("${nphuy.jwt.refresh-token-validity-in-seconds}")
+	private long refreshTokenValidity;
+
+	@Value("${nphuy.frontend.url}")
+	private String frontendUrl;
 
 	private final ProfileConnectedAccountRepository connectedAccountRepository;
 	private final ProfileRepository profileRepository;
+	private final SecurityUtil securityUtil;
+
+	public Oauth2LoginSuccessHandler(ProfileConnectedAccountRepository connectedAccountRepository,
+			ProfileRepository profileRepository, @Lazy SecurityUtil securityUtil) {
+		this.connectedAccountRepository = connectedAccountRepository;
+		this.profileRepository = profileRepository;
+		this.securityUtil = securityUtil;
+	}
 
 	@Override
 	@Transactional
@@ -75,8 +93,33 @@ public class Oauth2LoginSuccessHandler implements AuthenticationSuccessHandler {
 	}
 
 	private void authenticate(Profile profile, HttpServletResponse response) throws IOException {
-		// final AppAuthenticationToken token = new AppAuthenticationToken(account);
-		// SecurityContextHolder.getContext().setAuthentication(token);
-		// response.sendRedirect(configService.getFrontendUrl());
+		String id = profile.getId();
+		String email = profile.getEmail();
+		String name = profile.getName();
+		ResLoginDTO resLogin = new ResLoginDTO();
+
+		UserLogin userLogin = new UserLogin(id, email, name);
+		resLogin.setUser(userLogin);
+
+		String accessToken = securityUtil.createAccessToken(email, resLogin);
+		resLogin.setAccessToken(accessToken);
+
+		// Create refresh token
+		String refreshToken = securityUtil.createRefreshToken(email, resLogin);
+		profile.setRefreshToken(refreshToken);
+		profileRepository.save(profile);
+
+		ResponseCookie resCookie = ResponseCookie.from("refreshToken", refreshToken)
+				.httpOnly(true)
+				.path("/")
+				.secure(true)
+				.maxAge(refreshTokenValidity) // 6 months
+				.build();
+
+		String redirectUrl = frontendUrl + "/login-success?accessToken=" + accessToken;
+
+		// Send response
+		response.addHeader("Set-Cookie", resCookie.toString());
+		response.sendRedirect(redirectUrl);
 	}
 }

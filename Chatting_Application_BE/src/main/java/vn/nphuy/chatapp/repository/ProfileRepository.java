@@ -17,7 +17,5 @@ public interface ProfileRepository extends JpaRepository<Profile, String>, JpaSp
 
 	Optional<Profile> findByRefreshTokenAndEmail(String refreshToken, String email);
 
-	Optional<Profile> findByPasswordResetTokenAndEmail(String resetToken, String email);
-
 	List<Profile> findByIdIn(List<Long> id);
 }

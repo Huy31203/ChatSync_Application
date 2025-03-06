@@ -1,5 +1,7 @@
 package vn.nphuy.chatapp.util;
 
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Optional;
 
 import javax.crypto.SecretKey;
@@ -13,14 +15,18 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
+import org.springframework.security.oauth2.jwt.JwsHeader;
 import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.oauth2.jwt.JwtClaimsSet;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
+import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.stereotype.Service;
 
 import com.nimbusds.jose.util.Base64;
 
 import lombok.RequiredArgsConstructor;
+import vn.nphuy.chatapp.domain.response.ResLoginDTO;
 
 @Service
 @RequiredArgsConstructor
@@ -28,7 +34,6 @@ public class SecurityUtil {
 
   public static final MacAlgorithm JWT_ALGORITHM = MacAlgorithm.HS256;
   public final JwtEncoder jwtEncoder;
-  // public final UserService userService;
   private final Logger logger = LoggerFactory.getLogger(SecurityUtil.class);
 
   @Value("${nphuy.jwt.base64-secret}")
@@ -43,43 +48,37 @@ public class SecurityUtil {
   @Value("${nphuy.jwt.reset-token-validity-in-seconds}")
   private long jwtResetExpiration;
 
-  // public String createAccessToken(String email, ResLoginDTO dto) {
-  // Instant now = Instant.now();
-  // Instant validity = now.plus(jwtAccessExpiration, ChronoUnit.SECONDS);
+  public String createAccessToken(String email, ResLoginDTO dto) {
+    Instant now = Instant.now();
+    Instant validity = now.plus(jwtAccessExpiration, ChronoUnit.SECONDS);
 
-  // // hard code permission
-  // List<String> permissions = new ArrayList<>();
-  // permissions.add("ROLE_USER_CREATE");
-  // permissions.add("ROLE_USER_UPDATE");
+    // @formatter:off
+    JwtClaimsSet claims = JwtClaimsSet.builder()
+        .issuedAt(now)
+        .expiresAt(validity)
+        .subject(email)
+        .claim("user", dto.getUser())
+        .build();
 
-  //   // @formatter:off
-  //   JwtClaimsSet claims = JwtClaimsSet.builder()
-  //       .issuedAt(now)
-  //       .expiresAt(validity)
-  //       .subject(email)
-  //       .claim("user", dto.getUser())
-  //       .claim("permissions", permissions)
-  //       .build();
+    JwsHeader jwsHeader = JwsHeader.with(JWT_ALGORITHM).build();
+    return jwtEncoder.encode(JwtEncoderParameters.from(jwsHeader, claims)).getTokenValue();
+  }
 
-  //   JwsHeader jwsHeader = JwsHeader.with(JWT_ALGORITHM).build();
-  //   return jwtEncoder.encode(JwtEncoderParameters.from(jwsHeader, claims)).getTokenValue();
-  // }
+  public String createRefreshToken(String email, ResLoginDTO dto) {
+    Instant now = Instant.now();
+    Instant validity = now.plus(jwtRefreshExpiration, ChronoUnit.SECONDS);
 
-  // public String createRefreshToken(String email, ResLoginDTO dto) {
-  //   Instant now = Instant.now();
-  //   Instant validity = now.plus(jwtRefreshExpiration, ChronoUnit.SECONDS);
+    // @formatter:off
+    JwtClaimsSet claims = JwtClaimsSet.builder()
+        .issuedAt(now)
+        .expiresAt(validity)
+        .subject(email)
+        .claim("user", dto.getUser())
+        .build();
 
-  //   // @formatter:off
-  //   JwtClaimsSet claims = JwtClaimsSet.builder()
-  //       .issuedAt(now)
-  //       .expiresAt(validity)
-  //       .subject(email)
-  //       .claim("user", dto.getUser())
-  //       .build();
-
-  //   JwsHeader jwsHeader = JwsHeader.with(JWT_ALGORITHM).build();
-  //   return jwtEncoder.encode(JwtEncoderParameters.from(jwsHeader, claims)).getTokenValue();
-  // }
+    JwsHeader jwsHeader = JwsHeader.with(JWT_ALGORITHM).build();
+    return jwtEncoder.encode(JwtEncoderParameters.from(jwsHeader, claims)).getTokenValue();
+  }
 
   // public String createResetToken(String email, User user) {
   //   Instant now = Instant.now();

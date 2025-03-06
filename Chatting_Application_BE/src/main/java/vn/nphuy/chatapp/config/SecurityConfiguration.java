@@ -26,13 +26,17 @@ import org.springframework.security.web.SecurityFilterChain;
 import com.nimbusds.jose.jwk.source.ImmutableSecret;
 import com.nimbusds.jose.util.Base64;
 
+import lombok.RequiredArgsConstructor;
 import vn.nphuy.chatapp.util.SecurityUtil;
+import vn.nphuy.chatapp.util.auth.Oauth2LoginSuccessHandler;
 
 @Configuration
+@RequiredArgsConstructor
 @EnableMethodSecurity(securedEnabled = true)
 class SecurityConfiguration {
 
 	private static final Logger logger = LoggerFactory.getLogger(SecurityConfiguration.class);
+	private final Oauth2LoginSuccessHandler oauth2LoginSuccessHandler;
 
 	@Value("${nphuy.jwt.base64-secret}")
 	private String jwtKey;
@@ -104,12 +108,13 @@ class SecurityConfiguration {
 	SecurityFilterChain filterChain(HttpSecurity http, CustomAuthenticationEntryPoint customAuthenticationEntryPoint)
 			throws Exception {
 		http.cors(Customizer.withDefaults()).csrf(c -> c.disable()).authorizeHttpRequests(
-						authz -> authz
-								.requestMatchers(AUTH_WHITELIST).permitAll()
-								.requestMatchers(HttpMethod.GET, AUTH_WHITELIST_GET).permitAll()
-								.anyRequest().authenticated())
+				authz -> authz
+						.requestMatchers(AUTH_WHITELIST).permitAll()
+						.requestMatchers(HttpMethod.GET, AUTH_WHITELIST_GET).permitAll()
+						.anyRequest().authenticated())
 				.oauth2ResourceServer(
 						oauth2 -> oauth2.jwt(Customizer.withDefaults()).authenticationEntryPoint(customAuthenticationEntryPoint))
+				.oauth2Login(customizer -> customizer.successHandler(oauth2LoginSuccessHandler))
 				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
 		return http.build();
