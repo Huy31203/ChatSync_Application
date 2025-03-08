@@ -6,9 +6,9 @@ import lombok.Setter;
 @Getter
 @Setter
 public class ReqProfileConnectedAccountDTO {
-	private String provider;
+    private String provider;
 
-	private String providerId;
+    private String providerId;
 
-	private String profileId;
+    private String profileId;
 }

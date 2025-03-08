@@ -17,44 +17,53 @@ import vn.nphuy.chatapp.util.annotation.ApiMessage;
 @ControllerAdvice
 public class FormatRestResponse implements ResponseBodyAdvice<Object> {
 
-  @Value("${server.servlet.context-path}")
-  private String contextPath;
+    @Value("${server.servlet.context-path}")
+    private String contextPath;
 
-  @Override
-  public boolean supports(MethodParameter returnType, Class converterType) {
-    return true;
-  }
-
-  @Override
-  public Object beforeBodyWrite(Object body, MethodParameter returnType, MediaType selectedContentType,
-      Class selectedConverterType, ServerHttpRequest request, ServerHttpResponse response) {
-    HttpServletResponse servletResponse = ((ServletServerHttpResponse) response).getServletResponse();
-    int status = servletResponse.getStatus();
-
-    RestResponse<Object> res = new RestResponse<>();
-    res.setStatusCode(status);
-
-    if (body instanceof Resource) {
-      // case download file
-      return body;
+    @Override
+    public boolean supports(MethodParameter returnType, Class converterType) {
+        return true;
     }
 
-    // case swagger
-    String path = request.getURI().getPath();
-    if (path.startsWith(contextPath + "/v3/api-docs") || path.startsWith(contextPath + "/swagger-ui")) {
-      return body;
-    }
+    @Override
+    public Object beforeBodyWrite(
+            Object body,
+            MethodParameter returnType,
+            MediaType selectedContentType,
+            Class selectedConverterType,
+            ServerHttpRequest request,
+            ServerHttpResponse response) {
+        HttpServletResponse servletResponse = ((ServletServerHttpResponse) response).getServletResponse();
+        int status = servletResponse.getStatus();
 
-    if (status >= 400) {
-      // case error
-      return body;
-    } else {
-      // case success
-      res.setResult(body);
-      ApiMessage apiMessage = returnType.getMethodAnnotation(ApiMessage.class);
-      res.setMessage(apiMessage != null ? apiMessage.message() + " successfully" : "Call API successfully");
-    }
+        RestResponse<Object> res = new RestResponse<>();
+        res.setStatusCode(status);
 
-    return res;
-  }
+        if (body instanceof Resource) {
+            // case download file
+            return body;
+        }
+
+        // case swagger
+        String path = request.getURI().getPath();
+        if (path.startsWith(contextPath + "/v3/api-docs")
+                || path.startsWith(contextPath + "/swagger-ui")) {
+            return body;
+        }
+
+        if (status >= 400) {
+            // case error
+            return body;
+        } else {
+            // case success
+            res.setResult(body);
+            ApiMessage apiMessage = returnType.getMethodAnnotation(ApiMessage.class);
+            res.setMessage(
+                    apiMessage != null
+                            ? apiMessage.message() + " successfully"
+                            : "Call API successfully");
+        }
+
+        return res;
+    }
 }

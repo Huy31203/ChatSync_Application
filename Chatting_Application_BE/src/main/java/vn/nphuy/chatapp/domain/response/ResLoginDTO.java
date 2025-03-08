@@ -8,17 +8,17 @@ import lombok.Setter;
 @Getter
 @Setter
 public class ResLoginDTO {
-  private String accessToken;
+    private String accessToken;
 
-  private UserLogin user;
+    private ProfileLogin profile;
 
-  @Getter
-  @Setter
-  @AllArgsConstructor
-  @NoArgsConstructor
-  public static class UserLogin {
-    private String id;
-    private String email;
-    private String name;
-  }
+    @Getter
+    @Setter
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class ProfileLogin {
+        private String id;
+        private String email;
+        private String name;
+    }
 }

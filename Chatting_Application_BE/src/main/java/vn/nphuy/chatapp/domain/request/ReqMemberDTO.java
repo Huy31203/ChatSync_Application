@@ -9,10 +9,10 @@ import vn.nphuy.chatapp.util.constant.MemberRoleEnum;
 @Getter
 @Setter
 public class ReqMemberDTO {
-	private String serverId;
+    private String serverId;
 
-	private String profileId;
+    private String profileId;
 
-	@Enumerated(EnumType.STRING)
-	private MemberRoleEnum memberRole;
+    @Enumerated(EnumType.STRING)
+    private MemberRoleEnum memberRole;
 }

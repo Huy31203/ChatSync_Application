@@ -12,36 +12,32 @@ import vn.nphuy.chatapp.util.SecurityUtil;
 @RequiredArgsConstructor
 public class PermissionInterceptorConfiguration implements WebMvcConfigurer {
 
-  private final SecurityUtil securityUtil;
+    private final SecurityUtil securityUtil;
 
-  @Bean
-  PermissionInterceptor getPermissionInterceptor(SecurityUtil securityUtil) {
-    PermissionInterceptor interceptor = new PermissionInterceptor(securityUtil);
-    // Configure GET-only paths
-    interceptor.addGetOnlyPath("/companies");
-    interceptor.addGetOnlyPath("/jobs");
-    interceptor.addGetOnlyPath("/skills");
-    return interceptor;
-  }
+    @Bean
+    PermissionInterceptor getPermissionInterceptor(SecurityUtil securityUtil) {
+        PermissionInterceptor interceptor = new PermissionInterceptor(securityUtil);
+        // Configure GET-only paths
+        // interceptor.addGetOnlyPath("/companies");
+        // interceptor.addGetOnlyPath("/jobs");
+        // interceptor.addGetOnlyPath("/skills");
+        return interceptor;
+    }
 
-  @Override
-  public void addInterceptors(InterceptorRegistry registry) {
-    String[] whiteList = {
-        "/",
-        "/auth/login",
-        "/auth/register",
-        "/auth/forgot-password",
-        "/auth/reset-password",
-        "/auth/refresh",
-        "/storage/**",
-        "/v3/api-docs/**",
-        "/swagger-ui/**",
-        "/swagger-ui.html",
-        "/companies",
-        "/jobs",
-        "/skills"
-    };
-    registry.addInterceptor(getPermissionInterceptor(securityUtil))
-        .excludePathPatterns(whiteList);
-  }
+    @Override
+    public void addInterceptors(InterceptorRegistry registry) {
+        String[] whiteList = {
+                "/v1/auth/login",
+                "/v1/auth/register",
+                "/v1/auth/forgot-password",
+                "/v1/auth/reset-password",
+                "/v1/auth/refresh",
+                "/v1/storage/**",
+                "/v1/v3/api-docs/**",
+                "/v1/swagger-ui/**",
+                "/v1/swagger-ui.html",
+        };
+        registry.addInterceptor(getPermissionInterceptor(securityUtil))
+                .excludePathPatterns(whiteList);
+    }
 }

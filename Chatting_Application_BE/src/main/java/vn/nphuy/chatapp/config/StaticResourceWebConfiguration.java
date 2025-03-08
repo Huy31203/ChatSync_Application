@@ -7,11 +7,11 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
 public class StaticResourceWebConfiguration implements WebMvcConfigurer {
-  @Value("${nghuy.upload-file.base-uri}")
-  private String uploadUri;
+    @Value("${nghuy.upload-file.base-uri}")
+    private String uploadUri;
 
-  @Override
-  public void addResourceHandlers(ResourceHandlerRegistry registry) {
-    registry.addResourceHandler("/storage/**").addResourceLocations(uploadUri);
-  }
+    @Override
+    public void addResourceHandlers(ResourceHandlerRegistry registry) {
+        registry.addResourceHandler("/storage/**").addResourceLocations(uploadUri);
+    }
 }

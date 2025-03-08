@@ -33,6 +33,7 @@ dependencies {
     implementation("net.kaczmarzyk:specification-arg-resolver:3.1.0")
     implementation("com.cloudinary:cloudinary-http44:1.33.0")
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.7.0")
+    implementation("org.modelmapper:modelmapper:3.2.2")
     implementation("org.springframework.boot:spring-boot-starter-mail")
     developmentOnly("org.springframework.boot:spring-boot-devtools")
     runtimeOnly("com.mysql:mysql-connector-j")
@@ -43,3 +44,4 @@ dependencies {
 tasks.withType<Test> {
 	useJUnitPlatform()
 }
+

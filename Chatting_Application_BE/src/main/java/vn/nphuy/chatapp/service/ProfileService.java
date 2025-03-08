@@ -17,107 +17,108 @@ import vn.nphuy.chatapp.repository.ProfileRepository;
 @RequiredArgsConstructor
 public class ProfileService {
 
-  private final ProfileRepository profileRepository;
-  private final EntityManager entityManager;
+    private final ProfileRepository profileRepository;
+    private final EntityManager entityManager;
 
-  public ResultPaginationDTO getAllProfile(Specification spec, Pageable pageable) {
-    Session session = entityManager.unwrap(Session.class);
-    session.enableFilter("deletedProfilesFilter");
+    public ResultPaginationDTO getAllProfile(Specification spec, Pageable pageable) {
+        Session session = entityManager.unwrap(Session.class);
+        session.enableFilter("deletedProfilesFilter");
 
-    Page<Profile> profiles = profileRepository.findAll(spec, pageable);
+        Page<Profile> profiles = profileRepository.findAll(spec, pageable);
 
-    session.disableFilter("deletedProfilesFilter");
+        session.disableFilter("deletedProfilesFilter");
 
-    ResultPaginationDTO result = new ResultPaginationDTO();
-    Meta meta = new Meta();
+        ResultPaginationDTO result = new ResultPaginationDTO();
+        Meta meta = new Meta();
 
-    meta.setPage(profiles.getNumber() + 1);
-    meta.setPageSize(profiles.getSize());
+        meta.setPage(profiles.getNumber() + 1);
+        meta.setPageSize(profiles.getSize());
 
-    meta.setTotalPages(profiles.getTotalPages());
-    meta.setTotalElements(profiles.getTotalElements());
+        meta.setTotalPages(profiles.getTotalPages());
+        meta.setTotalElements(profiles.getTotalElements());
 
-    result.setMeta(meta);
-    result.setData(profiles.getContent());
+        result.setMeta(meta);
+        result.setData(profiles.getContent());
 
-    return result;
-  }
-
-  public Profile getProfileById(String id) {
-    Session session = entityManager.unwrap(Session.class);
-    session.enableFilter("deletedProfilesFilter");
-
-    Profile profile = profileRepository.findOneById(id).orElse(null);
-
-    session.disableFilter("deletedProfilesFilter");
-
-    return profile;
-  }
-
-  public Profile getProfileByProfileName(String profilename) {
-    return profileRepository.findOneByEmail(profilename).orElse(null);
-  }
-
-  public Profile createProfile(Profile profile) {
-    return profileRepository.save(profile);
-  }
-
-  public boolean isEmailExist(String email) {
-    return profileRepository.existsByEmail(email);
-  }
-
-  public Profile getProfileByRefreshTokenAndEmail(String refreshToken, String email) {
-    return profileRepository.findByRefreshTokenAndEmail(refreshToken, email).orElse(null);
-  }
-
-  // public Profile getProfileByResetTokenAndEmail(String resetToken, String
-  // email) {
-  // return profileRepository.findByPasswordResetTokenAndEmail(resetToken,
-  // email).orElse(null);
-  // }
-
-  public Profile updateProfile(Profile profile) {
-    Profile existingProfile = this.getProfileById(profile.getId());
-    if (existingProfile != null) {
-
-      existingProfile.setName(null != profile.getName() ? profile.getName() : existingProfile.getName());
-
-      return profileRepository.save(existingProfile);
-    } else {
-      return null;
+        return result;
     }
-  }
 
-  // public void updateProfileRefreshToken(String email, String refreshToken) {
-  // Profile profile = profileRepository.findByEmail(email);
-  // if (profile != null) {
-  // profile.setRefreshToken(refreshToken);
-  // profileRepository.save(profile);
-  // }
-  // }
+    public Profile getProfileById(String id) {
+        Session session = entityManager.unwrap(Session.class);
+        session.enableFilter("deletedProfilesFilter");
 
-  // public void updateProfileResetToken(String email, String refreshToken) {
-  // Profile profile = profileRepository.findByEmail(email);
-  // if (profile != null) {
-  // profile.setPasswordResetToken(refreshToken);
-  // profileRepository.save(profile);
-  // }
-  // }
+        Profile profile = profileRepository.findOneById(id).orElse(null);
 
-  public void updateProfilePassword(String email, String password) {
-    Profile profile = profileRepository.findOneByEmail(email).orElse(null);
-    if (profile != null) {
-      profile.setPassword(password);
-      profileRepository.save(profile);
+        session.disableFilter("deletedProfilesFilter");
+
+        return profile;
     }
-  }
 
-  public boolean deleteProfile(String id) {
-    if (profileRepository.existsById(id)) {
-      profileRepository.deleteById(id);
-      return true;
-    } else {
-      return false;
+    public Profile getProfileByEmail(String email) {
+        return profileRepository.findOneByEmail(email).orElse(null);
     }
-  }
+
+    public Profile createProfile(Profile profile) {
+        return profileRepository.save(profile);
+    }
+
+    public boolean isEmailExist(String email) {
+        return profileRepository.existsByEmail(email);
+    }
+
+    public Profile getProfileByRefreshTokenAndEmail(String refreshToken, String email) {
+        return profileRepository.findByRefreshTokenAndEmail(refreshToken, email).orElse(null);
+    }
+
+    // public Profile getProfileByResetTokenAndEmail(String resetToken, String
+    // email) {
+    // return profileRepository.findByPasswordResetTokenAndEmail(resetToken,
+    // email).orElse(null);
+    // }
+
+    public Profile updateProfile(Profile profile) {
+        Profile existingProfile = this.getProfileById(profile.getId());
+        if (existingProfile != null) {
+
+            existingProfile.setName(
+                    null != profile.getName() ? profile.getName() : existingProfile.getName());
+
+            return profileRepository.save(existingProfile);
+        } else {
+            return null;
+        }
+    }
+
+    public void updateProfileRefreshToken(String email, String refreshToken) {
+        Profile profile = profileRepository.findOneByEmail(email).orElse(null);
+        if (profile != null) {
+            profile.setRefreshToken(refreshToken);
+            profileRepository.save(profile);
+        }
+    }
+
+    // public void updateProfileResetToken(String email, String refreshToken) {
+    // Profile profile = profileRepository.findByEmail(email);
+    // if (profile != null) {
+    // profile.setPasswordResetToken(refreshToken);
+    // profileRepository.save(profile);
+    // }
+    // }
+
+    public void updateProfilePassword(String email, String password) {
+        Profile profile = profileRepository.findOneByEmail(email).orElse(null);
+        if (profile != null) {
+            profile.setPassword(password);
+            profileRepository.save(profile);
+        }
+    }
+
+    public boolean deleteProfile(String id) {
+        if (profileRepository.existsById(id)) {
+            profileRepository.deleteById(id);
+            return true;
+        } else {
+            return false;
+        }
+    }
 }

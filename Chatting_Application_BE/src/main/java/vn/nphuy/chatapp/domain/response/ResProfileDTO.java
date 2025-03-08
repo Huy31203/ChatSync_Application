@@ -1,31 +1,33 @@
 package vn.nphuy.chatapp.domain.response;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import lombok.Getter;
-import lombok.Setter;
-
 import java.time.Instant;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 @Getter
 @Setter
+@NoArgsConstructor
 public class ResProfileDTO {
-	private Long id;
+    private String id;
 
-	private String email;
+    private String email;
 
-	private String name;
+    private String name;
 
-	private String avatarUrl;
+    private String avatarUrl;
 
-	@JsonIgnoreProperties("profile")
-	private List<ResMemberDTO> members;
+    @JsonIgnoreProperties("profile")
+    private List<ResMemberDTO> members;
 
-	@JsonIgnoreProperties("profile")
-	private ResProfileConnectedAccountDTO connectedAccount;
+    @JsonIgnoreProperties("profile")
+    private ResProfileConnectedAccountDTO connectedAccount;
 
-	private Instant createdAt;
+    private Instant createdAt;
 
-	private Instant updatedAt;
+    private Instant updatedAt;
 }
-

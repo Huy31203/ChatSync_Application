@@ -27,97 +27,99 @@ import com.nimbusds.jose.jwk.source.ImmutableSecret;
 import com.nimbusds.jose.util.Base64;
 
 import lombok.RequiredArgsConstructor;
+import vn.nphuy.chatapp.auth.Oauth2LoginSuccessHandler;
 import vn.nphuy.chatapp.util.SecurityUtil;
-import vn.nphuy.chatapp.util.auth.Oauth2LoginSuccessHandler;
 
 @Configuration
 @RequiredArgsConstructor
 @EnableMethodSecurity(securedEnabled = true)
 class SecurityConfiguration {
 
-	private static final Logger logger = LoggerFactory.getLogger(SecurityConfiguration.class);
-	private final Oauth2LoginSuccessHandler oauth2LoginSuccessHandler;
+    private static final Logger logger = LoggerFactory.getLogger(SecurityConfiguration.class);
+    private final Oauth2LoginSuccessHandler oauth2LoginSuccessHandler;
 
-	@Value("${nphuy.jwt.base64-secret}")
-	private String jwtKey;
+    @Value("${nphuy.jwt.base64-secret}")
+    private String jwtKey;
 
-	// delclare routes that not require authentication
-	private static final String[] AUTH_WHITELIST = {
-			"/",
-			"/auth/login",
-			"/auth/register",
-			"/auth/forgot-password",
-			"/auth/reset-password",
-			"/auth/refresh",
-			"/storage/**",
-			"/v3/api-docs/**",
-			"/swagger-ui/**",
-			"/swagger-ui.html",
-	};
+    // delclare routes that not require authentication
+    private static final String[] AUTH_WHITELIST = {
+            "/v1/auth/login",
+            "/v1/auth/register",
+            "/v1/auth/forgot-password",
+            "/v1/auth/reset-password",
+            "/v1/auth/refresh",
+            "/v1/auth/logout",
+            "/storage/**",
+            "/v3/api-docs/**",
+            "/swagger-ui/**",
+            "/swagger-ui.html",
+    };
 
-	private static final String[] AUTH_WHITELIST_GET = {
-			"/jobs",
-			"/jobs/**",
-			"/companies",
-			"/companies/**",
-			"/skills",
-			"/skills/**"
-	};
+    private static final String[] AUTH_WHITELIST_GET = {
+    };
 
-	@Bean
-	PasswordEncoder passwordEncoder() {
-		return new BCryptPasswordEncoder();
-	}
+    @Bean
+    PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
 
-	private SecretKey getSecretKey() {
-		byte[] keyBytes = Base64.from(jwtKey).decode();
-		return new SecretKeySpec(keyBytes, 0, keyBytes.length, SecurityUtil.JWT_ALGORITHM.getName());
-	}
+    private SecretKey getSecretKey() {
+        byte[] keyBytes = Base64.from(jwtKey).decode();
+        return new SecretKeySpec(
+                keyBytes, 0, keyBytes.length, SecurityUtil.JWT_ALGORITHM.getName());
+    }
 
-	@Bean
-	JwtEncoder jwtEncoder() {
-		return new NimbusJwtEncoder(new ImmutableSecret<>(getSecretKey()));
-	}
+    @Bean
+    JwtEncoder jwtEncoder() {
+        return new NimbusJwtEncoder(new ImmutableSecret<>(getSecretKey()));
+    }
 
-	@Bean
-	JwtDecoder jwtDecoder() {
-		NimbusJwtDecoder jwtDecoder = NimbusJwtDecoder.withSecretKey(
-				getSecretKey()).macAlgorithm(SecurityUtil.JWT_ALGORITHM).build();
-		return token -> {
-			try {
-				return jwtDecoder.decode(token);
-			} catch (Exception e) {
-				logger.error((">>> Access token error: " + e.getMessage()));
-				throw e;
-			}
-		};
-	}
+    @Bean
+    JwtDecoder jwtDecoder() {
+        NimbusJwtDecoder jwtDecoder = NimbusJwtDecoder.withSecretKey(getSecretKey())
+                .macAlgorithm(SecurityUtil.JWT_ALGORITHM)
+                .build();
+        return token -> {
+            try {
+                return jwtDecoder.decode(token);
+            } catch (Exception e) {
+                logger.error((">>> Access token error: " + e.getMessage()));
+                throw e;
+            }
+        };
+    }
 
-	@Bean
-	JwtAuthenticationConverter jwtAuthenticationConverter() {
-		JwtGrantedAuthoritiesConverter grantedAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
-		grantedAuthoritiesConverter.setAuthorityPrefix("");
-		grantedAuthoritiesConverter.setAuthoritiesClaimName("permissions");
-		JwtAuthenticationConverter jwtAuthenticationConverter = new JwtAuthenticationConverter();
+    @Bean
+    JwtAuthenticationConverter jwtAuthenticationConverter() {
+        JwtGrantedAuthoritiesConverter grantedAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
+        grantedAuthoritiesConverter.setAuthorityPrefix("");
+        grantedAuthoritiesConverter.setAuthoritiesClaimName("permissions");
+        JwtAuthenticationConverter jwtAuthenticationConverter = new JwtAuthenticationConverter();
 
-		jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(grantedAuthoritiesConverter);
-		return jwtAuthenticationConverter;
-	}
+        jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(grantedAuthoritiesConverter);
+        return jwtAuthenticationConverter;
+    }
 
-	@Bean
-	SecurityFilterChain filterChain(HttpSecurity http, CustomAuthenticationEntryPoint customAuthenticationEntryPoint)
-			throws Exception {
-		http.cors(Customizer.withDefaults()).csrf(c -> c.disable()).authorizeHttpRequests(
-				authz -> authz
-						.requestMatchers(AUTH_WHITELIST).permitAll()
-						.requestMatchers(HttpMethod.GET, AUTH_WHITELIST_GET).permitAll()
-						.anyRequest().authenticated())
-				.oauth2ResourceServer(
-						oauth2 -> oauth2.jwt(Customizer.withDefaults()).authenticationEntryPoint(customAuthenticationEntryPoint))
-				.oauth2Login(customizer -> customizer.successHandler(oauth2LoginSuccessHandler))
-				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+    @Bean
+    SecurityFilterChain filterChain(
+            HttpSecurity http, CustomAuthenticationEntryPoint customAuthenticationEntryPoint)
+            throws Exception {
+        http.cors(Customizer.withDefaults())
+                .csrf(c -> c.disable())
+                .authorizeHttpRequests(
+                        authz -> authz.requestMatchers(AUTH_WHITELIST)
+                                .permitAll()
+                                .requestMatchers(HttpMethod.GET, AUTH_WHITELIST_GET)
+                                .permitAll()
+                                .anyRequest()
+                                .authenticated())
+                .oauth2ResourceServer(
+                        oauth2 -> oauth2.jwt(Customizer.withDefaults())
+                                .authenticationEntryPoint(customAuthenticationEntryPoint))
+                .oauth2Login(customizer -> customizer.successHandler(oauth2LoginSuccessHandler))
+                .sessionManagement(
+                        session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
-		return http.build();
-	}
-
+        return http.build();
+    }
 }

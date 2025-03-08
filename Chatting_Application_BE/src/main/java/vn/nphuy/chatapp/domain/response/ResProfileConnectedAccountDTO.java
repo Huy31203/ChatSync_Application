@@ -7,12 +7,12 @@ import lombok.Setter;
 @Getter
 @Setter
 public class ResProfileConnectedAccountDTO {
-	private String id;
+    private String id;
 
-	private String provider;
+    private String provider;
 
-	private String providerId;
+    private String providerId;
 
-	@JsonIgnoreProperties("connectedAccount")
-	private ResProfileDTO profile;
+    @JsonIgnoreProperties("connectedAccount")
+    private ResProfileDTO profile;
 }

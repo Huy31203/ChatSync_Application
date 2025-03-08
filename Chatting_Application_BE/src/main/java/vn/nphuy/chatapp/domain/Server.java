@@ -1,31 +1,16 @@
 package vn.nphuy.chatapp.domain;
 
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.HashMap;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.OneToMany;
+import jakarta.validation.constraints.NotBlank;
 import java.util.List;
-import java.util.Map;
-
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.annotations.Filter;
 import org.hibernate.annotations.FilterDef;
 import org.hibernate.annotations.SQLDelete;
-
-import com.fasterxml.jackson.annotation.JsonProperty;
-
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.PrePersist;
-import jakarta.persistence.PreUpdate;
-import jakarta.persistence.Table;
-import jakarta.validation.constraints.NotBlank;
-import lombok.Getter;
-import lombok.Setter;
 
 @Entity
 @SQLDelete(sql = "UPDATE servers SET deleted = true WHERE id=?")
@@ -34,19 +19,21 @@ import lombok.Setter;
 @Getter
 @Setter
 public class Server extends AbstractEntity {
-  @NotBlank(message = "Name is required")
-  private String name;
+    @NotBlank(message = "Name is required")
+    private String name;
 
-  private String imageUrl;
+    private String imageUrl;
 
-  @Column(unique = true)
-  private String inviteCode;
+    @Column(unique = true)
+    private String inviteCode;
 
-  @OneToMany(mappedBy = "server")
-  @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-  private List<Member> members;
+    @OneToMany(mappedBy = "server")
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    private List<Member> members;
 
-  public List<Member> getMembers() {
-    return members != null ? members.stream().filter(member -> !member.isDeleted()).toList() : List.of();
-  }
+    public List<Member> getMembers() {
+        return members != null
+                ? members.stream().filter(member -> !member.isDeleted()).toList()
+                : List.of();
+    }
 }

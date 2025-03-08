@@ -1,22 +1,17 @@
-import { redirect } from "next/navigation";
-import { db } from "@/lib/db";
-import { initialProfile } from "@/lib/initial-profile";
+"use client";
+
 import InitialModal from "@/components/modals/initial-modal";
+import { useAuth } from "@/hooks/use-auth";
+import { useRouter } from "next/navigation";
 
-const SetupPage = async () => {
-  const profile = await initialProfile();
+const SetupPage = () => {
+  const router = useRouter();
+  const { profile, loading } = useAuth();
 
-  const server = await db.server.findFirst({
-    where: {
-      members: {
-        some: {
-          profileId: profile.id,
-        },
-      },
-    },
-  });
-
-  if (server) return redirect(`/servers/${server.id}`);
+  if (!profile && !loading) {
+    router.push("/login");
+    return null;
+  }
 
   return <InitialModal />;
 };

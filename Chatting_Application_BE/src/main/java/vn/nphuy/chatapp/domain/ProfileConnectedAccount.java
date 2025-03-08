@@ -18,14 +18,13 @@ import lombok.Setter;
 @AllArgsConstructor
 public class ProfileConnectedAccount extends AbstractEntity {
 
-	@NotBlank(message = "Provider is required")
-	private String provider;
+    @NotBlank(message = "Provider is required")
+    private String provider;
 
-	@NotBlank(message = "Provider ID is required")
-	private String providerId;
+    @NotBlank(message = "Provider ID is required")
+    private String providerId;
 
-	@OneToOne
-	@JoinColumn(name = "profile_id")
-	private Profile profile;
-
+    @OneToOne
+    @JoinColumn(name = "profile_id")
+    private Profile profile;
 }

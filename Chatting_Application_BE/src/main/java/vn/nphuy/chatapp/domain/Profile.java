@@ -29,28 +29,30 @@ import lombok.Setter;
 @AllArgsConstructor
 public class Profile extends AbstractEntity {
 
-	@Column(unique = true)
-	@NotBlank(message = "Email is required")
-	@Email(regexp = "[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,3}", flags = Pattern.Flag.CASE_INSENSITIVE, message = "Email is invalid")
-	private String email;
+    @Column(unique = true)
+    @NotBlank(message = "Email is required")
+    @Email(regexp = "[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,3}", flags = Pattern.Flag.CASE_INSENSITIVE, message = "Email is invalid")
+    private String email;
 
-	private String password;
+    private String password;
 
-	@NotBlank(message = "Name is required")
-	private String name;
+    @NotBlank(message = "Name is required")
+    private String name;
 
-	private String avatarUrl;
+    private String avatarUrl;
 
-	@Column(name = "refresh_token", length = 1024, unique = true)
-	private String refreshToken;
+    @Column(name = "refresh_token", length = 1024, unique = true)
+    private String refreshToken;
 
-	@OneToMany(mappedBy = "profile", fetch = FetchType.LAZY)
-	private List<Member> members;
+    @OneToMany(mappedBy = "profile", fetch = FetchType.LAZY)
+    private List<Member> members;
 
-	@OneToOne(mappedBy = "profile", fetch = FetchType.LAZY)
-	private ProfileConnectedAccount connectedAccount;
+    @OneToOne(mappedBy = "profile", fetch = FetchType.LAZY)
+    private ProfileConnectedAccount connectedAccount;
 
-	public List<Member> getMembers() {
-		return members != null ? members.stream().filter(member -> !member.isDeleted()).toList() : List.of();
-	}
+    public List<Member> getMembers() {
+        return members != null
+                ? members.stream().filter(member -> !member.isDeleted()).toList()
+                : List.of();
+    }
 }

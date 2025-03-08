@@ -6,9 +6,9 @@ import lombok.Setter;
 @Getter
 @Setter
 public class ReqProfileDTO {
-	private String name;
+    private String name;
 
-	private String avatarUrl;
+    private String avatarUrl;
 
-	private String connectedAccountId;
+    private String connectedAccountId;
 }
