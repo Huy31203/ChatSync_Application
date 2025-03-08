@@ -1,8 +1,6 @@
 /* eslint-disable no-undef */
 'use server';
 
-import { cookies } from 'next/headers';
-
 import { ApiResponse } from '@/types';
 
 import { CustomOptions, handleRefreshToken } from './http';
@@ -53,19 +51,12 @@ const request = async <Response>(
     body = JSON.stringify(options.body);
   }
 
-  const cookieStore = cookies();
-
   const baseHeaders: { [key: string]: string } =
     body instanceof FormData
       ? {}
       : {
           'Content-Type': 'application/json',
         };
-
-  const accessToken = cookieStore.get('accessToken')?.value;
-  if (accessToken) {
-    baseHeaders.Authorization = `Bearer ${accessToken}`;
-  }
 
   const baseUrl = options?.baseUrl === undefined ? process.env.NEXT_PUBLIC_API_URL : process.env.NEXT_PUBLIC_API_URL;
 
@@ -106,39 +97,27 @@ const request = async <Response>(
         }
       );
     } else if (res.status === AUTHENTICATION_ERROR_STATUS) {
-      const refreshData = await handleRefreshToken(
-        cookieStore.get(KEY_LOCALSTORAGE.ACCESS_TOKEN)?.value,
-        cookieStore.get(KEY_LOCALSTORAGE.REFRESH_TOKEN)?.value
-      );
+      await handleRefreshToken();
 
-      if (refreshData) {
-        baseHeaders.Authorization = `Bearer ${refreshData.token}`;
+      res = await fetch(fullUrl, {
+        ...options,
+        headers: {
+          ...baseHeaders,
+          ...options?.headers,
+        } as any,
+        body,
+        method,
+      });
 
-        (await cookies()).set(KEY_LOCALSTORAGE.ACCESS_TOKEN, refreshData.token, {
-          httpOnly: true,
-          secure: true,
-          sameSite: 'lax',
-          path: '/',
-        });
-
-        res = await fetch(fullUrl, {
-          ...options,
-          headers: {
-            ...baseHeaders,
-            ...options?.headers,
-          } as any,
-          body,
-          method,
-        });
-
-        payload = await res.json();
-        data = {
-          status: res.status,
-          payload,
-        };
-      }
+      payload = await res.json();
+      data = {
+        status: res.status,
+        payload,
+      };
     }
   }
 
   return data;
 };
+
+export default request;

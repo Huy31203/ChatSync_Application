@@ -1,15 +1,13 @@
-import { API_URL } from "@/constants/endpoint";
-import { ApiResponse, IProfile } from "@/types";
-import { LoginCredentials } from "@/types/auth";
-import { BE_URL } from "@/utils";
-import { getCookie } from "cookies-next";
-import apiClient from "./api-client";
+import { API_URL } from '@/constants/endpoint';
+import { ApiResponse, IProfile } from '@/types';
+import { LoginCredentials } from '@/types/auth';
+import { BE_URL } from '@/utils';
+
+import apiClient from './api-client';
 
 export const authService = {
   login: async (data: LoginCredentials) => {
     await apiClient.post(`${API_URL.AUTH}/login`, data);
-    const accessToken = getCookie("accessToken") || "";
-    localStorage.setItem("accessToken", accessToken);
   },
 
   getCurrentProfile: async (): Promise<ApiResponse<IProfile>> => {
@@ -17,11 +15,10 @@ export const authService = {
   },
 
   refresh: async () => {
-    await fetch(`${BE_URL}/${API_URL.AUTH}/refresh`);
+    await apiClient.get(`${BE_URL}/${API_URL.AUTH}/refresh`);
   },
 
   logout: async () => {
-    await fetch(`${BE_URL}/${API_URL.AUTH}/logout`);
-    localStorage.removeItem("accessToken");
+    await apiClient.get(`${BE_URL}/${API_URL.AUTH}/logout`);
   },
 };

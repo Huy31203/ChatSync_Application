@@ -1,18 +1,19 @@
 package vn.nphuy.chatapp.config;
 
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import java.util.HashSet;
 import java.util.Set;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.servlet.HandlerInterceptor;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 import vn.nphuy.chatapp.util.SecurityUtil;
 
+@Slf4j
 public class PermissionInterceptor implements HandlerInterceptor {
 
-    private final Logger logger = LoggerFactory.getLogger(PermissionInterceptor.class);
     private final SecurityUtil securityUtil;
     private final Set<String> getOnlyPaths = new HashSet<>();
 
@@ -40,10 +41,10 @@ public class PermissionInterceptor implements HandlerInterceptor {
         // return true;
         // }
 
-        // logger.info(">>> RUN preHandle");
-        // logger.info(">>> path= " + path);
-        // logger.info(">>> httpMethod= " + httpMethod);
-        // logger.info(">>> requestURI= " + requestURI);
+        // log.info(">>> RUN preHandle");
+        // log.info(">>> path= " + path);
+        // log.info(">>> httpMethod= " + httpMethod);
+        // log.info(">>> requestURI= " + requestURI);
 
         // // check permission
         // User currentUser = securityUtil.getCurrentUser();
@@ -79,7 +80,7 @@ public class PermissionInterceptor implements HandlerInterceptor {
         // throw new NotAllowedException("User has no permission to access this path");
         // }
 
-        // logger.info("User has nessessary permission, continue...");
+        // log.info("User has nessessary permission, continue...");
         return true;
     }
 }

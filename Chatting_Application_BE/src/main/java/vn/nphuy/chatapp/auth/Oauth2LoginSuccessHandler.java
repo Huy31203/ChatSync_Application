@@ -24,6 +24,9 @@ import vn.nphuy.chatapp.util.SecurityUtil;
 @Component
 public class Oauth2LoginSuccessHandler implements AuthenticationSuccessHandler {
 
+    @Value("${nphuy.jwt.access-token-validity-in-seconds}")
+    private long accessTokenValidity;
+
     @Value("${nphuy.jwt.refresh-token-validity-in-seconds}")
     private long refreshTokenValidity;
 
@@ -113,18 +116,24 @@ public class Oauth2LoginSuccessHandler implements AuthenticationSuccessHandler {
         profile.setRefreshToken(refreshToken);
         profileRepository.save(profile);
 
-        // Send tokens to client via cookie
-        ResponseCookie resCookie = ResponseCookie.from("refreshToken", refreshToken)
+        // Set cookies
+        ResponseCookie resAccessCookie = ResponseCookie.from("accessToken", accessToken)
                 .httpOnly(true)
                 .path("/")
                 .secure(true)
-                .maxAge(refreshTokenValidity) // 6 months
+                .maxAge(accessTokenValidity)
                 .build();
 
-        String redirectUrl = frontendUrl + "/login?accessToken=" + accessToken;
+        ResponseCookie resRefreshCookie = ResponseCookie.from("refreshToken", refreshToken)
+                .httpOnly(true)
+                .path("/")
+                .secure(true)
+                .maxAge(refreshTokenValidity)
+                .build();
 
         // Send response
-        response.addHeader("Set-Cookie", resCookie.toString());
-        response.sendRedirect(redirectUrl);
+        response.addHeader("Set-Cookie", resAccessCookie.toString());
+        response.addHeader("Set-Cookie", resRefreshCookie.toString());
+        response.sendRedirect(frontendUrl);
     }
 }

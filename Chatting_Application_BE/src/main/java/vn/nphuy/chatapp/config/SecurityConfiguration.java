@@ -3,8 +3,6 @@ package vn.nphuy.chatapp.config;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -22,38 +20,28 @@ import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import com.nimbusds.jose.jwk.source.ImmutableSecret;
 import com.nimbusds.jose.util.Base64;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import vn.nphuy.chatapp.auth.Oauth2LoginSuccessHandler;
+import vn.nphuy.chatapp.config.filter.CookieToHeaderFilter;
 import vn.nphuy.chatapp.util.SecurityUtil;
+import vn.nphuy.chatapp.util.constant.GlobalUtil;
 
 @Configuration
 @RequiredArgsConstructor
 @EnableMethodSecurity(securedEnabled = true)
+@Slf4j
 class SecurityConfiguration {
 
-    private static final Logger logger = LoggerFactory.getLogger(SecurityConfiguration.class);
     private final Oauth2LoginSuccessHandler oauth2LoginSuccessHandler;
 
     @Value("${nphuy.jwt.base64-secret}")
     private String jwtKey;
-
-    // delclare routes that not require authentication
-    private static final String[] AUTH_WHITELIST = {
-            "/v1/auth/login",
-            "/v1/auth/register",
-            "/v1/auth/forgot-password",
-            "/v1/auth/reset-password",
-            "/v1/auth/refresh",
-            "/v1/auth/logout",
-            "/storage/**",
-            "/v3/api-docs/**",
-            "/swagger-ui/**",
-            "/swagger-ui.html",
-    };
 
     private static final String[] AUTH_WHITELIST_GET = {
     };
@@ -83,7 +71,7 @@ class SecurityConfiguration {
             try {
                 return jwtDecoder.decode(token);
             } catch (Exception e) {
-                logger.error((">>> Access token error: " + e.getMessage()));
+                log.error((">>> Access token error: " + e.getMessage()));
                 throw e;
             }
         };
@@ -102,12 +90,13 @@ class SecurityConfiguration {
 
     @Bean
     SecurityFilterChain filterChain(
-            HttpSecurity http, CustomAuthenticationEntryPoint customAuthenticationEntryPoint)
+            HttpSecurity http, CustomAuthenticationEntryPoint customAuthenticationEntryPoint,
+            CookieToHeaderFilter cookieToHeaderFilter)
             throws Exception {
         http.cors(Customizer.withDefaults())
                 .csrf(c -> c.disable())
                 .authorizeHttpRequests(
-                        authz -> authz.requestMatchers(AUTH_WHITELIST)
+                        authz -> authz.requestMatchers(GlobalUtil.AUTH_WHITELIST)
                                 .permitAll()
                                 .requestMatchers(HttpMethod.GET, AUTH_WHITELIST_GET)
                                 .permitAll()
@@ -118,7 +107,10 @@ class SecurityConfiguration {
                                 .authenticationEntryPoint(customAuthenticationEntryPoint))
                 .oauth2Login(customizer -> customizer.successHandler(oauth2LoginSuccessHandler))
                 .sessionManagement(
-                        session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+                        session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .addFilterBefore(cookieToHeaderFilter, UsernamePasswordAuthenticationFilter.class)
+                .exceptionHandling(exceptionHandlingConfigurer -> exceptionHandlingConfigurer.authenticationEntryPoint(
+                        new Oauth2AuthenticationEntrypoint()));
 
         return http.build();
     }

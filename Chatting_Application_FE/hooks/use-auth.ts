@@ -20,12 +20,7 @@ export function useAuth() {
       }
     };
 
-    const accessToken = localStorage.getItem('accessToken');
-    if (accessToken) {
-      loadUser();
-    } else {
-      setLoading(false);
-    }
+    loadUser();
   }, [setLoading, setProfile]);
 
   return { profile, loading, login, logout };

@@ -7,8 +7,6 @@ import java.util.Optional;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
@@ -26,17 +24,18 @@ import org.springframework.stereotype.Service;
 import com.nimbusds.jose.util.Base64;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import vn.nphuy.chatapp.domain.Profile;
 import vn.nphuy.chatapp.domain.response.ResLoginDTO;
 import vn.nphuy.chatapp.service.ProfileService;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class SecurityUtil {
 
     public static final MacAlgorithm JWT_ALGORITHM = MacAlgorithm.HS256;
     public final JwtEncoder jwtEncoder;
-    private final Logger logger = LoggerFactory.getLogger(SecurityUtil.class);
     private final ProfileService profileService;
 
     @Value("${nphuy.jwt.base64-secret}")
@@ -138,7 +137,7 @@ public class SecurityUtil {
         try {
             return jwtDecoder.decode(refreshToken);
         } catch (Exception e) {
-            logger.error((">>> Refresh token error: " + e.getMessage()));
+            log.error((">>> Refresh token error: " + e.getMessage()));
             throw e;
         }
     }
@@ -151,7 +150,7 @@ public class SecurityUtil {
         try {
             jwtDecoder.decode(resetToken);
         } catch (Exception e) {
-            logger.error((">>> Reset token error: " + e.getMessage()));
+            log.error((">>> Reset token error: " + e.getMessage()));
             throw e;
         }
     }

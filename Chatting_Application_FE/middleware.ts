@@ -1,14 +1,14 @@
-import type { NextRequest } from "next/server";
-import { NextResponse } from "next/server";
+import type { NextRequest } from 'next/server';
+import { NextResponse } from 'next/server';
 
 export function middleware(request: NextRequest) {
   // Modify API requests to include token from cookie
-  const token = request.cookies.get("accessToken")?.value;
+  const token = request.cookies.get('accessToken')?.value;
 
   if (token) {
     // Clone the request and add the Authorization header
     const requestHeaders = new Headers(request.headers);
-    requestHeaders.set("Authorization", `Bearer ${token}`);
+    requestHeaders.set('Authorization', `Bearer ${token}`);
 
     return NextResponse.next({
       request: {
@@ -21,5 +21,5 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/api/:path*", "/((?!_next/static|_next/image|favicon.ico).*)"],
+  matcher: ['/api/:path*', '/((?!_next/static|_next/image|favicon.ico).*)'],
 };

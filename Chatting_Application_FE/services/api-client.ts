@@ -1,32 +1,16 @@
-import axios from "axios";
+import axios from 'axios';
 
-import { BE_URL, logError } from "@/utils";
-import { authService } from "./auth-service";
+import { BE_URL, logError } from '@/utils';
+
+import { authService } from './auth-service';
 
 const apiClient = axios.create({
   baseURL: BE_URL,
   headers: {
-    "Content-Type": "application/json",
+    'Content-Type': 'application/json',
   },
+  withCredentials: true,
 });
-
-// Add a request interceptor
-apiClient.interceptors.request.use(
-  function (config) {
-    // Do something before request is sent
-    const accessToken = localStorage.getItem("accessToken");
-    console.log(accessToken);
-
-    if (accessToken) {
-      config.headers.Authorization = `Bearer ${accessToken}`;
-    }
-    return config;
-  },
-  function (error) {
-    // Do something with request error
-    return Promise.reject(error);
-  }
-);
 
 // Add a response interceptor
 apiClient.interceptors.response.use(
@@ -46,11 +30,13 @@ apiClient.interceptors.response.use(
           return apiClient(originalRequest);
         } catch (error) {
           logError(error);
-          // await authService.logout();
+          await authService.logout();
+          window.location.href = '/login';
         }
       } else {
         if (error.response.status === 401) {
-          window.location.href = "/login";
+          await authService.logout();
+          window.location.href = '/login';
         }
       }
     }

@@ -1,3 +1,3 @@
 export const API_URL = {
-  AUTH: "v1/auth",
+  AUTH: 'v1/auth',
 };

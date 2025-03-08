@@ -8,8 +8,6 @@ import lombok.Setter;
 @Getter
 @Setter
 public class ResLoginDTO {
-    private String accessToken;
-
     private ProfileLogin profile;
 
     @Getter
