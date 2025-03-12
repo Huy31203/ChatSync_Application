@@ -9,8 +9,8 @@ import { Button } from '@/components/ui/button';
 import { cn } from '@/libs/utils';
 
 interface ImageUploadProps {
-  onChange: (file: string | null) => void;
-  value?: string | null;
+  onChange: (file: File | string | null) => void;
+  value?: File | string | null;
   className?: string;
   maxSizeMB?: number;
   acceptedFileTypes?: string[];
@@ -58,7 +58,7 @@ export default function ImageUpload({
     };
     reader.readAsDataURL(file);
 
-    onChange(URL.createObjectURL(file));
+    onChange(file);
   };
 
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {

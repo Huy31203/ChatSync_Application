@@ -12,7 +12,7 @@ const AuthLayout = async ({ children }: { children: React.ReactNode }) => {
     redirect('/');
   }
 
-  return <div className="h-full flex items-center justify-center">{children}</div>;
+  return <section>{children}</section>;
 };
 
 export default AuthLayout;

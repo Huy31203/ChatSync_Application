@@ -1,16 +1,19 @@
 package vn.nphuy.chatapp.domain;
 
+import java.util.List;
+
+import org.hibernate.annotations.Filter;
+import org.hibernate.annotations.FilterDef;
+import org.hibernate.annotations.SQLDelete;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.OneToMany;
 import jakarta.validation.constraints.NotBlank;
-import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.Filter;
-import org.hibernate.annotations.FilterDef;
-import org.hibernate.annotations.SQLDelete;
 
 @Entity
 @SQLDelete(sql = "UPDATE servers SET deleted = true WHERE id=?")

@@ -20,6 +20,8 @@ public class ReqRegisterDTO {
   @NotBlank(message = "Name is required")
   private String name;
 
+  private String avatarUrl = "";
+
   @NotBlank(message = "Password is required")
   @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$", message = "Password must be at least 8 characters and contain at least one uppercase letter, one lowercase letter, and one number")
   private String password;

@@ -25,6 +25,7 @@ import vn.nphuy.chatapp.domain.request.ReqLoginDTO;
 import vn.nphuy.chatapp.domain.request.ReqRegisterDTO;
 import vn.nphuy.chatapp.domain.response.ResLoginDTO;
 import vn.nphuy.chatapp.domain.response.ResProfileDTO;
+import vn.nphuy.chatapp.domain.response.ResRegisterDTO;
 import vn.nphuy.chatapp.service.ProfileService;
 import vn.nphuy.chatapp.service.RateLimitService;
 import vn.nphuy.chatapp.util.SecurityUtil;
@@ -124,7 +125,9 @@ public class AuthController {
       throw new ServerErrorException("Failed to register");
     }
 
-    return ResponseEntity.status(201).body(result);
+    ResRegisterDTO res = modelMapper.map(result, ResRegisterDTO.class);
+
+    return ResponseEntity.status(201).body(res);
   }
 
   // @PostMapping("forgot-password")
