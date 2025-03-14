@@ -6,10 +6,9 @@ import org.hibernate.annotations.Filter;
 import org.hibernate.annotations.FilterDef;
 import org.hibernate.annotations.SQLDelete;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.OneToMany;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
@@ -30,8 +29,7 @@ public class Server extends AbstractEntity {
     @Column(unique = true)
     private String inviteCode;
 
-    @OneToMany(mappedBy = "server")
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    @OneToMany(mappedBy = "server", fetch = FetchType.LAZY)
     private List<Member> members;
 
     public List<Member> getMembers() {

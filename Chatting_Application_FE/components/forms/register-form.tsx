@@ -93,8 +93,6 @@ export default function RegisterForm() {
     }
   };
 
-  const avatar = form.watch('avatar');
-
   return (
     <div className="space-y-6">
       <Form {...form}>

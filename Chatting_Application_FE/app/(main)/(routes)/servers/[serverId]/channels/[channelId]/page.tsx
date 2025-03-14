@@ -1,9 +1,5 @@
 const ChannelIdPage = () => {
-  return (
-    <div>
-      Channel Id Page
-    </div>
-  );
-}
- 
+  return <div>Channel Id Page</div>;
+};
+
 export default ChannelIdPage;

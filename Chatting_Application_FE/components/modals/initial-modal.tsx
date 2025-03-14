@@ -4,6 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { toast } from 'react-toastify';
 import * as z from 'zod';
 
 import { Button } from '@/components/ui//button';
@@ -17,6 +18,8 @@ import {
 } from '@/components/ui/dialog';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
+import { serverService } from '@/services/server-service';
+import uploadService from '@/services/upload-service';
 import { logError } from '@/utils';
 
 import ImageUpload from '../upload/image-upload';
@@ -25,9 +28,7 @@ const FormSchema = z.object({
   name: z.string().min(1, {
     message: 'Server name is required.',
   }),
-  imageUrl: z.string().min(1, {
-    message: 'Server image is required.',
-  }),
+  image: z.any().optional(),
 });
 
 const InitialModal = () => {
@@ -43,7 +44,7 @@ const InitialModal = () => {
     resolver: zodResolver(FormSchema),
     defaultValues: {
       name: '',
-      imageUrl: '',
+      image: '',
     },
   });
 
@@ -52,9 +53,20 @@ const InitialModal = () => {
   const onSubmit = async (values: z.infer<typeof FormSchema>) => {
     try {
       console.log('values', values);
+      const data = {
+        name: values.name,
+        imageUrl: '',
+      };
+      if (values.image) {
+        const { fileUrl } = await uploadService.uploadImage(values.image);
+        data.imageUrl = fileUrl;
+      }
 
-      // router.refresh();
-      // window.location.reload();
+      const res = await serverService.createServer(data);
+      toast.success('Server created successfully, redirect in 5 seconds');
+      // setTimeout(() => {
+      //   router.push(`/servers/${res.result.id}`);
+      // }, 5000);
     } catch (error) {
       logError(error);
     }
@@ -77,7 +89,7 @@ const InitialModal = () => {
               <div className="flex items-center justify-center text-center">
                 <FormField
                   control={form.control}
-                  name="imageUrl"
+                  name="image"
                   render={({ field }) => (
                     <FormItem>
                       <FormControl>

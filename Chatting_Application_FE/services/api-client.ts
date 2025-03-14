@@ -33,11 +33,9 @@ apiClient.interceptors.response.use(
           await authService.logout();
           window.location.href = '/login';
         }
-      } else {
-        if (error.response.status === 401) {
-          await authService.logout();
-          window.location.href = '/login';
-        }
+      } else if (error.response.status === 401) {
+        await authService.logout();
+        window.location.href = '/login';
       }
     }
     return Promise.reject(error);

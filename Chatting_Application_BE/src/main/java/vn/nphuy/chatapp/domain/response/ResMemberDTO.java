@@ -1,9 +1,11 @@
 package vn.nphuy.chatapp.domain.response;
 
+import java.time.Instant;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
-import java.time.Instant;
 import lombok.Getter;
 import lombok.Setter;
 import vn.nphuy.chatapp.util.constant.MemberRoleEnum;
@@ -11,7 +13,7 @@ import vn.nphuy.chatapp.util.constant.MemberRoleEnum;
 @Getter
 @Setter
 public class ResMemberDTO {
-    private Long id;
+    private String id;
 
     @Enumerated(EnumType.STRING)
     private MemberRoleEnum memberRole;

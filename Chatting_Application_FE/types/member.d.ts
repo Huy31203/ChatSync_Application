@@ -1,4 +1,6 @@
-enum MemberRoleEnum {
+import { IBaseModel, IProfile, IServer } from '.';
+
+export enum MemberRoleEnum {
   ADMIN,
   MODERATOR,
   GUEST,

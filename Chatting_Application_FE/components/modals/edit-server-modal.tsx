@@ -47,7 +47,7 @@ export const EditServerModal = () => {
   useEffect(() => {
     if (server) {
       form.setValue('name', server.name);
-      form.setValue('imageUrl', server.imageUrl);
+      form.setValue('image', server.imageUrl);
     }
   }, [server, form]);
 
@@ -85,7 +85,7 @@ export const EditServerModal = () => {
               <div className="flex items-center justify-center text-center">
                 <FormField
                   control={form.control}
-                  name="imageUrl"
+                  name="image"
                   render={({ field }) => (
                     <FormItem>
                       <FormControl>
