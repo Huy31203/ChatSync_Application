@@ -20,7 +20,7 @@ public class ProfileService {
     private final ProfileRepository profileRepository;
     private final EntityManager entityManager;
 
-    public ResultPaginationDTO getAllProfile(Specification spec, Pageable pageable) {
+    public ResultPaginationDTO getAllProfile(Specification<Profile> spec, Pageable pageable) {
         Session session = entityManager.unwrap(Session.class);
         session.enableFilter("deletedProfilesFilter");
 

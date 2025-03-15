@@ -1,6 +1,7 @@
 package vn.nphuy.chatapp.service;
 
-import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 import org.hibernate.Session;
 import org.springframework.data.domain.Page;
@@ -10,14 +11,17 @@ import org.springframework.stereotype.Service;
 
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
+import vn.nphuy.chatapp.domain.Channel;
 import vn.nphuy.chatapp.domain.Member;
 import vn.nphuy.chatapp.domain.Profile;
 import vn.nphuy.chatapp.domain.Server;
 import vn.nphuy.chatapp.domain.response.Meta;
 import vn.nphuy.chatapp.domain.response.ResultPaginationDTO;
+import vn.nphuy.chatapp.repository.ChannelRepository;
 import vn.nphuy.chatapp.repository.MemberRepository;
 import vn.nphuy.chatapp.repository.ServerRepository;
 import vn.nphuy.chatapp.util.constant.MemberRoleEnum;
+import vn.nphuy.chatapp.util.specification.ServerSpecifications;
 
 @Service
 @RequiredArgsConstructor
@@ -25,9 +29,10 @@ public class ServerService {
 
   private final ServerRepository serverRepository;
   private final MemberRepository memberRepository;
+  private final ChannelRepository channelRepository;
   private final EntityManager entityManager;
 
-  public ResultPaginationDTO getAllServer(Specification spec, Pageable pageable) {
+  public ResultPaginationDTO getAllServers(Specification<Server> spec, Pageable pageable) {
     Session session = entityManager.unwrap(Session.class);
     session.enableFilter("deletedServersFilter");
 
@@ -54,7 +59,9 @@ public class ServerService {
     Session session = entityManager.unwrap(Session.class);
     session.enableFilter("deletedServersFilter");
 
-    Page<Server> servers = serverRepository.findServersByProfileId(pageable, profileId);
+    Specification<Server> spec = ServerSpecifications.hasProfileId(profileId);
+
+    Page<Server> servers = serverRepository.findAll(spec, pageable);
 
     session.disableFilter("deletedServersFilter");
 
@@ -85,6 +92,9 @@ public class ServerService {
   }
 
   public Server createServer(Server server, Profile profile) {
+    // Generate a random invite code for the server
+    server.setInviteCode(UUID.randomUUID().toString());
+
     // Create and save the server first
     Server newServer = serverRepository.save(server);
 
@@ -94,16 +104,20 @@ public class ServerService {
     newAdmin.setProfile(profile);
     newAdmin.setServer(newServer);
 
-    // Save the member
+    // Add the default text channel with name is "general"
+    Channel defaultChannel = new Channel();
+    defaultChannel.setName("general");
+    defaultChannel.setServer(newServer);
+
+    // Save the member and channel
     Member savedMember = memberRepository.save(newAdmin);
+    Channel savedChannel = channelRepository.save(defaultChannel);
 
-    // Create a new modifiable list with existing members (if any)
-    ArrayList<Member> members = new ArrayList<>();
-    members.add(savedMember);
-    newServer.setMembers(members);
+    newServer.setMembers(List.of(savedMember));
+    newServer.setChannels(List.of(savedChannel));
 
-    // Save and return the updated server with its admin
-    return serverRepository.save(newServer);
+    // return the updated server
+    return newServer;
   }
 
   public Server updateServer(Server server) {

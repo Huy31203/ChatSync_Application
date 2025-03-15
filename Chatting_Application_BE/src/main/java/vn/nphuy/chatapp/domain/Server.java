@@ -6,6 +6,7 @@ import org.hibernate.annotations.Filter;
 import org.hibernate.annotations.FilterDef;
 import org.hibernate.annotations.SQLDelete;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -29,12 +30,21 @@ public class Server extends AbstractEntity {
     @Column(unique = true)
     private String inviteCode;
 
-    @OneToMany(mappedBy = "server", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "server", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<Member> members;
+
+    @OneToMany(mappedBy = "server", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<Channel> channels;
 
     public List<Member> getMembers() {
         return members != null
                 ? members.stream().filter(member -> !member.isDeleted()).toList()
+                : List.of();
+    }
+
+    public List<Channel> getChannels() {
+        return channels != null
+                ? channels.stream().filter(channel -> !channel.isDeleted()).toList()
                 : List.of();
     }
 }

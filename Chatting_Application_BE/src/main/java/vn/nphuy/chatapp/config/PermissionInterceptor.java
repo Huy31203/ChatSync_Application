@@ -49,7 +49,7 @@ public class PermissionInterceptor implements HandlerInterceptor {
         // // check permission
         // User currentUser = securityUtil.getCurrentUser();
         // if (currentUser == null) {
-        // throw new NotAllowedException("You are not logged in");
+        // throw new NotAuthorizedException("You are not logged in");
         // }
 
         // // check if user has role

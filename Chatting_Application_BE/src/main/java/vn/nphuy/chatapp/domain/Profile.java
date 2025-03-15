@@ -6,6 +6,7 @@ import org.hibernate.annotations.Filter;
 import org.hibernate.annotations.FilterDef;
 import org.hibernate.annotations.SQLDelete;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -44,8 +45,8 @@ public class Profile extends AbstractEntity {
     @Column(name = "refresh_token", length = 1024, unique = true)
     private String refreshToken;
 
-    @OneToMany(mappedBy = "profile", fetch = FetchType.LAZY)
-    private List<Member> members; 
+    @OneToMany(mappedBy = "profile", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<Member> members;
 
     @OneToOne(mappedBy = "profile", fetch = FetchType.LAZY)
     private ProfileConnectedAccount connectedAccount;

@@ -45,6 +45,14 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(value = { NotAllowedException.class })
     public ResponseEntity<RestResponse<Object>> handleRNotAllowedException(Exception ex) {
         RestResponse<Object> res = new RestResponse<>();
+        res.setStatusCode(HttpStatus.FORBIDDEN.value());
+        res.setMessage(ex.getMessage());
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(res);
+    }
+
+    @ExceptionHandler(value = { NotAuthorizedException.class })
+    public ResponseEntity<RestResponse<Object>> handleRNotAuthorizedException(Exception ex) {
+        RestResponse<Object> res = new RestResponse<>();
         res.setStatusCode(HttpStatus.UNAUTHORIZED.value());
         res.setMessage(ex.getMessage());
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(res);

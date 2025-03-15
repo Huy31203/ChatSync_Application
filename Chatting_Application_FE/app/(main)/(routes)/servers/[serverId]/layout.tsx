@@ -1,43 +1,24 @@
-import { ServerSidebar } from "@/components/server/server-sidebar";
-import { currentProfile } from "@/lib/current-profile";
-import { db } from "@/lib/db";
+import React from 'react';
 
-import { redirectToSignIn } from "@clerk/nextjs";
-import { redirect } from "next/navigation";
+import { ServerSidebar } from '@/components/server/server-sidebar';
+import { API_URL } from '@/constants/endpoint';
+import { ServerProvider } from '@/contexts/ServerContext';
+import http from '@/libs/http';
+import { ApiResponse, IServer } from '@/types';
 
-const ServerIdLayout = async ({
-  children,
-  params,
-}: {
-  children: React.ReactNode;
-  params: { serverId: string};
-}) => {
-  const profile = await currentProfile();
-
-  if (!profile) return redirectToSignIn();
-
-  const server = await db.server.findUnique({
-    where: {
-      id: params.serverId,
-      members: {
-        some: {
-          profileId: profile.id,
-        },
-      },
-    },
-  });
-
-  if (!server) return redirect("/");
+const ServerIdLayout = async ({ children, params }: { children: React.ReactNode; params: { serverId: string } }) => {
+  const res = await http.get<IServer>(`${API_URL.SERVERS}/${params.serverId}`);
+  const payload = res.payload as ApiResponse<IServer>;
 
   return (
-    <div className="h-full">
-      <div className="hidden md:flex h-full w-60 z-20 flex-col fixed inset-y-0">
-        <ServerSidebar serverId={params.serverId}/>
+    <ServerProvider server={payload.result}>
+      <div className="h-full">
+        <div className="hidden md:flex h-full w-60 z-20 flex-col fixed inset-y-0">
+          <ServerSidebar server={payload.result} />
+        </div>
+        <main className="h-full md:pl-60">{children}</main>
       </div>
-        <main className="h-full md:pl-60">
-          {children}
-        </main>
-    </div>
+    </ServerProvider>
   );
 };
 

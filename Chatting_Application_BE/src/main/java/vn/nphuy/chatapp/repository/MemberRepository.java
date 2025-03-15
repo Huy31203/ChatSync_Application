@@ -13,4 +13,6 @@ public interface MemberRepository extends JpaRepository<Member, String>, JpaSpec
   Optional<Member> findOneById(String id);
 
   List<Member> findByIdIn(List<String> id);
+
+  Optional<Member> findOneByProfileIdAndServerId(String profileId, String serverId);
 }

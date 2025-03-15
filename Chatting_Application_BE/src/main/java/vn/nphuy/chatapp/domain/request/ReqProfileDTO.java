@@ -9,6 +9,4 @@ public class ReqProfileDTO {
     private String name;
 
     private String avatarUrl;
-
-    private String connectedAccountId;
 }

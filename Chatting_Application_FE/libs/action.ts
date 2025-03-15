@@ -1,7 +1,10 @@
 /* eslint-disable no-undef */
 'use server';
 
-import { ApiResponse } from '@/types';
+import { cookies } from 'next/headers';
+
+import { ACCESS_TOKEN } from '@/constants';
+import { ApiResponse, ApiResponseWithPagination } from '@/types';
 
 import { CustomOptions, handleRefreshToken } from './http';
 
@@ -43,7 +46,7 @@ const request = async <Response>(
   method: 'GET' | 'POST' | 'PUT' | 'DELETE',
   url: string,
   options?: CustomOptions | undefined
-): Promise<{ status: number; payload: ApiResponse<Response> }> => {
+): Promise<{ status: number; payload: ApiResponse<Response> | ApiResponseWithPagination<Response> }> => {
   let body: FormData | string | undefined = undefined;
   if (options?.body instanceof FormData) {
     body = options.body;
@@ -51,22 +54,21 @@ const request = async <Response>(
     body = JSON.stringify(options.body);
   }
 
-  const baseHeaders: { [key: string]: string } =
-    body instanceof FormData
-      ? {}
-      : {
-          'Content-Type': 'application/json',
-        };
+  const baseHeaders: { [key: string]: string } = body instanceof FormData ? {} : { 'Content-Type': 'application/json' };
 
   const baseUrl = options?.baseUrl === undefined ? process.env.NEXT_PUBLIC_API_URL : process.env.NEXT_PUBLIC_API_URL;
 
   const fullUrl = url.startsWith('/') ? `${baseUrl}${url}` : `${baseUrl}/${url}`;
+
+  const cookieStore = cookies();
+  const accessToken = cookieStore.get(ACCESS_TOKEN)?.value ?? '';
 
   let res = await fetch(fullUrl, {
     ...options,
     headers: {
       ...baseHeaders,
       ...options?.headers,
+      Authorization: `Bearer ${accessToken}`,
     } as any,
     body,
     method,

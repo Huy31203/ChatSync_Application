@@ -64,9 +64,9 @@ const InitialModal = () => {
 
       const res = await serverService.createServer(data);
       toast.success('Server created successfully, redirect in 5 seconds');
-      // setTimeout(() => {
-      //   router.push(`/servers/${res.result.id}`);
-      // }, 5000);
+      setTimeout(() => {
+        router.push(`/servers/${res.result.id}`);
+      }, 5000);
     } catch (error) {
       logError(error);
     }

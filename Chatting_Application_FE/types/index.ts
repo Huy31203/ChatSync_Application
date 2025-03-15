@@ -1,14 +1,17 @@
+export * from './channel';
 export * from './member';
 export * from './profile';
 export * from './server';
 
+export interface PaginationMeta {
+  page: number;
+  pageSize: number;
+  totalPages: number;
+  totalElements: number;
+}
+
 export interface IPaginatedResult<T> {
-  meta: {
-    page: number;
-    pageSize: number;
-    totalPages: number;
-    totalElements: number;
-  };
+  meta: PaginationMeta;
   data: T;
 }
 

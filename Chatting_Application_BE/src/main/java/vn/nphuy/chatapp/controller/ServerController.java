@@ -20,14 +20,22 @@ import com.turkraft.springfilter.boot.Filter;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import vn.nphuy.chatapp.domain.Channel;
+import vn.nphuy.chatapp.domain.Member;
 import vn.nphuy.chatapp.domain.Profile;
 import vn.nphuy.chatapp.domain.Server;
+import vn.nphuy.chatapp.domain.request.ReqCreateChannelDTO;
 import vn.nphuy.chatapp.domain.request.ReqServerDTO;
+import vn.nphuy.chatapp.domain.response.ResChannelDTO;
 import vn.nphuy.chatapp.domain.response.ResServerDTO;
 import vn.nphuy.chatapp.domain.response.ResultPaginationDTO;
+import vn.nphuy.chatapp.service.ChannelService;
+import vn.nphuy.chatapp.service.MemberService;
 import vn.nphuy.chatapp.service.ServerService;
 import vn.nphuy.chatapp.util.SecurityUtil;
 import vn.nphuy.chatapp.util.annotation.ApiMessage;
+import vn.nphuy.chatapp.util.constant.MemberRoleEnum;
+import vn.nphuy.chatapp.util.error.NotAllowedException;
 import vn.nphuy.chatapp.util.error.ResourceNotFoundException;
 import vn.nphuy.chatapp.util.error.ServerErrorException;
 
@@ -37,16 +45,18 @@ import vn.nphuy.chatapp.util.error.ServerErrorException;
 @Slf4j
 public class ServerController {
   private final ServerService serverService;
+  private final ChannelService channelService;
+  private final MemberService memberService;
   private final ModelMapper modelMapper;
   private final SecurityUtil securityUtil;
   // private final RateLimitService rateLimitService;
 
   @GetMapping("/servers")
   @ApiMessage(message = "Fetch all servers")
-  public ResponseEntity<Object> getAllServer(@Filter Specification<Server> spec,
+  public ResponseEntity<Object> getAllServers(@Filter Specification<Server> spec,
       Pageable pageable) {
 
-    ResultPaginationDTO results = serverService.getAllServer(spec, pageable);
+    ResultPaginationDTO results = serverService.getAllServers(spec, pageable);
 
     // Map Server entities to ResServerDTO objects
     if (results.getData() != null) {
@@ -119,9 +129,41 @@ public class ServerController {
     return ResponseEntity.status(201).body(resServer);
   }
 
+  @PostMapping("/servers/{id}/channels")
+  @ApiMessage(message = "Create new channel in server")
+  public ResponseEntity<Object> createNewChannel(@PathVariable("id") String id,
+      @Valid @RequestBody ReqCreateChannelDTO reqChannel) {
+
+    String profileId = securityUtil.getCurrentProfile().getId();
+    Member member = memberService.getMemberByProfileIdAndServerId(profileId, id);
+
+    if (member == null || member.getMemberRole().equals(MemberRoleEnum.GUEST)) {
+      throw new NotAllowedException("You are not allowed to create channel in this server");
+    }
+
+    Channel channel = modelMapper.map(reqChannel, Channel.class);
+
+    Channel result = channelService.createChannel(channel);
+
+    if (result == null) {
+      throw new ServerErrorException("Failed to create server");
+    }
+
+    ResChannelDTO resChannel = modelMapper.map(result, ResChannelDTO.class);
+
+    return ResponseEntity.status(201).body(resChannel);
+  }
+
   @PatchMapping("/servers/{id}")
   @ApiMessage(message = "Update server by id")
   public ResponseEntity<Object> updateServer(@PathVariable("id") String id, @RequestBody ReqServerDTO reqServer) {
+
+    String profileId = securityUtil.getCurrentProfile().getId();
+    Member member = memberService.getMemberByProfileIdAndServerId(profileId, id);
+
+    if (member == null || !member.getMemberRole().equals(MemberRoleEnum.ADMIN)) {
+      throw new NotAllowedException("You are not the owner of this server");
+    }
 
     Server server = modelMapper.map(reqServer, Server.class);
 
@@ -137,6 +179,32 @@ public class ServerController {
     return ResponseEntity.ok(resServer);
   }
 
+  @PatchMapping("/servers/{serverId}/channels/{channelId}")
+  @ApiMessage(message = "Update channel by id")
+  public ResponseEntity<Object> updateChannel(@PathVariable("serverId") String serverId,
+      @PathVariable("channelId") String channelId, @RequestBody ReqCreateChannelDTO reqChannel) {
+
+    String profileId = securityUtil.getCurrentProfile().getId();
+    Member member = memberService.getMemberByProfileIdAndServerId(profileId, serverId);
+
+    if (member == null || !member.getMemberRole().equals(MemberRoleEnum.GUEST)) {
+      throw new NotAllowedException("You are not allowed to update channel in this server");
+    }
+
+    Channel channel = modelMapper.map(reqChannel, Channel.class);
+
+    channel.setId(channelId);
+    Channel result = channelService.updateChannel(channel);
+
+    if (result == null) {
+      throw new ResourceNotFoundException("Channel not found with id: " + channelId);
+    }
+
+    ResChannelDTO resChannel = modelMapper.map(result, ResChannelDTO.class);
+
+    return ResponseEntity.ok(resChannel);
+  }
+
   @DeleteMapping("/servers/{id}")
   @ApiMessage(message = "Delete server by id")
   public ResponseEntity<Void> deleteServer(@PathVariable("id") String id) {
@@ -144,6 +212,26 @@ public class ServerController {
     boolean result = serverService.deleteServer(id);
     if (!result) {
       throw new ResourceNotFoundException("Server not found with id: " + id);
+    }
+
+    return ResponseEntity.ok().body(null);
+  }
+
+  @DeleteMapping("/servers/{serverId}/channels/{channelId}")
+  @ApiMessage(message = "Delete channel by id")
+  public ResponseEntity<Void> deleteChannel(@PathVariable("serverId") String serverId,
+      @PathVariable("channelId") String channelId) {
+
+    String profileId = securityUtil.getCurrentProfile().getId();
+    Member member = memberService.getMemberByProfileIdAndServerId(profileId, serverId);
+
+    if (member == null || !member.getMemberRole().equals(MemberRoleEnum.ADMIN)) {
+      throw new NotAllowedException("You are not allowed to delete channel in this server");
+    }
+
+    boolean result = channelService.deleteChannel(channelId);
+    if (!result) {
+      throw new ResourceNotFoundException("Channel not found with id: " + channelId);
     }
 
     return ResponseEntity.ok().body(null);

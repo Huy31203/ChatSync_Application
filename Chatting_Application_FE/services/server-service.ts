@@ -12,6 +12,10 @@ export const serverService = {
     return await apiClient.get(`${API_URL.SERVERS}/current-profile`);
   },
 
+  async getServerByServerId(serverId: string): Promise<ApiResponse<IServer>> {
+    return await apiClient.get(`${API_URL.SERVERS}/${serverId}`);
+  },
+
   async createServer(data: Partial<IServer>): Promise<ApiResponse<IServer>> {
     return await apiClient.post(`${API_URL.SERVERS}`, data);
   },

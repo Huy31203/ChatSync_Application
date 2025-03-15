@@ -1,8 +1,10 @@
 package vn.nphuy.chatapp.domain.response;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.time.Instant;
 import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -19,6 +21,9 @@ public class ResServerDTO {
 
     @JsonIgnoreProperties("server")
     private List<ResMemberDTO> members;
+
+    @JsonIgnoreProperties("server")
+    private List<ResChannelDTO> channels;
 
     private Instant createdAt;
 

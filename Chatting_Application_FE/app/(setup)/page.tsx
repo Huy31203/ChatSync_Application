@@ -15,6 +15,8 @@ const SetupPage = () => {
 
   const fetchServer = async () => {
     const res = await serverService.getAllServersByProfile();
+    console.log(res);
+
     setServers(res.result.data);
   };
 
@@ -26,9 +28,13 @@ const SetupPage = () => {
 
   if (!profile && !loading) {
     router.push('/login');
+    console.log('profile', profile);
+
     return null;
   } else if (servers.length > 0) {
-    // router.push(`/servers/${servers[0].id}`);
+    router.push(`/servers/${servers[0].id}`);
+    console.log('servers', servers);
+
     return null;
   }
 

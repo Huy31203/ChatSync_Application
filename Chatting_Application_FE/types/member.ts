@@ -1,9 +1,9 @@
 import { IBaseModel, IProfile, IServer } from '.';
 
 export enum MemberRoleEnum {
-  ADMIN,
-  MODERATOR,
-  GUEST,
+  ADMIN = 'ADMIN',
+  MODERATOR = 'MODERATOR',
+  GUEST = 'GUEST',
 }
 
 export interface IMember extends IBaseModel {

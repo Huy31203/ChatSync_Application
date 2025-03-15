@@ -35,7 +35,7 @@ const http = {
 export const handleRefreshToken = async () => {
   try {
     const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/v1/auth/refresh`, {
-      method: 'POST',
+      method: 'GET',
       headers: {
         'Content-Type': 'application/json',
       },
