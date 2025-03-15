@@ -45,7 +45,7 @@ public class Profile extends AbstractEntity {
     private String refreshToken;
 
     @OneToMany(mappedBy = "profile", fetch = FetchType.LAZY)
-    private List<Member> members;
+    private List<Member> members; 
 
     @OneToOne(mappedBy = "profile", fetch = FetchType.LAZY)
     private ProfileConnectedAccount connectedAccount;
