@@ -1,12 +1,12 @@
 /* eslint-disable no-undef */
 'use server';
 
-import { cookies } from 'next/headers';
+import { cookies, headers } from 'next/headers';
 
 import { ACCESS_TOKEN } from '@/constants';
 import { ApiResponse, ApiResponseWithPagination } from '@/types';
 
-import { CustomOptions, handleRefreshToken } from './http';
+import { CustomOptions } from './http';
 
 type EntityErrorPayload = {
   message: string;
@@ -43,7 +43,7 @@ const ENTITY_ERROR_STATUS = 422;
 const AUTHENTICATION_ERROR_STATUS = 401;
 
 const request = async <Response>(
-  method: 'GET' | 'POST' | 'PUT' | 'DELETE',
+  method: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE',
   url: string,
   options?: CustomOptions | undefined
 ): Promise<{ status: number; payload: ApiResponse<Response> | ApiResponseWithPagination<Response> }> => {
@@ -99,18 +99,22 @@ const request = async <Response>(
         }
       );
     } else if (res.status === AUTHENTICATION_ERROR_STATUS) {
-      await handleRefreshToken();
+      const headersStore = headers();
+
+      const cookie = headersStore.get('Set-Cookie');
+      const accessTokenMatch = cookie?.match(/accessToken=([^;]+)/);
+      const accessToken = accessTokenMatch ? accessTokenMatch[1] : null;
 
       res = await fetch(fullUrl, {
         ...options,
         headers: {
           ...baseHeaders,
           ...options?.headers,
+          Authorization: `Bearer ${accessToken}`,
         } as any,
         body,
         method,
       });
-
       payload = await res.json();
       data = {
         status: res.status,

@@ -1,9 +1,10 @@
 'use client';
 
 import Image from 'next/image';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams } from 'next/navigation';
 
 import { ActionTooltip } from '@/components/action-tooltip';
+import { useRouter } from '@/hooks/use-router';
 import { cn } from '@/libs/utils';
 
 interface NavigationItemProps {
@@ -37,7 +38,13 @@ export const NavigationItem = ({ id, name, imageUrl }: NavigationItemProps) => {
             params?.serverId === id && 'bg-primary/10 text-primary rounded-[16px]'
           )}
         >
-          <Image fill src={imageUrl} alt="Server" />
+          {imageUrl ? (
+            <Image fill src={imageUrl} alt="Server" />
+          ) : (
+            <div className="absolute inset-0 flex items-center justify-center bg-primary/10 text-primary font-semibold text-xl">
+              {name[0].toUpperCase()}
+            </div>
+          )}
         </div>
       </button>
     </ActionTooltip>

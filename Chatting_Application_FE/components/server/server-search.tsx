@@ -1,7 +1,7 @@
 'use client';
 
 import { Search } from 'lucide-react';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
 
 import {
@@ -12,6 +12,7 @@ import {
   CommandItem,
   CommandList,
 } from '@/components/ui/command';
+import { useRouter } from '@/hooks/use-router';
 
 interface ServerSearchProps {
   data: {

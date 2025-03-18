@@ -1,11 +1,12 @@
 'use client';
 
 import { Edit, Hash, Lock, Mic, Trash, Video } from 'lucide-react';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams } from 'next/navigation';
 import React from 'react';
 
 import { ActionTooltip } from '@/components/action-tooltip';
 import { ModalType, useModal } from '@/hooks/use-modal-store';
+import { useRouter } from '@/hooks/use-router';
 import { cn } from '@/libs/utils';
 import { ChannelTypeEnum, IChannel, IServer, MemberRoleEnum } from '@/types';
 
@@ -29,7 +30,7 @@ export const ServerChannel = ({ channel, server, role }: ServerChannelProps) => 
 
   const Icon = iconMap[channel.type];
 
-  const onClick = () => {
+  const goToChannel = () => {
     router.push(`/servers/${params?.serverId}/channels/${channel.id}`);
   };
 
@@ -40,7 +41,7 @@ export const ServerChannel = ({ channel, server, role }: ServerChannelProps) => 
 
   return (
     <button
-      onClick={onClick}
+      onClick={goToChannel}
       className={cn(
         'group px-2 py-2 rounded-md flex items-center gap-x-2 w-full',
         'hover:bg-zinc-700/10 dark:hover:bg-zinc-700/50 transition mb-1',

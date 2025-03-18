@@ -24,5 +24,6 @@ export const authService = {
 
   logout: async () => {
     await apiClient.get(`${BE_URL}/${API_URL.AUTH}/logout`);
+    window.location.href = '/login';
   },
 };

@@ -1,5 +1,10 @@
 'use client';
 
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm } from 'react-hook-form';
+import { toast } from 'react-toastify';
+import * as z from 'zod';
+
 import { Button } from '@/components/ui//button';
 import {
   Dialog,
@@ -11,21 +16,18 @@ import {
 } from '@/components/ui/dialog';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
+import ImageUpload from '@/components/upload/image-upload';
 import { useModal } from '@/hooks/use-modal-store';
-import { zodResolver } from '@hookform/resolvers/zod';
-import axios from 'axios';
-import { useRouter } from 'next/navigation';
-import { useForm } from 'react-hook-form';
-import * as z from 'zod';
-import FileUpload from '../upload/image-upload';
+import { useRouter } from '@/hooks/use-router';
+import { serverService } from '@/services/server-service';
+import uploadService from '@/services/upload-service';
+import { logError } from '@/utils';
 
 const FormSchema = z.object({
   name: z.string().min(1, {
     message: 'Server name is required.',
   }),
-  imageUrl: z.string().min(1, {
-    message: 'Server image is required.',
-  }),
+  image: z.any().optional(),
 });
 
 export const CreateServerModal = () => {
@@ -38,7 +40,7 @@ export const CreateServerModal = () => {
     resolver: zodResolver(FormSchema),
     defaultValues: {
       name: '',
-      imageUrl: '',
+      image: '',
     },
   });
 
@@ -46,13 +48,24 @@ export const CreateServerModal = () => {
 
   const onSubmit = async (values: z.infer<typeof FormSchema>) => {
     try {
-      await axios.post('/api/servers', values);
+      const data = {
+        name: values.name,
+        imageUrl: '',
+      };
+      if (values.image) {
+        const { fileUrl } = await uploadService.uploadImage(values.image);
+        data.imageUrl = fileUrl;
+      }
 
-      form.reset();
+      await serverService.createServer(data);
+
+      toast.success('Server created successfully');
+
       router.refresh();
+
       onClose();
     } catch (error) {
-      console.log(error);
+      logError(error);
     }
   };
 
@@ -80,7 +93,7 @@ export const CreateServerModal = () => {
                   render={({ field }) => (
                     <FormItem>
                       <FormControl>
-                        <FileUpload endpoint="serverImage" value={field.value} onChange={field.onChange} />
+                        <ImageUpload value={field.value} onChange={field.onChange} />
                       </FormControl>
                     </FormItem>
                   )}

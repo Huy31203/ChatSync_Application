@@ -1,22 +1,17 @@
 'use client';
 
-import { ShieldAlert, ShieldCheck } from 'lucide-react';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams } from 'next/navigation';
 
 import { UserAvatar } from '@/components/user-avatar';
+import { roleIconMap } from '@/constants/icon-map';
+import { useRouter } from '@/hooks/use-router';
 import { cn } from '@/libs/utils';
-import { IMember, IServer, MemberRoleEnum } from '@/types';
+import { IMember, IServer } from '@/types';
 
 interface ServerMemberProps {
   member: IMember;
   server: IServer;
 }
-
-const roleIconMap = {
-  [MemberRoleEnum.GUEST]: null,
-  [MemberRoleEnum.MODERATOR]: <ShieldCheck className="h-4 w-4 ml-2 text-indigo-500" />,
-  [MemberRoleEnum.ADMIN]: <ShieldAlert className="h-4 w-4 ml-2 text-rose-500" />,
-};
 
 export const ServerMember = ({ member, server }: ServerMemberProps) => {
   const params = useParams();
@@ -32,7 +27,7 @@ export const ServerMember = ({ member, server }: ServerMemberProps) => {
     <button
       onClick={onClick}
       className={cn(
-        'group px-2 py-2 rounded-md flex items-center gap-x-2 w-full',
+        'group px-2 py-2 rounded-md flex items-center w-full',
         'hover:bg-zinc-700/10 dark:hover:bg-zinc-700/50 transition mb-1',
         params?.memberId === member.id && 'bg-zinc-700/20 dark:hover:bg-zinc-700'
       )}
@@ -40,8 +35,8 @@ export const ServerMember = ({ member, server }: ServerMemberProps) => {
       <UserAvatar src={member.profile.avatarUrl} className="h-8 w-8 md:h-8 md:w-8" />
       <p
         className={cn(
-          'font-semibold text-sm whitespace-nowrap overflow-hidden text-ellipsis',
-          'text-zinc-500 group-hover:text-zinc-600 dark:text-zinc-400 dark:group-hover:text-zinc-300 transition',
+          'font-semibold text-sm pl-2 whitespace-nowrap overflow-hidden text-ellipsis',
+          'text-zinc-500 group-hover:text-zinc-600 dark:text-zinc-400 text-left dark:group-hover:text-zinc-300 transition',
           params?.memberId === member.id && 'text-primary dark:text-zinc-200 dark:group-hover:text-white',
           icon !== null ? 'w-32' : 'w-40'
         )}

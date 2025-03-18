@@ -1,8 +1,9 @@
-import { authService } from "@/services/auth-service";
-import { IProfile } from "@/types/profile";
-import { logError } from "@/utils";
-import { toast } from "react-toastify";
-import { create } from "zustand";
+import { toast } from 'react-toastify';
+import { create } from 'zustand';
+
+import { authService } from '@/services/auth-service';
+import { IProfile } from '@/types/profile';
+import { logError } from '@/utils';
 
 interface AuthState {
   profile: IProfile | null;
@@ -28,7 +29,7 @@ export const useAuthStore = create<AuthState>((set) => ({
 
       set({ profile, loading: false });
 
-      toast.success("Đăng nhập thành công");
+      toast.success('Login successfully');
     } catch (error) {
       logError(error);
       set({
@@ -38,6 +39,8 @@ export const useAuthStore = create<AuthState>((set) => ({
   },
   logout: () => {
     authService.logout();
+    toast.success('Logout successfully');
+
     set({ profile: null });
   },
   setProfile: (profile: IProfile | null) => set({ profile }),

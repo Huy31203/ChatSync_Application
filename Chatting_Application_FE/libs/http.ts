@@ -1,5 +1,4 @@
 /* eslint-disable no-undef */
-import { redirect } from 'next/navigation';
 
 import request from './action';
 
@@ -19,8 +18,14 @@ const http = {
       body,
     });
   },
-  put<Response>(url: string, body: any, options?: Omit<CustomOptions, 'body'> | undefined) {
+  put<Response>(url: string, body?: any, options?: Omit<CustomOptions, 'body'> | undefined) {
     return request<Response>('PUT', url, {
+      ...options,
+      body,
+    });
+  },
+  patch<Response>(url: string, body?: any, options?: Omit<CustomOptions, 'body'> | undefined) {
+    return request<Response>('PATCH', url, {
       ...options,
       body,
     });
@@ -30,27 +35,6 @@ const http = {
       ...options,
     });
   },
-};
-
-export const handleRefreshToken = async () => {
-  try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/v1/auth/refresh`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
-
-    if (!res.ok) {
-      console.error(`Token refresh failed with status: ${res.status}`);
-      console.error(`Response text: ${await res.text()}`);
-      throw new Error('Failed to refresh token');
-    }
-    return;
-  } catch (error) {
-    console.error('Error refreshing token:', error);
-    redirect('/login');
-  }
 };
 
 export default http;

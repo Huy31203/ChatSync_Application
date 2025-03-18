@@ -31,7 +31,8 @@
 // import { zodResolver } from "@hookform/resolvers/zod";
 // import { Input } from "@/components/ui/input";
 // import { Button } from "@/components/ui//button";
-// import { useParams, useRouter } from "next/navigation";
+// import { useParams } from "next/navigation";
+// import { useRouter } from '@/hooks/use-router';
 // import { useModal } from "@/hooks/use-modal-store";
 
 // import { Channel, ChannelType } from "@prisma/client";

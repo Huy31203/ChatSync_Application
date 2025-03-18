@@ -1,10 +1,10 @@
-"use client";
+'use client';
 
-import { useEffect, useState } from "react";
-import axios from "axios";
-import qs from "query-string";
-import { useRouter } from "next/navigation";
+import { useRouter } from '@/hooks/use-router';
+import { useState } from 'react';
+import { toast } from 'react-toastify';
 
+import { Button } from '@/components/ui/button';
 import {
   Dialog,
   DialogContent,
@@ -12,14 +12,14 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
-import { useModal } from "@/hooks/use-modal-store";
-import { Button } from "@/components/ui/button";
+} from '@/components/ui/dialog';
+import { useModal } from '@/hooks/use-modal-store';
+import { channelService } from '@/services/channel-service';
 
 export const DeleteChannelModal = () => {
   const { isOpen, onClose, type, data } = useModal();
 
-  const isModalOpen = isOpen  && type === "deleteChannel";
+  const isModalOpen = isOpen && type === 'deleteChannel';
 
   const router = useRouter();
 
@@ -31,12 +31,11 @@ export const DeleteChannelModal = () => {
     try {
       setIsLoading(true);
 
-      const url = qs.stringifyUrl({
-        url: `/api/channels/${channel?.id}`,
-        query: { serverId: server?.id },
-      });
+      if (!server || !channel) return;
 
-      await axios.delete(url);
+      await channelService.deleteChannel(server.id, channel.id);
+
+      toast.success(`#${channel?.name} has been deleted successfully.`);
 
       onClose();
       router.refresh();
@@ -45,15 +44,13 @@ export const DeleteChannelModal = () => {
     } finally {
       setIsLoading(false);
     }
-  }
+  };
 
   return (
     <Dialog open={isModalOpen} onOpenChange={onClose}>
       <DialogContent className="bg-white text-black p-0 overflow-hidden">
         <DialogHeader className="pt-8 px-6">
-          <DialogTitle className="text-2xl text-center font-bold">
-            Delete Channel
-          </DialogTitle>
+          <DialogTitle className="text-2xl text-center font-bold">Delete Channel</DialogTitle>
           <DialogDescription className="text-center text-zinc-500">
             Are you sure you want to do this? <br />
             <span className="font-semibold text-indigo-500">#{channel?.name}</span> will be permanently deleted.
@@ -61,18 +58,10 @@ export const DeleteChannelModal = () => {
         </DialogHeader>
         <DialogFooter className="bg-gray-100 px-6 py-4">
           <div className="flex items-center justify-between w-full">
-            <Button
-              disabled={isLoading}
-              onClick={onClose}
-              variant="cancel"
-            >
+            <Button disabled={isLoading} onClick={onClose} variant="cancel">
               Cancel
             </Button>
-            <Button
-              disabled={isLoading}
-              onClick={deleteChannel}
-              variant="primary"
-            >
+            <Button disabled={isLoading} onClick={deleteChannel} variant="primary">
               Confirm
             </Button>
           </div>

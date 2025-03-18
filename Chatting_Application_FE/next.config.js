@@ -2,7 +2,7 @@
 const nextConfig = {
   distDir: process.env.NODE_ENV === 'production' ? './out' : '.next',
   trailingSlash: true,
-  reactStrictMode: true,
+  reactStrictMode: false,
   images: {
     dangerouslyAllowSVG: true,
     remotePatterns: [

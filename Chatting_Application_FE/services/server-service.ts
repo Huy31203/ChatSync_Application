@@ -4,8 +4,12 @@ import { ApiResponse, ApiResponseWithPagination, IServer } from '@/types';
 import apiClient from './api-client';
 
 export const serverService = {
-  async getAllServers(): Promise<ApiResponseWithPagination<IServer[]>> {
-    return await apiClient.get(`${API_URL.SERVERS}`);
+  // async getAllServers(): Promise<ApiResponseWithPagination<IServer[]>> {
+  //   return await apiClient.get(`${API_URL.SERVERS}`);
+  // },
+
+  async countAllServers(): Promise<ApiResponse<number>> {
+    return await apiClient.get(`${API_URL.SERVERS}/count`);
   },
 
   async getAllServersByProfile(): Promise<ApiResponseWithPagination<IServer[]>> {
@@ -21,7 +25,15 @@ export const serverService = {
   },
 
   async updateServer(id: string, data: Partial<IServer>): Promise<ApiResponse<IServer>> {
-    return await apiClient.put(`${API_URL.SERVERS}/${id}`, data);
+    return await apiClient.patch(`${API_URL.SERVERS}/${id}`, data);
+  },
+
+  async updateInviteCode(id: string): Promise<ApiResponse<IServer>> {
+    return await apiClient.patch(`${API_URL.SERVERS}/${id}/invite-code`);
+  },
+
+  async joinServerByInviteCode(inviteCode: string): Promise<ApiResponse<IServer>> {
+    return await apiClient.patch(`${API_URL.SERVERS}/join/${inviteCode}`);
   },
 
   async deleteServer(id: string): Promise<void> {

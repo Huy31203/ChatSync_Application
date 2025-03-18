@@ -10,18 +10,19 @@ import { logError } from '@/utils';
 
 const ServerContext = React.createContext({
   server: {} as IServer | null,
+  loading: true,
   setServer: (_server: IServer | null) => {},
 });
 
 const ServerProvider = ({ children, server }: { children: React.ReactNode; server: IServer | null }) => {
   const [data, setData] = useState<IServer | null>(null);
   const params = useParams();
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function fetchServer() {
       try {
-        const res = await serverService.getServerByServerId(params.serverId as string);
-        console.log(res);
+        const res = await serverService.getServerByServerId(params?.serverId as string);
 
         setData(res.result);
       } catch (error) {
@@ -34,13 +35,16 @@ const ServerProvider = ({ children, server }: { children: React.ReactNode; serve
     } else {
       fetchServer();
     }
-  }, [server, params.serverId]);
+
+    setLoading(false);
+  }, [server, params?.serverId]);
 
   return (
     <ServerContext.Provider
       value={{
         server: data,
         setServer: setData,
+        loading,
       }}
     >
       {children}
