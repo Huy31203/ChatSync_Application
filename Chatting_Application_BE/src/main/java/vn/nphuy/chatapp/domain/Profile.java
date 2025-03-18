@@ -42,8 +42,8 @@ public class Profile extends AbstractEntity {
 
     private String avatarUrl;
 
-    @Column(name = "refresh_token", length = 1024, unique = true)
-    private String refreshToken;
+    @OneToMany(mappedBy = "profile", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<Refresh> refreshTokens;
 
     @OneToMany(mappedBy = "profile", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<Member> members;

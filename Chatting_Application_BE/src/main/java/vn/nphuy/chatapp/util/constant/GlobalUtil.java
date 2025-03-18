@@ -1,5 +1,8 @@
 package vn.nphuy.chatapp.util.constant;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -14,6 +17,13 @@ public class GlobalUtil {
         Matcher matcher = pattern.matcher(email);
 
         return matcher.matches();
+    }
+
+    @SafeVarargs
+    public static <T> List<T> appendElements(List<T> immutableList, T... elements) {
+        List<T> tmpList = new ArrayList<>(immutableList);
+        tmpList.addAll(Arrays.asList(elements));
+        return tmpList;
     }
 
     public static final String[] AUTH_WHITELIST = {

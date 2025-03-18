@@ -15,7 +15,5 @@ public interface ProfileRepository extends JpaRepository<Profile, String>, JpaSp
 
     boolean existsByEmail(String email);
 
-    Optional<Profile> findByRefreshTokenAndEmail(String refreshToken, String email);
-
     List<Profile> findByIdIn(List<String> id);
 }

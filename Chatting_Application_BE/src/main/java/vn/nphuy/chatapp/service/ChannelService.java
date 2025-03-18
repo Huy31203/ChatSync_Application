@@ -9,8 +9,6 @@ import org.springframework.stereotype.Service;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import vn.nphuy.chatapp.domain.Channel;
-import vn.nphuy.chatapp.domain.Member;
-import vn.nphuy.chatapp.domain.Server;
 import vn.nphuy.chatapp.domain.response.Meta;
 import vn.nphuy.chatapp.domain.response.ResultPaginationDTO;
 import vn.nphuy.chatapp.repository.ChannelRepository;
@@ -53,12 +51,11 @@ public class ChannelService {
     return channelRepository.findById(channelId).orElse(null);
   }
 
-  public Channel createChannel(Channel channel) {
-    if (channel.getServer() != null) {
-      Server server = serverRepository.findById(channel.getServer().getId()).orElse(null);
-      channel.setServer(server);
-    }
+  public Channel getChannelByName(String serverId, String name) {
+    return channelRepository.findOneByServerIdAndName(serverId, name).orElse(null);
+  }
 
+  public Channel createChannel(Channel channel) {
     return channelRepository.save(channel);
   }
 

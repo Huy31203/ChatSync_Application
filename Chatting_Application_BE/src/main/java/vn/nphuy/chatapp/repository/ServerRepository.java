@@ -14,4 +14,6 @@ public interface ServerRepository extends JpaRepository<Server, String>, JpaSpec
 
   List<Server> findByIdIn(List<String> id);
 
+  Optional<Server> findOneByInviteCode(String inviteCode);
+
 }

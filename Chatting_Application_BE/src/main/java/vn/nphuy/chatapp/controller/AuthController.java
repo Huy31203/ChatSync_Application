@@ -28,6 +28,7 @@ import vn.nphuy.chatapp.domain.response.ResProfileDTO;
 import vn.nphuy.chatapp.domain.response.ResRegisterDTO;
 import vn.nphuy.chatapp.service.ProfileService;
 import vn.nphuy.chatapp.service.RateLimitService;
+import vn.nphuy.chatapp.service.RefreshService;
 import vn.nphuy.chatapp.util.SecurityUtil;
 import vn.nphuy.chatapp.util.annotation.ApiMessage;
 import vn.nphuy.chatapp.util.error.BadRequestException;
@@ -44,6 +45,7 @@ public class AuthController {
   private final PasswordEncoder passwordEncoder;
   private final SecurityUtil securityUtil;
   private final ProfileService profileService;
+  private final RefreshService refreshService;
   private final ModelMapper modelMapper;
   private final RateLimitService rateLimitService;
   // private final EmailService emailService;
@@ -85,7 +87,7 @@ public class AuthController {
 
     // Create refresh token
     String refreshToken = securityUtil.createRefreshToken(loginCred.getEmail(), resLogin);
-    profileService.updateProfileRefreshToken(loginCred.getEmail(), refreshToken);
+    refreshService.createRefreshToken(profile, refreshToken);
 
     // Set cookies
     ResponseCookie resAccessCookie = ResponseCookie.from("accessToken", accessToken)
@@ -221,13 +223,14 @@ public class AuthController {
 
     log.info(">> token: {}", refreshToken);
 
-    Bucket bucket = rateLimitService.resolveRefreshBucket(email);
-    if (!bucket.tryConsume(1)) {
-      throw new TooManyRequestsException("Too many refresh attempts, please try again later");
-    }
+    // Bucket bucket = rateLimitService.resolveRefreshBucket(email);
+    // if (!bucket.tryConsume(1)) {
+    // throw new TooManyRequestsException("Too many refresh attempts, please try
+    // again later");
+    // }
 
     // Check profile by email + refresh token
-    Profile profile = profileService.getProfileByRefreshTokenAndEmail(refreshToken, decodedToken.getSubject());
+    Profile profile = refreshService.getProfileByRefreshTokenAndEmail(refreshToken, email);
 
     if (profile == null) {
       throw new TokenInvalidException("Refresh token is invalid");
@@ -244,7 +247,7 @@ public class AuthController {
 
     String newRefreshToken = securityUtil.createRefreshToken(profile.getEmail(), resLogin);
 
-    profileService.updateProfileRefreshToken(profile.getEmail(), newRefreshToken);
+    refreshService.updateRefreshTokenByEmail(profile.getEmail(), refreshToken, newRefreshToken);
 
     // Set cookies
     ResponseCookie resAccessCookie = ResponseCookie.from("accessToken", newAccessToken)
@@ -271,10 +274,10 @@ public class AuthController {
 
   @GetMapping("logout")
   @ApiMessage(message = "Logout")
-  public ResponseEntity<Void> logout() {
+  public ResponseEntity<Void> logout(@CookieValue(name = "refreshToken") String refreshToken) {
     Profile profile = securityUtil.getCurrentProfile();
     if (profile != null) {
-      profileService.updateProfileRefreshToken(profile.getEmail(), null);
+      refreshService.deleteByRefreshTokenAndEmail(refreshToken, profile.getEmail());
     }
 
     // Set cookies

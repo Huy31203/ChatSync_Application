@@ -20,6 +20,7 @@ import vn.nphuy.chatapp.domain.response.ResultPaginationDTO;
 import vn.nphuy.chatapp.repository.ChannelRepository;
 import vn.nphuy.chatapp.repository.MemberRepository;
 import vn.nphuy.chatapp.repository.ServerRepository;
+import vn.nphuy.chatapp.util.constant.GlobalUtil;
 import vn.nphuy.chatapp.util.constant.MemberRoleEnum;
 import vn.nphuy.chatapp.util.specification.ServerSpecifications;
 
@@ -53,6 +54,17 @@ public class ServerService {
     result.setData(servers.getContent());
 
     return result;
+  }
+
+  public Number countAllServers() {
+    Session session = entityManager.unwrap(Session.class);
+    session.enableFilter("deletedServersFilter");
+
+    long count = serverRepository.count();
+
+    session.disableFilter("deletedServersFilter");
+
+    return count;
   }
 
   public ResultPaginationDTO getAllServersByProfileId(Pageable pageable, String profileId) {
@@ -131,6 +143,41 @@ public class ServerService {
     } else {
       return null;
     }
+  }
+
+  public Server updateNewInviteCode(String id) {
+    Server server = this.getServerById(id);
+    if (server != null) {
+      server.setInviteCode(UUID.randomUUID().toString());
+      return serverRepository.save(server);
+    } else {
+      return null;
+    }
+  }
+
+  public Server addNewMemberViaInvCode(String inviteCode, Profile profile) {
+    Server server = serverRepository.findOneByInviteCode(inviteCode).orElse(null);
+
+    if (server == null) {
+      return null;
+    }
+
+    boolean isMemberExist = server.getMembers().stream()
+        .anyMatch(member -> member.getProfile().getId().equals(profile.getId()));
+
+    if (isMemberExist) {
+      return server;
+    }
+
+    Member newMember = new Member();
+    newMember.setProfile(profile);
+    newMember.setServer(server);
+
+    Member savedMember = memberRepository.save(newMember);
+    List<Member> newMembers = GlobalUtil.appendElements(server.getMembers(), savedMember);
+    server.setMembers(newMembers);
+
+    return serverRepository.save(server);
   }
 
   public boolean deleteServer(String id) {

@@ -12,6 +12,8 @@ public interface ChannelRepository extends JpaRepository<Channel, String>, JpaSp
 
   Optional<Channel> findOneById(String id);
 
+  Optional<Channel> findOneByServerIdAndName(String serverId, String name);
+
   List<Channel> findByIdIn(List<String> id);
 
 }

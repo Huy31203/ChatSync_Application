@@ -15,10 +15,12 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import vn.nphuy.chatapp.domain.Profile;
 import vn.nphuy.chatapp.domain.ProfileConnectedAccount;
+import vn.nphuy.chatapp.domain.Refresh;
 import vn.nphuy.chatapp.domain.response.ResLoginDTO;
 import vn.nphuy.chatapp.domain.response.ResLoginDTO.ProfileLogin;
 import vn.nphuy.chatapp.repository.ProfileConnectedAccountRepository;
 import vn.nphuy.chatapp.repository.ProfileRepository;
+import vn.nphuy.chatapp.repository.RefreshRepository;
 import vn.nphuy.chatapp.util.SecurityUtil;
 
 @Component
@@ -35,14 +37,17 @@ public class Oauth2LoginSuccessHandler implements AuthenticationSuccessHandler {
 
     private final ProfileConnectedAccountRepository connectedAccountRepository;
     private final ProfileRepository profileRepository;
+    private final RefreshRepository refreshRepository;
     private final SecurityUtil securityUtil;
 
     public Oauth2LoginSuccessHandler(
             ProfileConnectedAccountRepository connectedAccountRepository,
             ProfileRepository profileRepository,
+            RefreshRepository refreshRepository,
             @Lazy SecurityUtil securityUtil) {
         this.connectedAccountRepository = connectedAccountRepository;
         this.profileRepository = profileRepository;
+        this.refreshRepository = refreshRepository;
         this.securityUtil = securityUtil;
     }
 
@@ -113,8 +118,11 @@ public class Oauth2LoginSuccessHandler implements AuthenticationSuccessHandler {
 
         // Create refresh token
         String refreshToken = securityUtil.createRefreshToken(email, resLogin);
-        profile.setRefreshToken(refreshToken);
-        profileRepository.save(profile);
+
+        Refresh refresh = new Refresh();
+        refresh.setProfile(profile);
+        refresh.setRefreshToken(refreshToken);
+        refreshRepository.save(refresh);
 
         // Set cookies
         ResponseCookie resAccessCookie = ResponseCookie.from("accessToken", accessToken)
