@@ -56,6 +56,9 @@ public class AuthController {
   @Value("${nphuy.jwt.refresh-token-validity-in-seconds}")
   private long refreshTokenValidity;
 
+  @Value("${spring.profiles.active}")
+  private String activeProfile;
+
   @PostMapping("login")
   @ApiMessage(message = "Login")
   public ResponseEntity<Object> login(@Valid @RequestBody ReqLoginDTO loginCred) {
@@ -93,14 +96,14 @@ public class AuthController {
     ResponseCookie resAccessCookie = ResponseCookie.from("accessToken", accessToken)
         .httpOnly(true)
         .path("/")
-        .secure(true)
+        .secure(activeProfile.equals("prod"))
         .maxAge(accessTokenValidity)
         .build();
 
     ResponseCookie resRefreshCookie = ResponseCookie.from("refreshToken", refreshToken)
         .httpOnly(true)
         .path("/")
-        .secure(true)
+        .secure(activeProfile.equals("prod"))
         .maxAge(refreshTokenValidity)
         .build();
 
@@ -253,14 +256,14 @@ public class AuthController {
     ResponseCookie resAccessCookie = ResponseCookie.from("accessToken", newAccessToken)
         .httpOnly(true)
         .path("/")
-        .secure(true)
+        .secure(activeProfile.equals("prod"))
         .maxAge(accessTokenValidity)
         .build();
 
     ResponseCookie resRefreshCookie = ResponseCookie.from("refreshToken", newRefreshToken)
         .httpOnly(true)
         .path("/")
-        .secure(true)
+        .secure(activeProfile.equals("prod"))
         .maxAge(refreshTokenValidity)
         .build();
 
@@ -284,13 +287,13 @@ public class AuthController {
     ResponseCookie resAccessCookie = ResponseCookie.from("accessToken", "")
         .httpOnly(true)
         .path("/")
-        .secure(true)
+        .secure(activeProfile.equals("prod"))
         .build();
 
     ResponseCookie resRefreshCookie = ResponseCookie.from("refreshToken", "")
         .httpOnly(true)
         .path("/")
-        .secure(true)
+        .secure(activeProfile.equals("prod"))
         .build();
 
     return ResponseEntity.ok()

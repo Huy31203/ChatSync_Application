@@ -11,7 +11,7 @@ import vn.nphuy.chatapp.domain.Profile;
 public interface ProfileRepository extends JpaRepository<Profile, String>, JpaSpecificationExecutor<Profile> {
     Optional<Profile> findOneById(String id);
 
-    Optional<Profile> findOneByEmail(String email);
+    Optional<Profile> findOneByEmailAndDeletedFalse(String email);
 
     boolean existsByEmail(String email);
 

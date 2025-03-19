@@ -35,6 +35,9 @@ public class Oauth2LoginSuccessHandler implements AuthenticationSuccessHandler {
     @Value("${nphuy.frontend.url}")
     private String frontendUrl;
 
+    @Value("${spring.profiles.active}")
+    private String activeProfile;
+
     private final ProfileConnectedAccountRepository connectedAccountRepository;
     private final ProfileRepository profileRepository;
     private final RefreshRepository refreshRepository;
@@ -75,7 +78,7 @@ public class Oauth2LoginSuccessHandler implements AuthenticationSuccessHandler {
 
         // at this point, connected account does not exist, so we find profile by email,
         // or create new profile
-        Profile existingProfile = profileRepository.findOneByEmail(email).orElse(null);
+        Profile existingProfile = profileRepository.findOneByEmailAndDeletedFalse(email).orElse(null);
 
         if (existingProfile != null) {
             ProfileConnectedAccount newConnectedAccount = new ProfileConnectedAccount(provider, providerId,
@@ -128,14 +131,14 @@ public class Oauth2LoginSuccessHandler implements AuthenticationSuccessHandler {
         ResponseCookie resAccessCookie = ResponseCookie.from("accessToken", accessToken)
                 .httpOnly(true)
                 .path("/")
-                .secure(true)
+                .secure(activeProfile.equals("prod"))
                 .maxAge(accessTokenValidity)
                 .build();
 
         ResponseCookie resRefreshCookie = ResponseCookie.from("refreshToken", refreshToken)
                 .httpOnly(true)
                 .path("/")
-                .secure(true)
+                .secure(activeProfile.equals("prod"))
                 .maxAge(refreshTokenValidity)
                 .build();
 

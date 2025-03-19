@@ -55,7 +55,7 @@ public class ProfileService {
     }
 
     public Profile getProfileByEmail(String email) {
-        return profileRepository.findOneByEmail(email).orElse(null);
+        return profileRepository.findOneByEmailAndDeletedFalse(email).orElse(null);
     }
 
     public Profile createProfile(Profile profile) {
@@ -94,7 +94,7 @@ public class ProfileService {
     // }
 
     public void updateProfilePassword(String email, String password) {
-        Profile profile = profileRepository.findOneByEmail(email).orElse(null);
+        Profile profile = profileRepository.findOneByEmailAndDeletedFalse(email).orElse(null);
         if (profile != null) {
             profile.setPassword(password);
             profileRepository.save(profile);

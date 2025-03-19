@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { NavigationSidebar } from '@/components/navigation/navigation-sidebar';
+import { NavigationSidebar } from '@/components/navigation/NavigationSidebar';
 import { API_URL } from '@/constants/endpoint';
 import { ServersProvider } from '@/contexts/ServersContext';
 import http from '@/libs/http';

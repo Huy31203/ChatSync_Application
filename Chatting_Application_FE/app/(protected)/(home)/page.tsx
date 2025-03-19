@@ -2,9 +2,9 @@
 
 import { useEffect, useState } from 'react';
 
-import { useAuth } from '@/hooks/use-auth';
-import { useRouter } from '@/hooks/use-router';
-import { serverService } from '@/services/server-service';
+import { useAuth } from '@/hooks/useAuth';
+import { useRouter } from '@/hooks/useRouter';
+import { serverService } from '@/services/serverService';
 import { IServer } from '@/types';
 
 const SetupPage = () => {

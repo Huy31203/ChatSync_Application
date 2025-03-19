@@ -48,11 +48,18 @@ public class ChannelService {
   }
 
   public Channel getChannelById(String channelId) {
-    return channelRepository.findById(channelId).orElse(null);
+    Session session = entityManager.unwrap(Session.class);
+    session.enableFilter("deletedChannelsFilter");
+
+    Channel channel = channelRepository.findById(channelId).orElse(null);
+
+    session.disableFilter("deletedChannelsFilter");
+
+    return channel;
   }
 
   public Channel getChannelByName(String serverId, String name) {
-    return channelRepository.findOneByServerIdAndName(serverId, name).orElse(null);
+    return channelRepository.findOneByServerIdAndNameAndDeletedFalse(serverId, name).orElse(null);
   }
 
   public Channel createChannel(Channel channel) {

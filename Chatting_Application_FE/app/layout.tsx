@@ -3,9 +3,9 @@ import { Open_Sans } from 'next/font/google';
 import React from 'react';
 import { ToastContainer } from 'react-toastify';
 
-import { ModalProvider } from '@/components/providers/modal-provider';
-import { ThemeProvider } from '@/components/providers/theme-provider';
-import { NextTopLoader } from '@/components/top-loader/top-loader';
+import { ModalProvider } from '@/components/providers/ModalProvider';
+import { ThemeProvider } from '@/components/providers/ThemeProvider';
+import { NextTopLoader } from '@/components/loader/top-loader';
 import { cn } from '@/libs/utils';
 import './globals.css';
 

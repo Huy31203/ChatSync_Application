@@ -6,6 +6,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -26,6 +27,7 @@ import vn.nphuy.chatapp.domain.Profile;
 import vn.nphuy.chatapp.domain.Server;
 import vn.nphuy.chatapp.domain.request.ReqChannelDTO;
 import vn.nphuy.chatapp.domain.request.ReqServerDTO;
+import vn.nphuy.chatapp.domain.request.ReqUpdateMemberDTO;
 import vn.nphuy.chatapp.domain.response.ResChannelDTO;
 import vn.nphuy.chatapp.domain.response.ResServerDTO;
 import vn.nphuy.chatapp.domain.response.ResultPaginationDTO;
@@ -148,8 +150,10 @@ public class ServerController {
 
   @PostMapping("/servers/{id}/channels")
   @ApiMessage(message = "Create new channel in server")
+  @Transactional
   public ResponseEntity<Object> createNewChannel(@PathVariable("id") String id,
       @Valid @RequestBody ReqChannelDTO reqChannel) {
+    Server server = serverService.getServerById(id);
 
     String profileId = securityUtil.getCurrentProfile().getId();
     Member member = memberService.getMemberByProfileIdAndServerId(profileId, id);
@@ -162,15 +166,13 @@ public class ServerController {
       throw new BadRequestException("Channel name already exists");
     }
 
-    Server server = serverService.getServerById(id);
     Channel channel = modelMapper.map(reqChannel, Channel.class);
-
     channel.setServer(server);
 
     Channel result = channelService.createChannel(channel);
 
     if (result == null) {
-      throw new ServerErrorException("Failed to create server");
+      throw new ServerErrorException("Failed to create channel");
     }
 
     ResChannelDTO resChannel = modelMapper.map(result, ResChannelDTO.class);
@@ -232,7 +234,7 @@ public class ServerController {
     String profileId = securityUtil.getCurrentProfile().getId();
     Member member = memberService.getMemberByProfileIdAndServerId(profileId, serverId);
 
-    if (member == null || !member.getMemberRole().equals(MemberRoleEnum.GUEST)) {
+    if (member == null || member.getMemberRole().equals(MemberRoleEnum.GUEST)) {
       throw new NotAllowedException("You are not allowed to update channel in this server");
     }
 
@@ -243,10 +245,10 @@ public class ServerController {
       throw new BadRequestException("Channel name already exists");
     }
 
-    Channel channel = modelMapper.map(reqChannel, Channel.class);
+    currentChannel.setName(reqChannel.getName());
+    currentChannel.setType(reqChannel.getType());
 
-    channel.setId(channelId);
-    Channel result = channelService.updateChannel(channel);
+    Channel result = channelService.updateChannel(currentChannel);
 
     if (result == null) {
       throw new ResourceNotFoundException("Channel not found with id: " + channelId);
@@ -257,13 +259,36 @@ public class ServerController {
     return ResponseEntity.ok(resChannel);
   }
 
+  @PatchMapping("/servers/{serverId}/members/{memberId}")
+  @ApiMessage(message = "Update member by id")
+  public ResponseEntity<Object> updateMember(@PathVariable("serverId") String serverId,
+      @PathVariable("memberId") String memberId, @RequestBody ReqUpdateMemberDTO reqMember) {
+
+    String profileId = securityUtil.getCurrentProfile().getId();
+    Member currentMember = memberService.getMemberByProfileIdAndServerId(profileId, serverId);
+
+    if (currentMember == null || !currentMember.getMemberRole().equals(MemberRoleEnum.ADMIN)) {
+      throw new NotAllowedException("You are not allowed to update member in this server");
+    }
+
+    Member targetMember = modelMapper.map(reqMember, Member.class);
+    targetMember.setId(memberId);
+
+    memberService.updateMember(targetMember);
+
+    Server server = serverService.getServerById(serverId);
+    ResServerDTO resServer = modelMapper.map(server, ResServerDTO.class);
+
+    return ResponseEntity.ok().body(resServer);
+  }
+
   @PatchMapping("servers/join/{inviteCode}")
   @ApiMessage(message = "Join server by invite code")
   public ResponseEntity<Object> joinServerByInviteCode(@PathVariable("inviteCode") String inviteCode) {
 
     Profile profile = securityUtil.getCurrentProfile();
     Server server = serverService.addNewMemberViaInvCode(inviteCode, profile);
-    
+
     if (server == null) {
       throw new ResourceNotFoundException("Server not found with invite code: " + inviteCode);
     }
@@ -303,5 +328,35 @@ public class ServerController {
     }
 
     return ResponseEntity.ok().body(null);
+  }
+
+  @DeleteMapping("/servers/{serverId}/members/{memberId}")
+  @ApiMessage(message = "Delete member by id")
+  public ResponseEntity<Object> deleteMember(@PathVariable("serverId") String serverId,
+      @PathVariable("memberId") String memberId) {
+
+    String profileId = securityUtil.getCurrentProfile().getId();
+    Member currentMember = memberService.getMemberByProfileIdAndServerId(profileId, serverId);
+    Member targetMember = memberService.getMemberById(memberId);
+
+    if (currentMember == null || currentMember.getMemberRole().equals(MemberRoleEnum.GUEST)) {
+      throw new NotAllowedException("You are not allowed to delete member in this server");
+    }
+
+    if (targetMember == null) {
+      throw new ResourceNotFoundException("Member not found with id: " + memberId);
+    }
+
+    if (targetMember.getMemberRole().equals(MemberRoleEnum.ADMIN)) {
+      throw new NotAllowedException("You are not allowed to delete admin member");
+    }
+
+    memberService.deleteMember(memberId);
+
+    Server server = serverService.getServerById(serverId);
+
+    ResServerDTO resServer = modelMapper.map(server, ResServerDTO.class);
+
+    return ResponseEntity.ok().body(resServer);
   }
 }

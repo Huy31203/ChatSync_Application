@@ -3,9 +3,9 @@
 
 import React, { createContext, useEffect, useState } from 'react';
 
-import { serverService } from '@/services/server-service';
+import { serverService } from '@/services/serverService';
 import { IServer } from '@/types';
-import { logError } from '@/utils';
+import logError from '@/utils';
 
 interface ServersContextType {
   servers: IServer[];

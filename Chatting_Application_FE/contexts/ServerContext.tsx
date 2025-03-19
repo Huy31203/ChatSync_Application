@@ -4,9 +4,9 @@
 import { useParams } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
 
-import { serverService } from '@/services/server-service';
+import { serverService } from '@/services/serverService';
 import { IServer } from '@/types';
-import { logError } from '@/utils';
+import logError from '@/utils';
 
 const ServerContext = React.createContext({
   server: {} as IServer | null,

@@ -74,7 +74,14 @@ public class MemberService {
   }
 
   public Member updateMember(Member member) {
-    return memberRepository.save(member);
+    Member existingMember = memberRepository.findById(member.getId()).orElse(null);
+    if (existingMember == null) {
+      return null;
+    }
+
+    existingMember.setMemberRole(member.getMemberRole());
+
+    return memberRepository.save(existingMember);
   }
 
   public boolean deleteMember(String memberId) {

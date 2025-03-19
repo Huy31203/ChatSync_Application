@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { ServerSidebar } from '@/components/server/server-sidebar';
+import { ServerSidebar } from '@/components/server/ServerSidebar';
 import { API_URL } from '@/constants/endpoint';
 import { ServerProvider } from '@/contexts/ServerContext';
 import http from '@/libs/http';
