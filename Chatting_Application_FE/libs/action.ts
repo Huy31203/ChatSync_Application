@@ -60,7 +60,7 @@ const request = async <Response>(
 
   const fullUrl = url.startsWith('/') ? `${baseUrl}${url}` : `${baseUrl}/${url}`;
 
-  const cookieStore = cookies();
+  const cookieStore = await cookies();
   const accessToken = cookieStore.get(ACCESS_TOKEN)?.value ?? '';
 
   let res = await fetch(fullUrl, {
@@ -99,7 +99,7 @@ const request = async <Response>(
         }
       );
     } else if (res.status === AUTHENTICATION_ERROR_STATUS) {
-      const headersStore = headers();
+      const headersStore = await headers();
 
       const cookie = headersStore.get('Set-Cookie');
       const accessTokenMatch = cookie?.match(/accessToken=([^;]+)/);
