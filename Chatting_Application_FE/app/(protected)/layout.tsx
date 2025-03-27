@@ -12,6 +12,8 @@ const ProtectedLayout = async ({ children }: { children: React.ReactNode }) => {
 
   const servers = payload.result?.data ?? [];
 
+  console.log('Servers:', servers);
+
   return (
     <ServersProvider servers={servers}>
       <div className="h-full">
@@ -19,7 +21,7 @@ const ProtectedLayout = async ({ children }: { children: React.ReactNode }) => {
           className="hidden md:flex h-full w-[72px]
 			z-30 flex-col fixed inset-y-0"
         >
-          <NavigationSidebar servers={servers} />
+          <NavigationSidebar />
         </div>
         <main className="md:pl-[72px] h-full">{children}</main>
       </div>

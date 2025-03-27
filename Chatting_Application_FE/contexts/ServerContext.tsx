@@ -2,19 +2,25 @@
 'use client';
 
 import { useParams } from 'next/navigation';
-import React, { useEffect, useState } from 'react';
+import { createContext, Dispatch, ReactNode, SetStateAction, useEffect, useState } from 'react';
 
 import { serverService } from '@/services/serverService';
 import { IServer } from '@/types';
 import logError from '@/utils';
 
-const ServerContext = React.createContext({
+interface ServersContextType {
+  server: IServer | null;
+  loading: boolean;
+  setServer: Dispatch<SetStateAction<IServer | null>>;
+}
+
+const ServerContext = createContext<ServersContextType>({
   server: {} as IServer | null,
   loading: true,
-  setServer: (_server: IServer | null) => {},
+  setServer: () => {},
 });
 
-const ServerProvider = ({ children, server }: { children: React.ReactNode; server: IServer | null }) => {
+const ServerProvider = ({ children, server }: { children: ReactNode; server: IServer | null }) => {
   const [data, setData] = useState<IServer | null>(null);
   const params = useParams();
   const [loading, setLoading] = useState(true);

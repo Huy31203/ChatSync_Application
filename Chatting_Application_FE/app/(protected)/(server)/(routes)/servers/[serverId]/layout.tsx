@@ -7,8 +7,12 @@ import http from '@/libs/http';
 import { ApiResponse, IServer } from '@/types';
 
 const ServerIdLayout = async ({ children, params }: { children: React.ReactNode; params: { serverId: string } }) => {
-  const res = await http.get<IServer>(`${API_URL.SERVERS}/${params.serverId}`);
+  const { serverId } = await params;
+
+  const res = await http.get<IServer>(`${API_URL.SERVERS}/${serverId}`);
   const payload = res.payload as ApiResponse<IServer>;
+
+  console.log('Server:', payload.result);
 
   return (
     <ServerProvider server={payload.result}>

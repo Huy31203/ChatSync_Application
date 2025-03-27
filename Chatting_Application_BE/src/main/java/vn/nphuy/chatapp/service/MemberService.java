@@ -56,7 +56,7 @@ public class MemberService {
   }
 
   public Member getMemberByProfileIdAndServerId(String profileId, String serverId) {
-    return memberRepository.findOneByProfileIdAndServerId(profileId, serverId).orElse(null);
+    return memberRepository.findOneByProfileIdAndServerIdAndDeletedFalse(profileId, serverId).orElse(null);
   }
 
   public Member createMember(Member member) {

@@ -8,10 +8,6 @@ export const serverService = {
   //   return await apiClient.get(`${API_URL.SERVERS}`);
   // },
 
-  async countAllServers(): Promise<ApiResponse<number>> {
-    return await apiClient.get(`${API_URL.SERVERS}/count`);
-  },
-
   async getAllServersByProfile(): Promise<ApiResponseWithPagination<IServer[]>> {
     return await apiClient.get(`${API_URL.SERVERS}/current-profile`);
   },
@@ -34,6 +30,10 @@ export const serverService = {
 
   async joinServerByInviteCode(inviteCode: string): Promise<ApiResponse<IServer>> {
     return await apiClient.patch(`${API_URL.SERVERS}/join/${inviteCode}`);
+  },
+
+  async leaveServerById(id: string): Promise<void> {
+    return await apiClient.delete(`${API_URL.SERVERS}/${id}/leave`);
   },
 
   async deleteServer(id: string): Promise<void> {

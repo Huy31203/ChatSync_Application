@@ -1,6 +1,8 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 'use client';
 
 import { ChevronDown, LogOut, PlusCircle, Settings, Trash, User, UserPlus } from 'lucide-react';
+import { Dispatch, SetStateAction, useEffect } from 'react';
 
 import {
   DropdownMenu,
@@ -13,12 +15,27 @@ import { useModal } from '@/hooks/useModalStore';
 import { IServer, MemberRoleEnum } from '@/types';
 
 interface ServerHeaderProps {
+  servers: IServer[];
+  setServers: Dispatch<SetStateAction<IServer[]>>;
   server: IServer;
+  setServer: Dispatch<SetStateAction<IServer | null>>;
   role?: MemberRoleEnum;
 }
 
-export const ServerHeader = ({ server, role }: ServerHeaderProps) => {
-  const { onOpen } = useModal();
+export const ServerHeader = ({ servers, setServers, server, setServer, role }: ServerHeaderProps) => {
+  const { data, onOpen } = useModal();
+
+  useEffect(() => {
+    if (data.servers) {
+      setServers(data.servers);
+    }
+  }, [data.servers, setServers]);
+
+  useEffect(() => {
+    if (data.server) {
+      setServer(data.server);
+    }
+  }, [data.server]);
 
   const isAdmin = role === MemberRoleEnum.ADMIN;
   const isModerator = isAdmin || role === MemberRoleEnum.MODERATOR;
@@ -51,7 +68,7 @@ export const ServerHeader = ({ server, role }: ServerHeaderProps) => {
 
         {isAdmin && (
           <DropdownMenuItem
-            onClick={() => onOpen('editServer', { server })}
+            onClick={() => onOpen('editServer', { server, servers })}
             className="px-3 py-2 text-sm cursor-pointer"
           >
             Server Settings
@@ -80,7 +97,7 @@ export const ServerHeader = ({ server, role }: ServerHeaderProps) => {
 
         {isAdmin && (
           <DropdownMenuItem
-            onClick={() => onOpen('deleteServer', { server })}
+            onClick={() => onOpen('deleteServer', { server, servers })}
             className="text-rose-500 px-3 py-2 text-sm cursor-pointer"
           >
             Delete Server
@@ -90,7 +107,7 @@ export const ServerHeader = ({ server, role }: ServerHeaderProps) => {
 
         {!isAdmin && (
           <DropdownMenuItem
-            onClick={() => onOpen('leaveServer', { server })}
+            onClick={() => onOpen('leaveServer', { server, servers })}
             className="text-rose-500 px-3 py-2 text-sm cursor-pointer"
           >
             Leave Server

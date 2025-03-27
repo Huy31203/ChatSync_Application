@@ -1,5 +1,4 @@
 import * as LabelPrimitive from '@radix-ui/react-label';
-import { Slot } from '@radix-ui/react-slot';
 import * as React from 'react';
 import { Controller, ControllerProps, FieldPath, FieldValues, FormProvider, useFormContext } from 'react-hook-form';
 
@@ -82,21 +81,19 @@ const FormLabel = React.forwardRef<
 });
 FormLabel.displayName = 'FormLabel';
 
-const FormControl = React.forwardRef<React.ElementRef<typeof Slot>, React.ComponentPropsWithoutRef<typeof Slot>>(
-  ({ ...props }, ref) => {
-    const { error, formItemId, formDescriptionId, formMessageId } = useFormField();
+const FormControl = React.forwardRef<HTMLDivElement, React.ComponentProps<'div'>>(({ ...props }, ref) => {
+  const { error, formItemId, formDescriptionId, formMessageId } = useFormField();
 
-    return (
-      <Slot
-        ref={ref}
-        id={formItemId}
-        aria-describedby={!error ? `${formDescriptionId}` : `${formDescriptionId} ${formMessageId}`}
-        aria-invalid={!!error}
-        {...props}
-      />
-    );
-  }
-);
+  return (
+    <div
+      ref={ref}
+      id={formItemId}
+      aria-describedby={!error ? `${formDescriptionId}` : `${formDescriptionId} ${formMessageId}`}
+      aria-invalid={!!error}
+      {...props}
+    />
+  );
+});
 FormControl.displayName = 'FormControl';
 
 const FormDescription = React.forwardRef<HTMLParagraphElement, React.HTMLAttributes<HTMLParagraphElement>>(

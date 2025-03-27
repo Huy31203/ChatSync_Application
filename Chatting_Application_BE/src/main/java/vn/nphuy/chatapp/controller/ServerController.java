@@ -4,7 +4,6 @@ import java.util.List;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -15,8 +14,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import com.turkraft.springfilter.boot.Filter;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -54,36 +51,28 @@ public class ServerController {
   private final SecurityUtil securityUtil;
   // private final RateLimitService rateLimitService;
 
-  @GetMapping("/servers")
-  @ApiMessage(message = "Fetch all servers")
-  public ResponseEntity<Object> getAllServers(@Filter Specification<Server> spec,
-      Pageable pageable) {
+  // @GetMapping("/servers")
+  // @ApiMessage(message = "Fetch all servers")
+  // public ResponseEntity<Object> getAllServers(@Filter Specification<Server>
+  // spec,
+  // Pageable pageable) {
 
-    ResultPaginationDTO results = serverService.getAllServers(spec, pageable);
+  // ResultPaginationDTO results = serverService.getAllServers(spec, pageable);
 
-    // Map Server entities to ResServerDTO objects
-    if (results.getData() != null) {
-      @SuppressWarnings("unchecked")
-      List<Server> servers = (List<Server>) results.getData();
+  // // Map Server entities to ResServerDTO objects
+  // if (results.getData() != null) {
+  // @SuppressWarnings("unchecked")
+  // List<Server> servers = (List<Server>) results.getData();
 
-      List<ResServerDTO> serverDTOs = servers.stream()
-          .map(server -> modelMapper.map(server, ResServerDTO.class))
-          .toList();
+  // List<ResServerDTO> serverDTOs = servers.stream()
+  // .map(server -> modelMapper.map(server, ResServerDTO.class))
+  // .toList();
 
-      results.setData(serverDTOs);
-    }
+  // results.setData(serverDTOs);
+  // }
 
-    return ResponseEntity.ok(results);
-  }
-
-  @GetMapping("/servers/count")
-  @ApiMessage(message = "Fetch all servers count")
-  public ResponseEntity<Object> getAllServersCount() {
-
-    Number count = serverService.countAllServers();
-
-    return ResponseEntity.ok(count);
-  }
+  // return ResponseEntity.ok(results);
+  // }
 
   @GetMapping("/servers/current-profile")
   @ApiMessage(message = "Fetch all servers by current profile")
@@ -296,6 +285,30 @@ public class ServerController {
     ResServerDTO resServer = modelMapper.map(server, ResServerDTO.class);
 
     return ResponseEntity.ok(resServer);
+  }
+
+  @DeleteMapping("servers/{id}/leave")
+  @ApiMessage(message = "Leave server by id")
+  public ResponseEntity<Object> leaveServer(@PathVariable("id") String id) {
+
+    String profileId = securityUtil.getCurrentProfile().getId();
+    Member member = memberService.getMemberByProfileIdAndServerId(profileId, id);
+
+    if (member == null) {
+      throw new NotAllowedException("You are not a member of this server");
+    }
+
+    if (member.getMemberRole().equals(MemberRoleEnum.ADMIN)) {
+      throw new NotAllowedException("Admin are not allowed to leave server");
+    }
+
+    boolean result = memberService.deleteMember(member.getId());
+
+    if (!result) {
+      throw new ResourceNotFoundException("Member not found with id: " + member.getId());
+    }
+
+    return ResponseEntity.ok().body(null);
   }
 
   @DeleteMapping("/servers/{id}")

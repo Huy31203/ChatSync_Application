@@ -31,11 +31,16 @@ export async function middleware(request: NextRequest) {
           'Content-Type': 'application/json',
           Cookie: `refreshToken=${refreshToken}`,
         },
-        credentials: 'include',
       });
 
       if (!response.ok) {
-        return NextResponse.redirect(new URL('/login', request.url));
+        const redirectResponse = NextResponse.redirect(new URL('/login', request.url));
+
+        // Remove the access and refresh tokens from cookies
+        redirectResponse.cookies.delete(ACCESS_TOKEN);
+        redirectResponse.cookies.delete(REFRESH_TOKEN);
+
+        return redirectResponse;
       }
 
       // Create a rewrite response to retry the original request path
@@ -52,7 +57,13 @@ export async function middleware(request: NextRequest) {
       return newResponse;
     } catch (error) {
       console.error('Error refreshing token in middleware:', error);
-      return NextResponse.redirect(new URL('/login', request.url));
+      const redirectResponse = NextResponse.redirect(new URL('/login', request.url));
+
+      // Remove the access and refresh tokens from cookies
+      redirectResponse.cookies.delete(ACCESS_TOKEN);
+      redirectResponse.cookies.delete(REFRESH_TOKEN);
+
+      return redirectResponse;
     }
   }
 

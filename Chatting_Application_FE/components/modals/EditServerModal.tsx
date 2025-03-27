@@ -18,9 +18,9 @@ import {
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { useModal } from '@/hooks/useModalStore';
-import { useRouter } from '@/hooks/useRouter';
 import { serverService } from '@/services/serverService';
 import uploadService from '@/services/uploadService';
+import { IServer } from '@/types';
 import logError from '@/utils';
 
 import FileUpload from '../upload/ImageUpload';
@@ -33,11 +33,13 @@ const FormSchema = z.object({
 });
 
 export const EditServerModal = () => {
-  const { isOpen, onClose, type, data } = useModal();
-  const router = useRouter();
+  const { isOpen, onClose, type, data, setData } = useModal();
 
   const isModalOpen = isOpen && type === 'editServer';
-  const { server } = data;
+  const { server, servers } = data as {
+    server: IServer;
+    servers: IServer[];
+  };
 
   const form = useForm({
     resolver: zodResolver(FormSchema),
@@ -52,7 +54,7 @@ export const EditServerModal = () => {
       form.setValue('name', server.name);
       form.setValue('image', server.imageUrl);
     }
-  }, [server, form]);
+  }, [server, form, isOpen]);
 
   const isLoading = form.formState.isSubmitting;
 
@@ -62,17 +64,29 @@ export const EditServerModal = () => {
         name: values.name,
         imageUrl: '',
       };
-      if (values.image && typeof values.image !== 'string') {
-        const { fileUrl } = await uploadService.uploadImage(values.image);
-        data.imageUrl = fileUrl;
+      if (values.image) {
+        if (typeof values.image !== 'string') {
+          const { fileUrl } = await uploadService.uploadImage(values.image);
+          data.imageUrl = fileUrl;
+        } else {
+          data.imageUrl = values.image;
+        }
       }
 
-      await serverService.updateServer(server?.id ?? '', data);
+      const res = await serverService.updateServer(server?.id ?? '', data);
 
       toast.success('Server created successfully');
 
+      const newServers = servers.map((s) => {
+        if (s.id === server?.id) {
+          return res.result;
+        }
+        return s;
+      });
+
+      setData({ server: res.result, servers: newServers });
+
       onClose();
-      router.refresh();
     } catch (error) {
       logError(error);
     }

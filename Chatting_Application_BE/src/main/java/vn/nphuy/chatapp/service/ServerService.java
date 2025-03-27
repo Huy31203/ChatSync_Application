@@ -8,6 +8,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
@@ -56,17 +57,6 @@ public class ServerService {
     return result;
   }
 
-  public Number countAllServers() {
-    Session session = entityManager.unwrap(Session.class);
-    session.enableFilter("deletedServersFilter");
-
-    long count = serverRepository.count();
-
-    session.disableFilter("deletedServersFilter");
-
-    return count;
-  }
-
   public ResultPaginationDTO getAllServersByProfileId(Pageable pageable, String profileId) {
     Session session = entityManager.unwrap(Session.class);
     session.enableFilter("deletedServersFilter");
@@ -103,6 +93,7 @@ public class ServerService {
     return server;
   }
 
+  @Transactional
   public Server createServer(Server server, Profile profile) {
     // Generate a random invite code for the server
     server.setInviteCode(UUID.randomUUID().toString());
@@ -155,6 +146,7 @@ public class ServerService {
     }
   }
 
+  @Transactional
   public Server addNewMemberViaInvCode(String inviteCode, Profile profile) {
     Server server = serverRepository.findOneByInviteCode(inviteCode).orElse(null);
 
@@ -177,7 +169,7 @@ public class ServerService {
     List<Member> newMembers = GlobalUtil.appendElements(server.getMembers(), savedMember);
     server.setMembers(newMembers);
 
-    return serverRepository.save(server);
+    return server;
   }
 
   public boolean deleteServer(String id) {

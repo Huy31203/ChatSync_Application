@@ -1,29 +1,25 @@
 'use client';
 
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
+import { toast } from 'react-toastify';
 import * as z from 'zod';
 
 import { Button } from '@/components/ui//button';
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useModal } from '@/hooks/useModalStore';
 import { useRouter } from '@/hooks/useRouter';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useParams } from 'next/navigation';
-
 import { channelService } from '@/services/channelService';
 import { ChannelTypeEnum, IChannel, IServer } from '@/types';
 import logError from '@/utils';
-import { useEffect } from 'react';
-import { toast } from 'react-toastify';
 
 export const EditChannelModal = () => {
-  const { isOpen, onClose, type, data } = useModal();
+  const { isOpen, onClose, type, data, setData } = useModal();
   const router = useRouter();
-  const params = useParams();
 
   const isModalOpen = isOpen && type === 'editChannel';
 
@@ -41,10 +37,10 @@ export const EditChannelModal = () => {
         message: 'Channel name is required.',
       })
       .refine((name) => name.toLowerCase() !== 'general', {
-        message: `Channel name cannot be "general".`,
+        message: 'Channel name cannot be "general".',
       })
       .refine((name) => name === channel.name || !nameList.includes(name), {
-        message: `Channel name cannot be dublicated.`,
+        message: 'Channel name cannot be dublicated.',
       }),
     type: z.nativeEnum(ChannelTypeEnum),
   });
@@ -62,7 +58,7 @@ export const EditChannelModal = () => {
       form.setValue('name', channel.name);
       form.setValue('type', channel.type);
     }
-  }, [channel, form]);
+  }, [channel, form, isOpen]);
 
   const isLoading = form.formState.isSubmitting;
 
@@ -72,9 +68,16 @@ export const EditChannelModal = () => {
 
       toast.success(`Channel ${channel.name} updated successfully`);
 
-      form.reset();
-      router.refresh();
+      const { channels, ...rest } = server;
+      const newServer = {
+        ...rest,
+        channels: channels.map((c) => (c.id === channel.id ? { ...c, ...values } : c)),
+      };
+
+      setData({ server: newServer });
+
       onClose();
+      form.reset();
     } catch (error) {
       logError(error);
     }

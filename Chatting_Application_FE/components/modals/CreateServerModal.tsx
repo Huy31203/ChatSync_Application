@@ -21,6 +21,7 @@ import { useModal } from '@/hooks/useModalStore';
 import { useRouter } from '@/hooks/useRouter';
 import { serverService } from '@/services/serverService';
 import uploadService from '@/services/uploadService';
+import { IServer } from '@/types';
 import logError from '@/utils';
 
 const FormSchema = z.object({
@@ -31,8 +32,12 @@ const FormSchema = z.object({
 });
 
 export const CreateServerModal = () => {
-  const { isOpen, onClose, type } = useModal();
+  const { data, setData, isOpen, onClose, type } = useModal();
   const router = useRouter();
+
+  const { servers } = data as {
+    servers: IServer[];
+  };
 
   const isModalOpen = isOpen && type === 'createServer';
 
@@ -59,9 +64,10 @@ export const CreateServerModal = () => {
 
       const res = await serverService.createServer(data);
 
+      setData({ servers: [...servers, res.result] });
+
       toast.success('Server created successfully');
 
-      router.refresh();
       router.push(`/servers/${res.result.id}`);
 
       onClose();

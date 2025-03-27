@@ -1,46 +1,21 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 
 import { useAuth } from '@/hooks/useAuth';
 import { useRouter } from '@/hooks/useRouter';
-import { serverService } from '@/services/serverService';
-import { IServer } from '@/types';
 
-const SetupPage = () => {
+const HomePage = () => {
   const router = useRouter();
   const { profile, loading } = useAuth();
-  const [servers, setServers] = useState<IServer[]>([]);
-  const [serversCount, setServersCount] = useState<number>(0);
-
-  const fetchServerCount = async () => {
-    const res = await serverService.countAllServers();
-
-    setServersCount(res.result);
-  };
-
-  const fetchServer = async () => {
-    const res = await serverService.getAllServersByProfile();
-
-    setServers(res.result.data);
-  };
 
   useEffect(() => {
-    if (profile) {
-      fetchServerCount();
-      fetchServer();
+    if (!profile && !loading) {
+      router.push('/login');
     }
-  }, [profile]);
+  }, [profile, loading, router]);
 
-  if (!profile && !loading) {
-    router.push('/login');
-    return null;
-  }
-
-  if (serversCount > 0 && servers.length === 0) {
-    router.push('/');
-    return null;
-  }
+  return null;
 };
 
-export default SetupPage;
+export default HomePage;

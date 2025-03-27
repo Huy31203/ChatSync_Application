@@ -1,10 +1,8 @@
 'use client';
 
 import { useSearchParams } from 'next/navigation';
-import { useContext, useEffect } from 'react';
+import { useEffect } from 'react';
 import { toast } from 'react-toastify';
-
-import { ServerContext } from '@/contexts/ServerContext';
 
 interface ServerPageProps {
   params: { serverId: string };
@@ -18,6 +16,11 @@ const ServerPage = ({ params }: ServerPageProps) => {
   useEffect(() => {
     if (newMenber) {
       toast.success('You have joined the server');
+
+      // remove the query param from the URL
+      const url = new URL(window.location.href);
+      url.searchParams.delete('new');
+      window.history.replaceState({}, '', url.toString());
     }
   }, [newMenber]);
 

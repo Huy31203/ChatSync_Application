@@ -1,5 +1,6 @@
 'use client';
 
+import { useParams } from 'next/navigation';
 import { useState } from 'react';
 import { toast } from 'react-toastify';
 
@@ -15,17 +16,21 @@ import {
 import { useModal } from '@/hooks/useModalStore';
 import { useRouter } from '@/hooks/useRouter';
 import { channelService } from '@/services/channelService';
+import { IChannel, IServer } from '@/types';
 
 export const DeleteChannelModal = () => {
-  const { isOpen, onClose, type, data } = useModal();
+  const { isOpen, onClose, type, data, setData } = useModal();
+  const params = useParams();
+  const router = useRouter();
 
   const isModalOpen = isOpen && type === 'deleteChannel';
 
-  const router = useRouter();
-
   const [isLoading, setIsLoading] = useState(false);
 
-  const { server, channel } = data;
+  const { server, channel } = data as {
+    server: IServer;
+    channel: IChannel;
+  };
 
   const deleteChannel = async () => {
     try {
@@ -37,8 +42,19 @@ export const DeleteChannelModal = () => {
 
       toast.success(`#${channel?.name} has been deleted successfully.`);
 
+      const { channels, ...rest } = server;
+      const newServer = {
+        ...rest,
+        channels: channels.filter((c) => c.id !== channel.id),
+      };
+
+      setData({ server: newServer });
+
+      if (params?.channelId === channel.id) {
+        router.push(`/servers/${server.id}`);
+      }
+
       onClose();
-      router.refresh();
     } catch (error) {
       console.log(error);
     } finally {

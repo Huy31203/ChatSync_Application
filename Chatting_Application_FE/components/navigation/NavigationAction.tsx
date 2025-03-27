@@ -1,19 +1,32 @@
 'use client';
 
 import { Plus } from 'lucide-react';
+import { Dispatch, SetStateAction, useEffect } from 'react';
 
 import { ActionTooltip } from '@/components/ActionTooltip';
 import { useModal } from '@/hooks/useModalStore';
+import { IServer } from '@/types';
 
-export const NavigationAction = () => {
-  const { onOpen } = useModal();
+interface NavigationActionProps {
+  servers: IServer[];
+  setServers: Dispatch<SetStateAction<IServer[]>>;
+}
+
+export const NavigationAction = ({ servers, setServers }: NavigationActionProps) => {
+  const { data, onOpen } = useModal();
+
+  useEffect(() => {
+    if (data.servers && data.servers?.length > 0) {
+      setServers(data.servers);
+    }
+  }, [data.servers]);
 
   return (
     <div>
       <ActionTooltip side="right" align="center" label="add a new server">
         <button
           onClick={() => {
-            onOpen('createServer');
+            onOpen('createServer', { servers });
           }}
           className="group flex items-center"
         >

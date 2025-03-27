@@ -1,10 +1,10 @@
 'use client';
 
+import Link from 'next/link';
 import { useParams } from 'next/navigation';
 
 import { UserAvatar } from '@/components/UserAvatar';
 import { roleIconMap } from '@/constants/IconMap';
-import { useRouter } from '@/hooks/useRouter';
 import { cn } from '@/libs/utils';
 import { IMember, IServer } from '@/types';
 
@@ -15,17 +15,12 @@ interface ServerMemberProps {
 
 export const ServerMember = ({ member, server }: ServerMemberProps) => {
   const params = useParams();
-  const router = useRouter();
 
   const icon = roleIconMap[member.memberRole];
 
-  const onClick = () => {
-    router.push(`/servers/${params?.serverId}/conversations/${member.id}`);
-  };
-
   return (
-    <button
-      onClick={onClick}
+    <Link
+      href={`/servers/${params?.serverId}/conversations/${member.id}`}
       className={cn(
         'group px-2 py-2 rounded-md flex items-center w-full',
         'hover:bg-zinc-700/10 dark:hover:bg-zinc-700/50 transition mb-1',
@@ -44,6 +39,6 @@ export const ServerMember = ({ member, server }: ServerMemberProps) => {
         {member.profile.name}
       </p>
       {icon}
-    </button>
+    </Link>
   );
 };

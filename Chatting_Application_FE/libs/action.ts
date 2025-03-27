@@ -63,16 +63,29 @@ const request = async <Response>(
   const cookieStore = await cookies();
   const accessToken = cookieStore.get(ACCESS_TOKEN)?.value ?? '';
 
-  let res = await fetch(fullUrl, {
-    ...options,
-    headers: {
-      ...baseHeaders,
-      ...options?.headers,
-      Authorization: `Bearer ${accessToken}`,
-    } as any,
-    body,
-    method,
-  });
+  let res;
+  try {
+    res = await fetch(fullUrl, {
+      ...options,
+      headers: {
+        ...baseHeaders,
+        ...options?.headers,
+        Authorization: `Bearer ${accessToken}`,
+      } as any,
+      body,
+      method,
+    });
+  } catch (error: unknown) {
+    console.error('Network error during fetch:', error);
+    // Return a meaningful error that can be handled by the UI
+    throw new HttpError({
+      status: 503,
+      payload: {
+        message: 'Unable to connect to the server. Please check your connection or try again later.',
+        originalError: (error as Error).message,
+      },
+    });
+  }
 
   let payload: any = null;
   const contentType = res.headers.get('content-type');

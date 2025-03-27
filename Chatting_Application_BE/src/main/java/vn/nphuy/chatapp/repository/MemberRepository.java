@@ -14,5 +14,5 @@ public interface MemberRepository extends JpaRepository<Member, String>, JpaSpec
 
   List<Member> findByIdIn(List<String> id);
 
-  Optional<Member> findOneByProfileIdAndServerId(String profileId, String serverId);
+  Optional<Member> findOneByProfileIdAndServerIdAndDeletedFalse(String profileId, String serverId);
 }

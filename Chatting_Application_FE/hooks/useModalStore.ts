@@ -15,13 +15,16 @@ export type ModalType =
 
 interface ModalData {
   server?: IServer;
+  servers?: IServer[];
   channel?: IChannel;
+  channels?: IChannel[];
   channelType?: ChannelTypeEnum;
 }
 
 interface ModalStore {
   type: ModalType | null;
   data: ModalData;
+  setData: (data: ModalData) => void;
   isOpen: boolean;
   onOpen: (type: ModalType, data?: ModalData) => void;
   onClose: () => void;
@@ -30,6 +33,7 @@ interface ModalStore {
 export const useModal = create<ModalStore>((set) => ({
   type: null,
   data: {},
+  setData: (data) => set({ data }),
   isOpen: false,
   onOpen: (type, data = {}) => set({ isOpen: true, type, data }),
   onClose: () => set({ isOpen: false, type: null }),

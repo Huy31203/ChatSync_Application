@@ -20,7 +20,7 @@ import logError from '@/utils';
 export const CreateChannelModal = () => {
   const router = useRouter();
 
-  const { isOpen, onClose, type, data } = useModal();
+  const { isOpen, onClose, type, data, setData } = useModal();
 
   const isModalOpen = isOpen && type === 'createChannel';
 
@@ -68,11 +68,17 @@ export const CreateChannelModal = () => {
         type: values.type,
       };
 
-      await channelService.createChannel(server.id, data);
+      const res = await channelService.createChannel(server.id, data);
+
+      const { channels, ...rest } = server;
+      const newServer = {
+        ...rest,
+        channels: [...channels, res.result],
+      };
 
       toast.success('Channel created successfully');
 
-      router.refresh();
+      setData({ server: newServer });
 
       form.reset();
       onClose();

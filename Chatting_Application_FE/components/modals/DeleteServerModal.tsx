@@ -15,10 +15,11 @@ import {
 import { useModal } from '@/hooks/useModalStore';
 import { useRouter } from '@/hooks/useRouter';
 import { serverService } from '@/services/serverService';
+import { IServer } from '@/types';
 import logError from '@/utils';
 
 export const DeleteServerModal = () => {
-  const { isOpen, onClose, type, data } = useModal();
+  const { isOpen, onClose, type, data, setData } = useModal();
 
   const isModalOpen = isOpen && type === 'deleteServer';
 
@@ -26,7 +27,10 @@ export const DeleteServerModal = () => {
 
   const [isLoading, setIsLoading] = useState(false);
 
-  const { server } = data;
+  const { server, servers } = data as {
+    server: IServer;
+    servers: IServer[];
+  };
 
   const deleteServer = async () => {
     try {
@@ -36,8 +40,9 @@ export const DeleteServerModal = () => {
 
       toast.success(`Server ${server?.name} has been deleted successfully.`);
 
+      setData({ servers: servers.filter((s) => s.id !== server?.id) });
+
       onClose();
-      router.refresh();
       router.push('/');
     } catch (error) {
       logError(error);

@@ -6,6 +6,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
 import { channelIconMap, roleIconMap } from '@/constants/IconMap';
 import { ServerContext } from '@/contexts/ServerContext';
+import { ServersContext } from '@/contexts/ServersContext';
 import { useAuth } from '@/hooks/useAuth';
 import { useRouter } from '@/hooks/useRouter';
 import { ChannelTypeEnum } from '@/types';
@@ -19,7 +20,8 @@ import { ServerSection } from './ServerSection';
 export const ServerSidebar = () => {
   const router = useRouter();
 
-  const { server, loading: serverLoading } = useContext(ServerContext);
+  const { server, setServer, loading: serverLoading } = useContext(ServerContext);
+  const { servers, setServers, loading: serversLoading } = useContext(ServersContext);
 
   const { profile, loading: authLoading } = useAuth();
 
@@ -52,9 +54,9 @@ export const ServerSidebar = () => {
       className="flex flex-col h-full text-primary w-full
     dark:bg-[#2B2D31] bg-[#F2F3F5]"
     >
-      {!authLoading && profile && server && (
+      {!authLoading && !serversLoading && profile && server && (
         <>
-          <ServerHeader server={server} role={role} />
+          <ServerHeader servers={servers} setServers={setServers} server={server} setServer={setServer} role={role} />
           <ScrollArea className="flex-1 px-3">
             <div className="mt-2">
               <ServerSearch

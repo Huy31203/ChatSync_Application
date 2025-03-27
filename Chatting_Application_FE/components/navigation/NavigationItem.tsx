@@ -1,10 +1,10 @@
 'use client';
 
 import Image from 'next/image';
+import Link from 'next/link';
 import { useParams } from 'next/navigation';
 
 import { ActionTooltip } from '@/components/ActionTooltip';
-import { useRouter } from '@/hooks/useRouter';
 import { cn } from '@/libs/utils';
 
 interface NavigationItemProps {
@@ -15,15 +15,10 @@ interface NavigationItemProps {
 
 export const NavigationItem = ({ id, name, imageUrl }: NavigationItemProps) => {
   const params = useParams();
-  const router = useRouter();
-
-  const onClick = () => {
-    router.push(`/servers/${id}`);
-  };
 
   return (
     <ActionTooltip side="right" align="center" label={name}>
-      <button onClick={onClick} className="group relative flex items-center">
+      <Link href={`/servers/${id}`} className="group relative flex items-center">
         <div
           className={cn(
             'absolute left-0 bg-primary rounded-r-full transition-all w-[4px]',
@@ -46,7 +41,7 @@ export const NavigationItem = ({ id, name, imageUrl }: NavigationItemProps) => {
             </div>
           )}
         </div>
-      </button>
+      </Link>
     </ActionTooltip>
   );
 };

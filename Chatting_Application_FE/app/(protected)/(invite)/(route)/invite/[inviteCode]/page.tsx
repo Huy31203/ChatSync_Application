@@ -10,12 +10,11 @@ interface InviteCodePageProps {
   };
 }
 const InviteCodePage = async ({ params }: InviteCodePageProps) => {
-  if (!params.inviteCode) return redirect('/');
+  const { inviteCode } = await params;
+  if (!inviteCode) return redirect('/');
 
-  const res = await http.patch<IServer>(`${API_URL.SERVERS}/join/${params.inviteCode}`);
+  const res = await http.patch<IServer>(`${API_URL.SERVERS}/join/${inviteCode}`);
   const payload = res.payload as ApiResponse<IServer>;
-
-  console.log(payload);
 
   if (!payload.result) return redirect('/');
 

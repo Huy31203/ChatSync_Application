@@ -26,6 +26,15 @@ public class GlobalUtil {
         return tmpList;
     }
 
+    @SafeVarargs
+    public static <T> List<T> removeElements(List<T> immutableList, T... elements) {
+        List<T> tmpList = new ArrayList<>(immutableList);
+        for (T element : elements) {
+            tmpList.remove(element);
+        }
+        return tmpList;
+    }
+
     public static final String[] AUTH_WHITELIST = {
             "/v1/auth/login",
             "/v1/auth/register",

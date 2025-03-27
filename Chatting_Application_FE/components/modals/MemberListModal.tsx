@@ -28,7 +28,7 @@ import logError from '@/utils';
 
 export const MemberListModal = () => {
   const router = useRouter();
-  const { onOpen, isOpen, onClose, type, data } = useModal();
+  const { onOpen, isOpen, onClose, type, data, setData } = useModal();
   const [loadingId, setLoadingId] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
 
@@ -62,7 +62,15 @@ export const MemberListModal = () => {
 
       const res = await memberService.deleteMember(server.id, memberId);
 
-      router.refresh();
+      const { members, ...rest } = server;
+      const newServer = {
+        ...rest,
+        members: members.filter((member) => member.id !== memberId),
+      };
+      setData({ server: newServer });
+
+      toast.success(`Member: ${res.result.name} has been kicked successfully`);
+
       onOpen('members', { server: res.result });
     } catch (error) {
       logError(error);
@@ -80,9 +88,16 @@ export const MemberListModal = () => {
       };
 
       const res = await memberService.updateMember(server.id, member.id, data);
-      toast.success(`Member: ${member.profile.name} role has been updated successfully`);
 
-      router.refresh();
+      const { members, ...rest } = server;
+      const newServer = {
+        ...rest,
+        members: members.map((m) => (m.id === member.id ? { ...m, ...data } : m)),
+      };
+      setData({ server: newServer });
+
+      toast.success(`Member: ${member.profile.name}'s role has been updated successfully`);
+
       onOpen('members', { server: res.result });
     } catch (error) {
       logError(error);
@@ -100,7 +115,7 @@ export const MemberListModal = () => {
             {filteredMembers?.length} of {server?.members?.length} Members
           </DialogDescription>
         </DialogHeader>
-
+    
         <div className="px-4 mt-2">
           <div className="relative">
             <Search className="absolute left-2 top-3 h-4 w-4 text-zinc-500" />

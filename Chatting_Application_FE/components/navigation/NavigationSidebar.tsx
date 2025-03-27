@@ -1,6 +1,7 @@
 'use client';
 
 import { LogOut, User } from 'lucide-react';
+import { useContext, useEffect, useState } from 'react';
 
 import { ModeToggle } from '@/components/ModeToggle';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -13,33 +14,41 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
+import { ServersContext } from '@/contexts/ServersContext';
 import { useAuth } from '@/hooks/useAuth';
 import { IServer } from '@/types';
 
 import { NavigationAction } from './NavigationAction';
 import { NavigationItem } from './NavigationItem';
 
-export const NavigationSidebar = ({ servers }: { servers: IServer[] }) => {
+export const NavigationSidebar = () => {
   const { profile, loading, logout } = useAuth();
+  const { servers, loading: serversLoading } = useContext(ServersContext);
 
-  console.log(loading);
+  const [serverList, setServerList] = useState<IServer[]>([]);
+
+  useEffect(() => {
+    if (servers) {
+      setServerList(servers);
+    }
+  }, [servers]);
 
   return (
     <div
       className="space-y-4 flex flex-col items-center h-full text-primary w-full
           dark:bg-[#1E1F22] bg-[#E3E5E8] py-3"
     >
-      {!loading && profile && servers && (
+      {!loading && profile && serverList && (
         <>
-          <NavigationAction />
-          {servers.length > 0 && (
+          <NavigationAction servers={serverList} setServers={setServerList} />
+          {serverList.length > 0 && (
             <Separator
               className="h-[2px] bg-zinc-300
             dark:gb-zinc-700 rounded-md w-10 mx-auto"
             />
           )}
           <ScrollArea className="flex-1 w-full">
-            {servers.map((server) => (
+            {serverList.map((server) => (
               <div key={server.id} className="mb-4">
                 <NavigationItem id={server.id} name={server.name} imageUrl={server.imageUrl} />
               </div>

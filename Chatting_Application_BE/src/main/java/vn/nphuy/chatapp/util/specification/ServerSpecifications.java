@@ -28,7 +28,8 @@ public class ServerSpecifications {
 
             // Build the where conditions
             return criteriaBuilder.and(
-                    criteriaBuilder.equal(profileJoin.get("id"), profileId));
+                    criteriaBuilder.equal(profileJoin.get("id"), profileId),
+                    criteriaBuilder.equal(memberJoin.get("deleted"), false));
         };
     }
 }
