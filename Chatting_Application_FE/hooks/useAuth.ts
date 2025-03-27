@@ -12,6 +12,7 @@ export function useAuth() {
       try {
         const res = await authService.getCurrentProfile();
         setProfile(res.result);
+
       } catch (error) {
         logError(error);
         setProfile(null);

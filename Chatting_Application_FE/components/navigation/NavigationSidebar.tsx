@@ -3,7 +3,7 @@
 import { LogOut, User } from 'lucide-react';
 import { useContext, useEffect, useState } from 'react';
 
-import { ModeToggle } from '@/components/ModeToggle';
+import { ModeToggle } from '@/components/toggles/ModeToggle';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
   DropdownMenu,
@@ -28,10 +28,10 @@ export const NavigationSidebar = () => {
   const [serverList, setServerList] = useState<IServer[]>([]);
 
   useEffect(() => {
-    if (servers) {
+    if (!serversLoading && servers.length > 0) {
       setServerList(servers);
     }
-  }, [servers]);
+  }, [serversLoading, servers]);
 
   return (
     <div

@@ -1,7 +1,7 @@
 import { redirect } from 'next/navigation';
 
 import { API_URL } from '@/constants/endpoint';
-import http from '@/libs/http';
+import http from '@/lib/http';
 import { ApiResponse, IServer } from '@/types';
 
 interface InviteCodePageProps {

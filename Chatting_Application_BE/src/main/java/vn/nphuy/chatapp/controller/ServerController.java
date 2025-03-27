@@ -1,5 +1,6 @@
 package vn.nphuy.chatapp.controller;
 
+import java.util.HashMap;
 import java.util.List;
 
 import org.modelmapper.ModelMapper;
@@ -19,16 +20,20 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import vn.nphuy.chatapp.domain.Channel;
+import vn.nphuy.chatapp.domain.Conversation;
 import vn.nphuy.chatapp.domain.Member;
 import vn.nphuy.chatapp.domain.Profile;
 import vn.nphuy.chatapp.domain.Server;
 import vn.nphuy.chatapp.domain.request.ReqChannelDTO;
+import vn.nphuy.chatapp.domain.request.ReqConversationDTO;
 import vn.nphuy.chatapp.domain.request.ReqServerDTO;
 import vn.nphuy.chatapp.domain.request.ReqUpdateMemberDTO;
 import vn.nphuy.chatapp.domain.response.ResChannelDTO;
+import vn.nphuy.chatapp.domain.response.ResConversationDTO;
 import vn.nphuy.chatapp.domain.response.ResServerDTO;
 import vn.nphuy.chatapp.domain.response.ResultPaginationDTO;
 import vn.nphuy.chatapp.service.ChannelService;
+import vn.nphuy.chatapp.service.ConversationService;
 import vn.nphuy.chatapp.service.MemberService;
 import vn.nphuy.chatapp.service.ServerService;
 import vn.nphuy.chatapp.util.SecurityUtil;
@@ -47,6 +52,7 @@ public class ServerController {
   private final ServerService serverService;
   private final ChannelService channelService;
   private final MemberService memberService;
+  private final ConversationService conversationService;
   private final ModelMapper modelMapper;
   private final SecurityUtil securityUtil;
   // private final RateLimitService rateLimitService;
@@ -119,6 +125,29 @@ public class ServerController {
     return ResponseEntity.ok(resServer);
   }
 
+  @GetMapping("/servers/{serverId}/conversations/{receiverId}")
+  @ApiMessage(message = "Get all conversations by memberId")
+  public ResponseEntity<Object> getConversationByMemberId(@PathVariable("serverId") String serverId,
+      @PathVariable("receiverId") String receiverId, Pageable pageable) {
+
+    String profileId = securityUtil.getCurrentProfile().getId();
+    Member member = memberService.getMemberByProfileIdAndServerId(profileId, serverId);
+
+    if (member == null) {
+      throw new NotAllowedException("You are not a member of that server");
+    }
+
+    Conversation result = conversationService.getConversationBySenderIdAndReceiverId(member.getId(), receiverId);
+
+    if (result == null) {
+      return ResponseEntity.ok().body(new HashMap<>());
+    }
+
+    ResConversationDTO resConversation = modelMapper.map(result, ResConversationDTO.class);
+
+    return ResponseEntity.ok().body(resConversation);
+  }
+
   @PostMapping("/servers")
   @ApiMessage(message = "Create new server")
   public ResponseEntity<Object> createNewServer(@Valid @RequestBody ReqServerDTO reqServer) {
@@ -167,6 +196,31 @@ public class ServerController {
     ResChannelDTO resChannel = modelMapper.map(result, ResChannelDTO.class);
 
     return ResponseEntity.status(201).body(resChannel);
+  }
+
+  @PostMapping("/servers/{id}/conversations")
+  @ApiMessage(message = "Create new conversation in server")
+  @Transactional
+  public ResponseEntity<Object> createNewConversation(@PathVariable("id") String id,
+      @Valid @RequestBody ReqConversationDTO reqConversation) {
+    String profileId = securityUtil.getCurrentProfile().getId();
+
+    Member sender = memberService.getMemberByProfileIdAndServerId(profileId, id);
+    Member receiver = memberService.getMemberById(reqConversation.getReceiverId());
+
+    Conversation conversation = new Conversation();
+    conversation.setSender(sender);
+    conversation.setReceiver(receiver);
+
+    Conversation result = conversationService.createConversation(conversation);
+
+    if (result == null) {
+      throw new ServerErrorException("Failed to create conversation");
+    }
+
+    ResConversationDTO resConversation = modelMapper.map(result, ResConversationDTO.class);
+
+    return ResponseEntity.ok(resConversation);
   }
 
   @PatchMapping("/servers/{id}")

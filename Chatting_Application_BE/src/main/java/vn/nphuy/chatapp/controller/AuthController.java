@@ -1,5 +1,7 @@
 package vn.nphuy.chatapp.controller;
 
+import java.util.Base64;
+
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
@@ -15,6 +17,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.github.bucket4j.Bucket;
 import jakarta.validation.Valid;
@@ -213,7 +217,30 @@ public class AuthController {
     Profile profile = securityUtil.getCurrentProfile();
     ResProfileDTO resProfile = modelMapper.map(profile, ResProfileDTO.class);
 
-    return ResponseEntity.ok().body(resProfile);
+    String profileJson;
+    try {
+      ObjectMapper objectMapper = new ObjectMapper();
+      // Register the Java 8 date/time module
+      objectMapper.registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule());
+      objectMapper.disable(com.fasterxml.jackson.databind.SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+      profileJson = objectMapper.writeValueAsString(resProfile);
+    } catch (Exception e) {
+      log.error("Error converting profile to JSON", e);
+      throw new ServerErrorException("Failed to convert profile to JSON");
+    }
+
+    String encodedProfileJson = Base64.getEncoder().encodeToString(profileJson.getBytes());
+
+    ResponseCookie resProfileCookie = ResponseCookie.from("profile", encodedProfileJson)
+        .httpOnly(true)
+        .path("/")
+        .secure(activeProfile.equals("prod"))
+        .build();
+
+    return ResponseEntity
+        .ok()
+        .header(HttpHeaders.SET_COOKIE, resProfileCookie.toString())
+        .body(resProfile);
   }
 
   @GetMapping("refresh")

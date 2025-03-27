@@ -6,7 +6,7 @@ import type React from 'react';
 import { useRef, useState, type ChangeEvent } from 'react';
 
 import { Button } from '@/components/ui/button';
-import { cn } from '@/libs/utils';
+import { cn } from '@/lib/utils';
 
 interface ImageUploadProps {
   onChange: (file: File | string | null) => void;

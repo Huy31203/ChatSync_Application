@@ -13,6 +13,9 @@ public class ChannelSpecifications {
   public static Specification<Channel> hasServerId(String serverId) {
     return (root, query, criteriaBuilder) ->
     // Build the where condition to get all channels in a server by serverId
-    criteriaBuilder.equal(root.get("server").get("id"), serverId);
+    criteriaBuilder.and(
+        criteriaBuilder.equal(root.get("server").get("id"), serverId),
+        criteriaBuilder.equal(root.get("deleted"), false) // Ensure the channel is not deleted
+    );
   }
 }

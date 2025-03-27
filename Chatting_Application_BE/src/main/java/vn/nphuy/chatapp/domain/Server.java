@@ -32,10 +32,10 @@ public class Server extends AbstractEntity {
     @Column(unique = true)
     private String inviteCode;
 
-    @OneToMany(mappedBy = "server", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "server", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<Member> members;
 
-    @OneToMany(mappedBy = "server", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "server", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<Channel> channels;
 
     public List<Member> getMembers() {

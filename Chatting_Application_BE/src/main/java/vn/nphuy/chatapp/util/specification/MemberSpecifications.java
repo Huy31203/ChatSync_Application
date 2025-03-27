@@ -13,6 +13,9 @@ public class MemberSpecifications {
   public static Specification<Member> hasProfileId(String profileId) {
     return (root, query, criteriaBuilder) ->
     // Build the where condition to get all channels in a profile by profileId
-    criteriaBuilder.equal(root.get("profile").get("id"), profileId);
+    criteriaBuilder.and(
+        criteriaBuilder.equal(root.get("profile").get("id"), profileId),
+        criteriaBuilder.equal(root.get("deleted"), false) // Ensure the member is not deleted
+    );
   }
 }

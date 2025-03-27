@@ -5,11 +5,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Setter
 @Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ReqCreateMemberDTO {
-    private String serverId;
-    private String profileId;
+public class ReqConversationDTO {
+  private String receiverId;
 }

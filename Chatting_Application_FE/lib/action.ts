@@ -3,10 +3,10 @@
 
 import { cookies, headers } from 'next/headers';
 
-import { ACCESS_TOKEN } from '@/constants';
-import { ApiResponse, ApiResponseWithPagination } from '@/types';
+import { ACCESS_TOKEN, PROFILE } from '@/constants';
+import { ApiResponse, ApiResponseWithPagination, IProfile } from '@/types';
 
-import { CustomOptions } from './http';
+import http, { CustomOptions } from './http';
 
 type EntityErrorPayload = {
   message: string;
@@ -30,8 +30,8 @@ class HttpError extends Error {
 }
 
 class EntityError extends HttpError {
-  status: 422;
-  payload: EntityErrorPayload;
+  status = 422;
+  payload: EntityErrorPayload = { message: '', errors: [] };
   constructor({ status, payload }: { status: 422; payload: EntityErrorPayload }) {
     super({ status, payload });
     this.status = status;
@@ -94,6 +94,7 @@ const request = async <Response>(
       payload = await res.json();
     } catch (error) {
       console.error('Error parsing JSON:', error);
+      console.error('Response text:', await res.text());
       throw new Error('Failed to parse JSON response');
     }
   }
@@ -137,6 +138,24 @@ const request = async <Response>(
   }
 
   return data;
+};
+
+export const getProfileFromCookie = async (): Promise<IProfile> => {
+  const cookieStore = await cookies();
+  const profileCookie = cookieStore.get(PROFILE)?.value;
+
+  if (profileCookie === undefined || profileCookie.length === 0) {
+    const res = await http.get('/auth/current-profile');
+    const payload = res.payload as ApiResponse<IProfile>;
+    const profile = payload.result;
+
+    return profile;
+  }
+
+  const decodedProfile = profileCookie ? atob(profileCookie) : '';
+  const profile = JSON.parse(decodedProfile);
+
+  return profile;
 };
 
 export default request;

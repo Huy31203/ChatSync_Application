@@ -30,7 +30,7 @@ export const ServerSidebar = () => {
     return null;
   }
 
-  if (!serverLoading && !server) {
+  if (!serverLoading && server?.id === undefined) {
     router.push('/');
     return null;
   }

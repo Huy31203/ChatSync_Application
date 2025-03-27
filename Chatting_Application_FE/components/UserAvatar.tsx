@@ -1,7 +1,7 @@
 import { AvatarFallback } from '@radix-ui/react-avatar';
 
 import { Avatar, AvatarImage } from '@/components/ui/avatar';
-import { cn } from '@/libs/utils';
+import { cn } from '@/lib/utils';
 
 interface UserAvatarProps {
   src?: string;

@@ -11,10 +11,12 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 import vn.nphuy.chatapp.domain.response.RestResponse;
 import vn.nphuy.chatapp.util.annotation.ApiMessage;
 
 @ControllerAdvice
+@Slf4j
 public class FormatRestResponse implements ResponseBodyAdvice<Object> {
 
     @Value("${server.servlet.context-path}")
@@ -33,6 +35,7 @@ public class FormatRestResponse implements ResponseBodyAdvice<Object> {
             Class selectedConverterType,
             ServerHttpRequest request,
             ServerHttpResponse response) {
+        
         HttpServletResponse servletResponse = ((ServletServerHttpResponse) response).getServletResponse();
         int status = servletResponse.getStatus();
 

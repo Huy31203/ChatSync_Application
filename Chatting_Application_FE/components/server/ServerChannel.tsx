@@ -7,7 +7,7 @@ import React from 'react';
 import { ActionTooltip } from '@/components/ActionTooltip';
 import { ModalType, useModal } from '@/hooks/useModalStore';
 import { useRouter } from '@/hooks/useRouter';
-import { cn } from '@/libs/utils';
+import { cn } from '@/lib/utils';
 import { ChannelTypeEnum, IChannel, IServer, MemberRoleEnum } from '@/types';
 
 interface ServerChannelProps {

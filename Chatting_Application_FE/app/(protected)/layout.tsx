@@ -3,7 +3,7 @@ import React from 'react';
 import { NavigationSidebar } from '@/components/navigation/NavigationSidebar';
 import { API_URL } from '@/constants/endpoint';
 import { ServersProvider } from '@/contexts/ServersContext';
-import http from '@/libs/http';
+import http from '@/lib/http';
 import { ApiResponseWithPagination, IServer } from '@/types';
 
 const ProtectedLayout = async ({ children }: { children: React.ReactNode }) => {

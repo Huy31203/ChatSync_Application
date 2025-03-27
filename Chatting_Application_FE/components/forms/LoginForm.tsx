@@ -13,7 +13,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
 import { useRouter } from '@/hooks/useRouter';
-import { cn } from '@/libs/utils';
+import { cn } from '@/lib/utils';
 import { authService } from '@/services/authService';
 import logError from '@/utils';
 

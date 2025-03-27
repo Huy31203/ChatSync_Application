@@ -5,7 +5,7 @@ import { useParams } from 'next/navigation';
 
 import { UserAvatar } from '@/components/UserAvatar';
 import { roleIconMap } from '@/constants/IconMap';
-import { cn } from '@/libs/utils';
+import { cn } from '@/lib/utils';
 import { IMember, IServer } from '@/types';
 
 interface ServerMemberProps {

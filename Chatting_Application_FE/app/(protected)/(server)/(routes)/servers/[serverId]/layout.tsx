@@ -1,9 +1,10 @@
 import React from 'react';
 
 import { ServerSidebar } from '@/components/server/ServerSidebar';
+import { GlobalMobileToggle } from '@/components/toggles/GlobalMobileToggle';
 import { API_URL } from '@/constants/endpoint';
 import { ServerProvider } from '@/contexts/ServerContext';
-import http from '@/libs/http';
+import http from '@/lib/http';
 import { ApiResponse, IServer } from '@/types';
 
 const ServerIdLayout = async ({ children, params }: { children: React.ReactNode; params: { serverId: string } }) => {
@@ -20,6 +21,7 @@ const ServerIdLayout = async ({ children, params }: { children: React.ReactNode;
         <div className="hidden md:flex h-full w-60 z-20 flex-col fixed inset-y-0">
           <ServerSidebar />
         </div>
+        <GlobalMobileToggle />
         <main className="h-full md:pl-60">{children}</main>
       </div>
     </ServerProvider>

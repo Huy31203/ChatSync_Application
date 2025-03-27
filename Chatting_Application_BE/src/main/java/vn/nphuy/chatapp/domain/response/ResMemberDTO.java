@@ -1,6 +1,7 @@
 package vn.nphuy.chatapp.domain.response;
 
 import java.time.Instant;
+import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
@@ -23,6 +24,12 @@ public class ResMemberDTO {
 
     @JsonIgnoreProperties("members")
     private ResProfileDTO profile;
+
+    @JsonIgnoreProperties("sender")
+    private List<ResConversationDTO> conversationSended;
+
+    @JsonIgnoreProperties("receiver")
+    private List<ResConversationDTO> conversationReceived;
 
     private Instant createdAt;
 

@@ -3,10 +3,10 @@ import { Open_Sans } from 'next/font/google';
 import React from 'react';
 import { ToastContainer } from 'react-toastify';
 
+import { NextTopLoader } from '@/components/loader/top-loader';
 import { ModalProvider } from '@/components/providers/ModalProvider';
 import { ThemeProvider } from '@/components/providers/ThemeProvider';
-import { NextTopLoader } from '@/components/loader/top-loader';
-import { cn } from '@/libs/utils';
+import { cn } from '@/lib/utils';
 import './globals.css';
 
 const font = Open_Sans({ subsets: ['latin'] });

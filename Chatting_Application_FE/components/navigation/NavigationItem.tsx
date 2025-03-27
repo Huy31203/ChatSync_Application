@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useParams } from 'next/navigation';
 
 import { ActionTooltip } from '@/components/ActionTooltip';
-import { cn } from '@/libs/utils';
+import { cn } from '@/lib/utils';
 
 interface NavigationItemProps {
   id: string;
