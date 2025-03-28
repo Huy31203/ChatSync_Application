@@ -42,6 +42,9 @@ const DialogContent = React.forwardRef<
         className
       )}
       onOpenAutoFocus={(e) => e.preventDefault()}
+      onInteractOutside={(e) => {
+        if ((e.target as HTMLElement)?.closest('.Toastify')) e.preventDefault();
+      }}
       {...props}
     >
       {children}

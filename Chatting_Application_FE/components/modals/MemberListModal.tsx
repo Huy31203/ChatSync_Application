@@ -108,20 +108,20 @@ export const MemberListModal = () => {
 
   return (
     <Dialog open={isModalOpen} onOpenChange={onClose}>
-      <DialogContent className="bg-white text-black overflow-hidden">
+      <DialogContent className="overflow-hidden">
         <DialogHeader className="pt-4 px-6">
           <DialogTitle className="text-2xl text-center font-bold">Manage Members</DialogTitle>
-          <DialogDescription className="text-center text-zinc-500">
+          <DialogDescription className="text-center">
             {filteredMembers?.length} of {server?.members?.length} Members
           </DialogDescription>
         </DialogHeader>
-    
+
         <div className="px-4 mt-2">
           <div className="relative">
-            <Search className="absolute left-2 top-3 h-4 w-4 text-zinc-500" />
+            <Search className="absolute left-2 top-3 h-4 w-4 text-black" />
             <Input
               placeholder="Search members..."
-              className="pl-8 bg-zinc-100 border-[1px] border-zinc-400 focus-visible:bg-gray-50 focus-visible:ring-0 focus-visible:ring-offset-0 text-black"
+              className="pl-8 dark:bg-zinc-700 border-[1px] focus-visible:ring-0 focus-visible:ring-offset-0"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
@@ -130,7 +130,7 @@ export const MemberListModal = () => {
 
         <ScrollArea className="mt-4 max-h-[400px] pr-6">
           {filteredMembers?.length === 0 ? (
-            <p className="text-zinc-500 text-center p-4">No members found</p>
+            <p className="text-center p-4">No members found</p>
           ) : (
             filteredMembers?.map((member) => (
               <div key={member.id} className="flex items-center gap-x-2 mb-6">

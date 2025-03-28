@@ -18,6 +18,10 @@ export const authService = {
     return apiClient.get(`${API_URL.AUTH}/current-profile`);
   },
 
+  changePassword: async (data: { oldPassword: string; newPassword: string }) => {
+    await apiClient.post(`${API_URL.AUTH}/change-password`, data);
+  },
+
   refresh: async () => {
     await apiClient.get(`${BE_URL}/${API_URL.AUTH}/refresh`);
   },

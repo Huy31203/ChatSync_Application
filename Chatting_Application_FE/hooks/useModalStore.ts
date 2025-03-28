@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 
-import { ChannelTypeEnum, IChannel, IServer } from '@/types';
+import { ChannelTypeEnum, IChannel, IProfile, IServer } from '@/types';
 
 export type ModalType =
   | 'createServer'
@@ -11,7 +11,8 @@ export type ModalType =
   | 'deleteServer'
   | 'leaveServer'
   | 'editChannel'
-  | 'deleteChannel';
+  | 'deleteChannel'
+  | 'editProfile';
 
 interface ModalData {
   server?: IServer;
@@ -19,6 +20,7 @@ interface ModalData {
   channel?: IChannel;
   channels?: IChannel[];
   channelType?: ChannelTypeEnum;
+  profile?: IProfile;
 }
 
 interface ModalStore {

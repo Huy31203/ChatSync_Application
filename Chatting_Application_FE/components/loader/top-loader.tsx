@@ -12,5 +12,5 @@ export const NextTopLoader = () => {
     NProgress.done();
   }, [pathname]);
 
-  return <Loader />;
+  return <Loader showSpinner={false} />;
 };

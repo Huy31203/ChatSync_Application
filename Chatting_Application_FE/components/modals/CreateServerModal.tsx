@@ -83,7 +83,7 @@ export const CreateServerModal = () => {
 
   return (
     <Dialog open={isModalOpen} onOpenChange={handleClose}>
-      <DialogContent className="bg-white text-black p-0 overflow-hidden">
+      <DialogContent className="p-0 overflow-hidden">
         <DialogHeader className="pt-8 px-6">
           <DialogTitle className="text-2xl text-center font-bold">Customize your Server</DialogTitle>
           <DialogDescription className="text-center text-zinc-500">
@@ -111,17 +111,12 @@ export const CreateServerModal = () => {
                 name="name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel
-                      className="uppercase text-xs font-bold text-zinc-500
-											dark:text-secondary/70"
-                    >
-                      Server name
-                    </FormLabel>
+                    <FormLabel className="uppercase text-xs font-semibold">Server name</FormLabel>
                     <FormControl>
                       <Input
                         disabled={isLoading}
-                        className="bg-zinc-300/50 border-0
-												focus-visible:ring-0 text-black
+                        className="dark:bg-zinc-700
+												focus-visible:ring-0
 												focus-visible:ring-offset-0"
                         placeholder="Enter Server name"
                         {...field}
@@ -132,7 +127,7 @@ export const CreateServerModal = () => {
                 )}
               />
             </div>
-            <DialogFooter className="bg-gray-100 px-6 py-4">
+            <DialogFooter className="p-6">
               <Button variant="primary" disabled={isLoading}>
                 Create
               </Button>

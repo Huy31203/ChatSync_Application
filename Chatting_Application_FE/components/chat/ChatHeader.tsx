@@ -1,6 +1,12 @@
+'use client';
+
 import { Hash } from 'lucide-react';
 
 import { MobileToggle } from '@/components/toggles/MobileToggle';
+import { useSocket } from '@/hooks/useSocket';
+
+import { UserAvatar } from '../UserAvatar';
+import { SocketIndicator } from '../indicator/SocketIndicator';
 
 interface ChatHeaderProps {
   serverId: string;
@@ -10,14 +16,20 @@ interface ChatHeaderProps {
 }
 
 export const ChatHeader = ({ serverId, name, type, imageUrl }: ChatHeaderProps) => {
+  const { isConnected, on, emit } = useSocket();
+
   return (
     <div
-      className="text-md font-semibold px-3 flex items-center h-12
+      className="text-md font-semibold px-3   flex items-center h-12
       border-neutral-200 dark:border-neutral-800 border-b-2"
     >
       <MobileToggle />
       {type === 'channel' && <Hash className="w-5 h-5 text-zinc-500 dark:text-zinc-400 mr-2" />}
+      {type === 'conversation' && <UserAvatar src={imageUrl} className="mr-2 h-8 w-8 md:h-8 md:w-8" />}
       <p className="font-semibold text-md text-black dark:text-white">{name}</p>
+      <div className="ml-auto flex items-center">
+        <SocketIndicator />
+      </div>
     </div>
   );
 };

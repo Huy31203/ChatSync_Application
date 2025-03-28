@@ -75,7 +75,7 @@ export const EditServerModal = () => {
 
       const res = await serverService.updateServer(server?.id ?? '', data);
 
-      toast.success('Server created successfully');
+      toast.success('Server edited successfully');
 
       const newServers = servers.map((s) => {
         if (s.id === server?.id) {
@@ -99,10 +99,10 @@ export const EditServerModal = () => {
 
   return (
     <Dialog open={isModalOpen} onOpenChange={handleClose}>
-      <DialogContent className="bg-white text-black p-0 overflow-hidden">
+      <DialogContent className="p-0 overflow-hidden">
         <DialogHeader className="pt-8 px-6">
           <DialogTitle className="text-2xl text-center font-bold">Modify your Server</DialogTitle>
-          <DialogDescription className="text-center text-zinc-500">
+          <DialogDescription className="text-center">
             You can change the name and image of your server
           </DialogDescription>
         </DialogHeader>
@@ -127,17 +127,12 @@ export const EditServerModal = () => {
                 name="name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel
-                      className="uppercase text-xs font-bold text-zinc-500
-											dark:text-secondary/70"
-                    >
-                      Name
-                    </FormLabel>
+                    <FormLabel className="uppercase text-xs font-semibold">Name</FormLabel>
                     <FormControl>
                       <Input
                         disabled={isLoading}
-                        className="bg-zinc-300/50 border-0
-												focus-visible:ring-0 text-black
+                        className="dark:bg-zinc-700
+												focus-visible:ring-0
 												focus-visible:ring-offset-0"
                         placeholder="Enter Server name"
                         {...field}
@@ -148,7 +143,7 @@ export const EditServerModal = () => {
                 )}
               />
             </div>
-            <DialogFooter className="bg-gray-100 px-6 py-4">
+            <DialogFooter className="p-6">
               <Button variant="primary" disabled={isLoading}>
                 Save
               </Button>

@@ -11,6 +11,7 @@ interface AuthState {
   login: (email: string, password: string) => Promise<void>;
   logout: () => void;
   setProfile: (profile: IProfile | null) => void;
+  renewProfile: () => Promise<void>;
   setLoading: (loading: boolean) => void;
 }
 
@@ -46,5 +47,15 @@ export const useAuthStore = create<AuthState>((set) => ({
     set({ loading: false });
   },
   setProfile: (profile: IProfile | null) => set({ profile }),
+  renewProfile: async () => {
+    try {
+      const res = await authService.getCurrentProfile();
+      const profile = res.result;
+
+      set({ profile });
+    } catch (error) {
+      logError(error);
+    }
+  },
   setLoading: (loading: boolean) => set({ loading }),
 }));

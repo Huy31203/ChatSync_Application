@@ -72,14 +72,15 @@ export default function RegisterForm() {
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
       console.log('values', values);
-      const { avatar, confirmPassword, terms, ...rest } = values;
       const data = {
-        ...rest,
+        name: values.name,
+        email: values.email,
+        password: values.password,
         avatarUrl: '',
       };
 
-      if (avatar) {
-        const { fileUrl } = await uploadService.uploadImage(avatar);
+      if (values.avatar) {
+        const { fileUrl } = await uploadService.uploadImage(values.avatar);
         data.avatarUrl = fileUrl;
       }
 

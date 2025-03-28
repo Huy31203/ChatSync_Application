@@ -16,12 +16,14 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
 import { ServersContext } from '@/contexts/ServersContext';
 import { useAuth } from '@/hooks/useAuth';
+import { useModal } from '@/hooks/useModalStore';
 import { IServer } from '@/types';
 
 import { NavigationAction } from './NavigationAction';
 import { NavigationItem } from './NavigationItem';
 
 export const NavigationSidebar = () => {
+  const { onOpen } = useModal();
   const { profile, loading, logout } = useAuth();
   const { servers, loading: serversLoading } = useContext(ServersContext);
 
@@ -64,7 +66,7 @@ export const NavigationSidebar = () => {
                 </Avatar>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-56">
-                <DropdownMenuItem className="cursor-pointer">
+                <DropdownMenuItem onClick={() => onOpen('editProfile', { profile })} className="cursor-pointer">
                   <User className="mr-2 h-4 w-4" />
                   <span>Edit Profile</span>
                 </DropdownMenuItem>
