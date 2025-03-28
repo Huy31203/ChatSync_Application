@@ -1,7 +1,7 @@
 package vn.nphuy.chatapp.controller;
 
-import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Pageable;
@@ -140,7 +140,7 @@ public class ServerController {
     Conversation result = conversationService.getConversationBySenderIdAndReceiverId(member.getId(), receiverId);
 
     if (result == null) {
-      return ResponseEntity.ok().body(new HashMap<>());
+      return ResponseEntity.ok().body(Optional.empty());
     }
 
     ResConversationDTO resConversation = modelMapper.map(result, ResConversationDTO.class);
@@ -220,7 +220,7 @@ public class ServerController {
 
     ResConversationDTO resConversation = modelMapper.map(result, ResConversationDTO.class);
 
-    return ResponseEntity.ok(resConversation);
+    return ResponseEntity.status(201).body(resConversation);
   }
 
   @PatchMapping("/servers/{id}")
@@ -362,7 +362,7 @@ public class ServerController {
       throw new ResourceNotFoundException("Member not found with id: " + member.getId());
     }
 
-    return ResponseEntity.ok().body(null);
+    return ResponseEntity.ok().body(Optional.empty());
   }
 
   @DeleteMapping("/servers/{id}")

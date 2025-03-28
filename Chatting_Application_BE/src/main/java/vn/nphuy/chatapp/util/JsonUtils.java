@@ -1,0 +1,28 @@
+package vn.nphuy.chatapp.util;
+
+import org.json.JSONObject;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+public class JsonUtils {
+  private static final ObjectMapper om = new ObjectMapper();
+
+  public static JSONObject toJsonObj(Object obj) {
+    try {
+      String s = om.writeValueAsString(obj);
+      return new JSONObject(s);
+    } catch (Exception e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  public static <T> T toPojoObj(JSONObject jo, Class<T> clazz) {
+    try {
+      return om.readValue(jo.toString(), clazz);
+    } catch (JsonProcessingException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+}

@@ -1,5 +1,7 @@
 package vn.nphuy.chatapp.util;
 
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.MethodParameter;
 import org.springframework.core.io.Resource;
@@ -35,7 +37,7 @@ public class FormatRestResponse implements ResponseBodyAdvice<Object> {
             Class selectedConverterType,
             ServerHttpRequest request,
             ServerHttpResponse response) {
-        
+
         HttpServletResponse servletResponse = ((ServletServerHttpResponse) response).getServletResponse();
         int status = servletResponse.getStatus();
 
@@ -59,6 +61,9 @@ public class FormatRestResponse implements ResponseBodyAdvice<Object> {
             return body;
         } else {
             // case success
+            if (body == Optional.empty()) {
+                res.setResult(null);
+            }
             res.setResult(body);
             ApiMessage apiMessage = returnType.getMethodAnnotation(ApiMessage.class);
             res.setMessage(

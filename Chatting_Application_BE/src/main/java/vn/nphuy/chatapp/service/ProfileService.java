@@ -79,6 +79,10 @@ public class ProfileService {
             existingProfile.setName(
                     null != profile.getName() ? profile.getName() : existingProfile.getName());
 
+            existingProfile.setAvatarUrl(
+                    null != profile.getAvatarUrl() ? profile.getAvatarUrl()
+                            : existingProfile.getAvatarUrl());
+
             return profileRepository.save(existingProfile);
         } else {
             return null;

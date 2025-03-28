@@ -3,6 +3,7 @@ package vn.nphuy.chatapp.domain.response;
 import java.time.Instant;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import jakarta.persistence.EnumType;
@@ -25,10 +26,10 @@ public class ResMemberDTO {
     @JsonIgnoreProperties("members")
     private ResProfileDTO profile;
 
-    @JsonIgnoreProperties("sender")
+    @JsonBackReference
     private List<ResConversationDTO> conversationSended;
 
-    @JsonIgnoreProperties("receiver")
+    @JsonBackReference
     private List<ResConversationDTO> conversationReceived;
 
     private Instant createdAt;

@@ -1,6 +1,6 @@
 plugins {
 	java
-	id("org.springframework.boot") version "3.4.3"
+	id("org.springframework.boot") version "3.4.4"
 	id("io.spring.dependency-management") version "1.1.7"
 	id("io.freefair.lombok") version "8.6"
 }
@@ -19,6 +19,9 @@ repositories {
 }
 
 dependencies {
+    implementation("net.logstash.logback:logstash-logback-encoder:8.0")
+    implementation("io.socket:socket.io-server:4.1.2") 
+    implementation("org.springframework:spring-websocket:6.2.5")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.springframework.boot:spring-boot-starter-security")

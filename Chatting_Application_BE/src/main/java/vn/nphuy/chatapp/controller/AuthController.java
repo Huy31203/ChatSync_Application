@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -25,6 +26,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import vn.nphuy.chatapp.domain.Profile;
+import vn.nphuy.chatapp.domain.request.ReqChangePasswordDTO;
 import vn.nphuy.chatapp.domain.request.ReqLoginDTO;
 import vn.nphuy.chatapp.domain.request.ReqRegisterDTO;
 import vn.nphuy.chatapp.domain.response.ResLoginDTO;
@@ -190,26 +192,25 @@ public class AuthController {
   // return ResponseEntity.ok().body(null);
   // }
 
-  // @PostMapping("change-password")
-  // @ApiMessage(message = "Change password")
-  // public ResponseEntity<Void> changePassword(@RequestBody ReqChangePasswordDTO
-  // changeCred) {
-  // String oldPassword = changeCred.getOldPassword();
-  // String newPassword = changeCred.getNewPassword();
+  @PostMapping("change-password")
+  @ApiMessage(message = "Change current profille password")
+  public ResponseEntity<Void> changePassword(@RequestBody ReqChangePasswordDTO changeCred) {
+    String oldPassword = changeCred.getOldPassword();
+    String newPassword = changeCred.getNewPassword();
 
-  // // Check valid old password
-  // User profile = securityUtil.getCurrentUser();
-  // boolean valid = passwordEncoder.matches(oldPassword, profile.getPassword());
+    // Check valid old password
+    Profile profile = securityUtil.getCurrentProfile();
+    boolean valid = passwordEncoder.matches(oldPassword, profile.getPassword());
 
-  // if (!valid) {
-  // throw new BadCredentialsException("Old password is incorrect");
-  // }
+    if (!valid) {
+      throw new BadCredentialsException("Old password is incorrect");
+    }
 
-  // String hashPassword = passwordEncoder.encode(newPassword);
-  // profileService.updateUserPassword(profile.getEmail(), hashPassword);
+    String hashPassword = passwordEncoder.encode(newPassword);
+    profileService.updateProfilePassword(profile.getEmail(), hashPassword);
 
-  // return ResponseEntity.ok().body(null);
-  // }
+    return ResponseEntity.ok().body(null);
+  }
 
   @GetMapping("current-profile")
   @ApiMessage(message = "Fetch current profile")

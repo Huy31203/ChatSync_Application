@@ -1,6 +1,7 @@
 package vn.nphuy.chatapp.config;
 
 import java.util.Arrays;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -23,6 +24,13 @@ public class CorsConfig {
         configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "Accept"));
         configuration.setAllowCredentials(true);
         configuration.setMaxAge(3600L);
+
+        // Add WebSocket-specific headers
+        configuration.addAllowedHeader("Sec-WebSocket-Key");
+        configuration.addAllowedHeader("Sec-WebSocket-Protocol");
+        configuration.addAllowedHeader("Sec-WebSocket-Version");
+        configuration.addAllowedHeader("Upgrade");
+        configuration.addAllowedHeader("Connection");
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
