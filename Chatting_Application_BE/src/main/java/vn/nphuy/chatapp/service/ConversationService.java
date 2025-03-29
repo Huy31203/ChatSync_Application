@@ -81,13 +81,4 @@ public class ConversationService {
   public Conversation createConversation(Conversation conversation) {
     return conversationRepository.save(conversation);
   }
-
-  public boolean deleteConversation(String conversationId) {
-    if (conversationRepository.existsById(conversationId)) {
-      conversationRepository.deleteById(conversationId);
-      return true;
-    } else {
-      return false;
-    }
-  }
 }

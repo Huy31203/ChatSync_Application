@@ -27,7 +27,7 @@ public class ProfileDetailCustom implements UserDetailsService {
     }
 
     if (profile.getPassword() == null && profile.getConnectedAccount() != null) {
-      throw new BadRequestException("Account is connected with social account, please login with your social account");
+      throw new BadRequestException("Your account does not have a password. Please log in using your social account.");
     }
 
     return new User(profile.getEmail(), profile.getPassword(),

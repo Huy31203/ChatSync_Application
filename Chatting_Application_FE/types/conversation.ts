@@ -6,8 +6,13 @@ export interface IConversation extends IBaseModel {
   directMessages: IDirectMessage[];
 }
 
+export interface IConversationsCreated {
+  conversationMeOther: IConversation;
+  conversationOtherMe: IConversation;
+}
+
 export interface IDirectMessage extends IBaseModel {
   content?: string;
-  fileUrl?: string;
+  fileUrls?: string[];
   conversation: IConversation;
 }

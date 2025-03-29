@@ -1,6 +1,7 @@
 package vn.nphuy.chatapp.domain.response;
 
 import java.time.Instant;
+import java.util.List;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -16,7 +17,7 @@ public class ResDirectMessageDTO {
 
   private String content;
 
-  private String fileUrl;
+  private List<String> fileUrls;
 
   private Instant createdAt;
 

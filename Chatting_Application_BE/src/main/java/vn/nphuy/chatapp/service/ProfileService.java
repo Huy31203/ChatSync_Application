@@ -83,6 +83,9 @@ public class ProfileService {
                     null != profile.getAvatarUrl() ? profile.getAvatarUrl()
                             : existingProfile.getAvatarUrl());
 
+            existingProfile.setHavePassword(!existingProfile.isHavePassword() ? profile.isHavePassword()
+                    : existingProfile.isHavePassword());
+
             return profileRepository.save(existingProfile);
         } else {
             return null;

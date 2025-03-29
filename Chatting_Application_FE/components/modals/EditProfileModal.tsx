@@ -34,7 +34,7 @@ export function EditProfileModal() {
           </TabsContent>
 
           <TabsContent value="password" className="mt-6">
-            <ChangePasswordForm />
+            <ChangePasswordForm havePassword={profile.havePassword} />
           </TabsContent>
         </Tabs>
       </DialogContent>

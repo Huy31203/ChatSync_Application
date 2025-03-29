@@ -21,6 +21,8 @@ public class ResProfileDTO {
 
     private String avatarUrl;
 
+    private boolean havePassword;
+
     @JsonIgnoreProperties("profile")
     private List<ResMemberDTO> members;
 

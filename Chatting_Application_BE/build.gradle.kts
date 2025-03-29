@@ -20,7 +20,7 @@ repositories {
 
 dependencies {
     implementation("net.logstash.logback:logstash-logback-encoder:8.0")
-    implementation("io.socket:socket.io-server:4.1.2") 
+    implementation("org.springframework:spring-messaging:6.2.5")
     implementation("org.springframework:spring-websocket:6.2.5")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")

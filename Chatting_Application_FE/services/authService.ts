@@ -22,7 +22,7 @@ export const authService = {
     await apiClient.post(`${API_URL.AUTH}/change-password`, data);
   },
 
-  refresh: async () => {
+  refresh: async (): Promise<any> => {
     await apiClient.get(`${BE_URL}/${API_URL.AUTH}/refresh`);
   },
 

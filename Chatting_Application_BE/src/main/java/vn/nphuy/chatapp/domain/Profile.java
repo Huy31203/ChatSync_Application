@@ -44,6 +44,8 @@ public class Profile extends AbstractEntity {
 
     private String avatarUrl;
 
+    private boolean havePassword = true;
+
     @OneToMany(mappedBy = "profile", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<Refresh> refreshTokens;
 

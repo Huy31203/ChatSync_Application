@@ -2,6 +2,7 @@ package vn.nphuy.chatapp.domain.request;
 
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -13,6 +14,7 @@ import vn.nphuy.chatapp.util.constant.MemberRoleEnum;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ReqUpdateMemberDTO {
+  @NotBlank(message = "Member role is required")
   @Enumerated(EnumType.STRING)
   private MemberRoleEnum memberRole;
 }

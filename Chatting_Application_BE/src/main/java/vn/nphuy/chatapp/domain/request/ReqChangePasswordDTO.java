@@ -11,7 +11,6 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ReqChangePasswordDTO {
-  @NotBlank(message = "Old password is required")
   private String oldPassword;
 
   @NotBlank(message = "New password is required")

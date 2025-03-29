@@ -198,8 +198,20 @@ public class AuthController {
     String oldPassword = changeCred.getOldPassword();
     String newPassword = changeCred.getNewPassword();
 
-    // Check valid old password
     Profile profile = securityUtil.getCurrentProfile();
+
+    // If profile not have password, set new password
+    if (!profile.isHavePassword()) {
+      String hashPassword = passwordEncoder.encode(newPassword);
+      profileService.updateProfilePassword(profile.getEmail(), hashPassword);
+
+      profile.setHavePassword(true);
+      profileService.updateProfile(profile);
+
+      return ResponseEntity.ok().body(null);
+    }
+
+    // Check valid old password
     boolean valid = passwordEncoder.matches(oldPassword, profile.getPassword());
 
     if (!valid) {

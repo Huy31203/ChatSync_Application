@@ -97,6 +97,7 @@ public class Oauth2LoginSuccessHandler implements AuthenticationSuccessHandler {
         newProfile.setEmail(email);
         newProfile.setName(token.getPrincipal().getAttribute("name"));
         newProfile.setAvatarUrl(token.getPrincipal().getAttribute("picture"));
+        newProfile.setHavePassword(false);
 
         ProfileConnectedAccount newConnectedAccount = new ProfileConnectedAccount(provider, providerId, newProfile);
         newProfile.setConnectedAccount(newConnectedAccount);

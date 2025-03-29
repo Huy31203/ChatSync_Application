@@ -3,7 +3,6 @@
 import { Hash } from 'lucide-react';
 
 import { MobileToggle } from '@/components/toggles/MobileToggle';
-import { useSocket } from '@/hooks/useSocket';
 
 import { UserAvatar } from '../UserAvatar';
 import { SocketIndicator } from '../indicator/SocketIndicator';
@@ -16,8 +15,6 @@ interface ChatHeaderProps {
 }
 
 export const ChatHeader = ({ serverId, name, type, imageUrl }: ChatHeaderProps) => {
-  const { isConnected, on, emit } = useSocket();
-
   return (
     <div
       className="text-md font-semibold px-3   flex items-center h-12

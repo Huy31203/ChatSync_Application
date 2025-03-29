@@ -125,19 +125,18 @@ public class ServerController {
     return ResponseEntity.ok(resServer);
   }
 
-  @GetMapping("/servers/{serverId}/conversations/{receiverId}")
+  @GetMapping("/servers/{serverId}/conversations/sender/{senderId}/receiver/{receiverId}")
   @ApiMessage(message = "Get all conversations by memberId")
   public ResponseEntity<Object> getConversationByMemberId(@PathVariable("serverId") String serverId,
-      @PathVariable("receiverId") String receiverId, Pageable pageable) {
+      @PathVariable("senderId") String senderId, @PathVariable("receiverId") String receiverId, Pageable pageable) {
 
-    String profileId = securityUtil.getCurrentProfile().getId();
-    Member member = memberService.getMemberByProfileIdAndServerId(profileId, serverId);
+    Member sender = memberService.getMemberById(senderId);
 
-    if (member == null) {
+    if (sender == null) {
       throw new NotAllowedException("You are not a member of that server");
     }
 
-    Conversation result = conversationService.getConversationBySenderIdAndReceiverId(member.getId(), receiverId);
+    Conversation result = conversationService.getConversationBySenderIdAndReceiverId(sender.getId(), receiverId);
 
     if (result == null) {
       return ResponseEntity.ok().body(Optional.empty());
@@ -203,14 +202,13 @@ public class ServerController {
   @Transactional
   public ResponseEntity<Object> createNewConversation(@PathVariable("id") String id,
       @Valid @RequestBody ReqConversationDTO reqConversation) {
-    String profileId = securityUtil.getCurrentProfile().getId();
-
-    Member sender = memberService.getMemberByProfileIdAndServerId(profileId, id);
+    Member sender = memberService.getMemberById(reqConversation.getSenderId());
     Member receiver = memberService.getMemberById(reqConversation.getReceiverId());
 
     Conversation conversation = new Conversation();
     conversation.setSender(sender);
     conversation.setReceiver(receiver);
+    
 
     Conversation result = conversationService.createConversation(conversation);
 
@@ -305,7 +303,7 @@ public class ServerController {
   @PatchMapping("/servers/{serverId}/members/{memberId}")
   @ApiMessage(message = "Update member by id")
   public ResponseEntity<Object> updateMember(@PathVariable("serverId") String serverId,
-      @PathVariable("memberId") String memberId, @RequestBody ReqUpdateMemberDTO reqMember) {
+      @PathVariable("memberId") String memberId, @Valid @RequestBody ReqUpdateMemberDTO reqMember) {
 
     String profileId = securityUtil.getCurrentProfile().getId();
     Member currentMember = memberService.getMemberByProfileIdAndServerId(profileId, serverId);

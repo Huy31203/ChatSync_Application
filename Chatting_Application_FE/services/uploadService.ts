@@ -23,6 +23,20 @@ const uploadService = {
 
     return res.result;
   },
+  async uploadFile(file: File): Promise<UploadResponse> {
+    const formData = new FormData();
+
+    formData.append('file', file);
+    formData.append('folder', 'files');
+
+    const res: ApiResponse<UploadResponse> = await apiClient.post(`${API_URL.UPLOADS}/upload`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+
+    return res.result;
+  },
 };
 
 export default uploadService;

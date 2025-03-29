@@ -1,152 +1,166 @@
-'use client';
-
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { io, Socket } from 'socket.io-client';
+import { Client, Frame } from '@stomp/stompjs';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import SockJS from 'sockjs-client';
 
 import { useCookies } from '@/contexts/CookieContext';
+import logError from '@/utils';
 
-let globalSocket: Socket | null = null;
+import { useToken } from './useToken';
 
-interface UseSocketIOOptions {
-  url: string;
+interface UseSocketProps {
+  url?: string;
+  headers?: Record<string, string>;
   autoConnect?: boolean;
-  auth: Record<string, string>;
-  query?: Record<string, string>;
+  onConnect?: (frame?: Frame) => void;
+  onError?: (error: any) => void;
+  onDisconnect?: () => void;
 }
 
-export const useSocket = () => {
-  const [isConnected, setIsConnected] = useState(false);
-  const socketRef = useRef<Socket | null>(null);
-
+export const useSocket = ({
+  url = process.env.NEXT_PUBLIC_SOCKET_URL || 'http://localhost:8080/api/chat',
+  headers = {},
+  autoConnect = true,
+  onConnect,
+  onError,
+  onDisconnect,
+}: UseSocketProps) => {
   const { cookie } = useCookies();
+  const { isTokenExpired, refreshToken } = useToken();
 
-  const url = process.env.NEXT_PUBLIC_BE_URL || 'http://localhost:8080';
+  // Stabilize headers with useMemo
+  const stableHeaders = useMemo(() => {
+    const authHeaders = cookie ? { Authorization: `Bearer ${cookie}` } : {};
+    return { ...authHeaders, ...headers };
+  }, [cookie, headers]);
 
-  const auth = {
-    token: cookie,
-  };
+  const [isConnected, setIsConnected] = useState(false);
+  const clientRef = useRef<Client | null>(null);
+  const subscriptionsRef = useRef<{ [id: string]: { unsubscribe: () => void } }>({});
 
-  const hasAuth = auth && auth.token;
+  // Use a ref to track if we've already connected to avoid connection loops
+  const hasConnectedRef = useRef(false);
 
-  const autoConnect = true;
-
-  // Initialize socket connection
   useEffect(() => {
-    // Don't create a connection if auth is missing
-    if (!hasAuth) {
-      console.log('Skipping socket connection - no auth token');
-      return;
+    if (autoConnect && !hasConnectedRef.current) {
+      hasConnectedRef.current = true; // Prevent multiple connections
+      connect();
     }
 
-    // Reuse existing global socket if available
-    if (globalSocket) {
-      console.log('Reusing existing socket connection');
-      socketRef.current = globalSocket;
-      setIsConnected(globalSocket.connected);
-      return;
-    }
-
-    console.log('Creating new socket connection');
-
-    const socketOptions = {
-      autoConnect,
-      path: '/api/socket.io/',
-      extraHeaders: {
-        authorization: `bearer ${auth.token}`,
-      },
-      // Add reconnection options
-      reconnection: true,
-      reconnectionAttempts: 5,
-      reconnectionDelay: 1000,
+    return () => {
+      if (hasConnectedRef.current) {
+        disconnect();
+        hasConnectedRef.current = false; // Reset connection state on unmount
+      }
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [autoConnect]);
 
-    const socket = io(url, socketOptions);
-    socketRef.current = socket;
-    globalSocket = socket;
+  // Store callback refs to avoid dependency changes
+  const callbacksRef = useRef({ onConnect, onError, onDisconnect });
 
-    // Connection events
-    socket.on('connect', () => {
-      console.log('Socket connected:', socket.id);
+  // Update callback refs when they change
+  useEffect(() => {
+    callbacksRef.current = { onConnect, onError, onDisconnect };
+  }, [onConnect, onError, onDisconnect]);
+
+  const connect = useCallback(async () => {
+    if (clientRef.current?.connected) return;
+
+    // Check if token is expired before connecting
+    if (isTokenExpired()) {
+      console.log('Token expired, refreshing before connecting');
+      const newToken = await refreshToken();
+      if (!newToken) {
+        console.error('Failed to refresh token before connecting');
+        return;
+      }
+      // Token refreshed, connect will be called by effect when cookie updates
+      return;
+    }
+
+    const client = new Client({
+      webSocketFactory: () => new SockJS(url),
+      connectHeaders: stableHeaders,
+      reconnectDelay: 5000,
+      heartbeatIncoming: 4000,
+      heartbeatOutgoing: 4000,
+    });
+
+    // Disable console logging
+    // client.debug = () => {};
+
+    client.onConnect = (frame) => {
+      console.log('Connected to WebSocket');
       setIsConnected(true);
-    });
+      if (callbacksRef.current.onConnect) callbacksRef.current.onConnect(frame);
+    };
 
-    socket.on('disconnect', (reason) => {
-      console.log('Socket disconnected:', reason);
+    client.onStompError = (error) => {
+      console.error('Connection error:', error);
       setIsConnected(false);
-    });
-
-    socket.on('connect_error', (error) => {
-      console.error('Socket connection error:', error);
-      setIsConnected(false);
-    });
-
-    // Cleanup on unmount - but keep global connection
-    return () => {
-      // Don't actually disconnect, just remove references
-      // We'll keep the global connection alive
-      socketRef.current = null;
+      if (callbacksRef.current.onError) callbacksRef.current.onError(error);
     };
-  }, [url, hasAuth]); // Simplified dependencies
 
-  // Rest of your code remains the same...
+    client.activate();
+    clientRef.current = client;
+  }, [url, stableHeaders]); // Only depends on url and stable headers
 
-  // When component using this hook unmounts
-  useEffect(() => {
-    return () => {
-      // Only disconnect when no components are using the socket
-      // In a real app, you might want to implement a reference counter
-      if (process.env.NODE_ENV === 'development') {
-        console.log('Component unmounted, but keeping socket alive');
-      }
-    };
-  }, []);
-
-  // Event listeners management
-  const on = useCallback((event: string, callback: (...args: any[]) => void) => {
-    const socket = socketRef.current;
-    if (socket) {
-      socket.on(event, callback);
-    }
-
-    return () => {
-      if (socket) {
-        socket.off(event, callback);
-      }
-    };
-  }, []);
-
-  // Send events
-  const emit = useCallback((event: string, ...args: any[]) => {
-    const socket = socketRef.current;
-    if (socket) {
-      socket.emit(event, ...args);
-    } else {
-      console.warn('Attempted to emit event but socket is not connected:', event);
-    }
-  }, []);
-
-  // Connect manually if autoConnect is false
-  const connect = useCallback(() => {
-    const socket = socketRef.current;
-    if (socket && !socket.connected) {
-      socket.connect();
-    }
-  }, []);
-
-  // Disconnect manually
   const disconnect = useCallback(() => {
-    const socket = socketRef.current;
-    if (socket && socket.connected) {
-      socket.disconnect();
+    if (clientRef.current?.connected) {
+      // Unsubscribe from all topics
+      Object.values(subscriptionsRef.current).forEach((sub) => sub.unsubscribe());
+      subscriptionsRef.current = {};
+
+      // Disconnect client
+      clientRef.current.deactivate().then(() => {
+        console.log('Disconnected from WebSocket');
+        setIsConnected(false);
+        if (callbacksRef.current.onDisconnect) callbacksRef.current.onDisconnect();
+      });
     }
+  }, []);
+
+  const subscribe = useCallback((destination: string, callback: (message: any) => void) => {
+    if (!clientRef.current?.connected) {
+      console.error('Cannot subscribe: client not connected');
+      return { unsubscribe: () => {} };
+    }
+
+    const subscription = clientRef.current.subscribe(destination, (message) => {
+      console.log('Received message:', { destination, message });
+
+      const payload = message.body ? JSON.parse(message.body) : {};
+      callback(payload);
+    });
+
+    const id = `${destination}-${Date.now()}`;
+    subscriptionsRef.current[id] = subscription;
+
+    return {
+      unsubscribe: () => {
+        subscription.unsubscribe();
+        delete subscriptionsRef.current[id];
+      },
+    };
+  }, []);
+
+  const send = useCallback((destination: string, body: any, headers: Record<string, string> = {}) => {
+    if (!clientRef.current?.connected) {
+      logError('Cannot send message: client not connected');
+      return;
+    }
+
+    console.log('Sending message:', { destination, body, headers });
+
+    clientRef.current?.publish({ destination, headers, body: typeof body === 'string' ? body : JSON.stringify(body) });
   }, []);
 
   return {
-    socket: socketRef.current,
     isConnected,
-    on,
-    emit,
+    client: clientRef.current,
     connect,
     disconnect,
+    subscribe,
+    send,
   };
 };

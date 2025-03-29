@@ -12,10 +12,8 @@ import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import ImageUpload from '@/components/upload/ImageUpload';
 import { useRouter } from '@/hooks/useRouter';
 import { authService } from '@/services/authService';
-import uploadService from '@/services/uploadService';
 import logError from '@/utils';
 
 // Password validation regex patterns
@@ -47,7 +45,6 @@ export default function RegisterForm() {
         .regex(hasNumber, { message: 'Password must contain at least one number' })
         .regex(hasSpecialChar, { message: 'Password must contain at least one special character' }),
       confirmPassword: z.string(),
-      avatar: z.any().optional(),
       terms: z.boolean().refine((val) => val === true, {
         message: 'You must agree to the terms and conditions',
       }),
@@ -64,7 +61,6 @@ export default function RegisterForm() {
       email: '',
       password: '',
       confirmPassword: '',
-      avatar: null,
       terms: false,
     },
   });
@@ -76,13 +72,7 @@ export default function RegisterForm() {
         name: values.name,
         email: values.email,
         password: values.password,
-        avatarUrl: '',
       };
-
-      if (values.avatar) {
-        const { fileUrl } = await uploadService.uploadImage(values.avatar);
-        data.avatarUrl = fileUrl;
-      }
 
       await authService.register(data);
 
@@ -98,21 +88,6 @@ export default function RegisterForm() {
     <div className="space-y-6">
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-          <FormField
-            control={form.control}
-            name="avatar"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className="self-start">Profile Picture</FormLabel>
-                <FormControl>
-                  <ImageUpload onChange={field.onChange} value={field.value} className="w-full" />
-                </FormControl>
-                <FormDescription className="text-xs">Optional: Upload a profile picture (max 5MB)</FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
           <FormField
             control={form.control}
             name="name"

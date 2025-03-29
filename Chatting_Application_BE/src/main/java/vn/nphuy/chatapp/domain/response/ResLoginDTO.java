@@ -12,6 +12,8 @@ import lombok.Setter;
 public class ResLoginDTO {
     private ProfileLogin profile;
 
+    private String accessToken;
+
     @Getter
     @Setter
     @AllArgsConstructor

@@ -81,7 +81,7 @@ public class UploadController {
 
   @PostMapping("image")
   @ApiMessage(message = "Upload image")
-  public ResponseEntity<Object> uploadFile(
+  public ResponseEntity<Object> uploadImage(
       @RequestParam("file") MultipartFile file,
       @RequestParam("folder") String folder) throws URISyntaxException, IOException {
 
@@ -111,6 +111,38 @@ public class UploadController {
     // Store file
     String fileName = uploadService.store(file, folder);
     String fileUrl = serverUrl + contextPath + "/storage/file/image?fileName=" + fileName + "&folder=" + folder;
+
+    ResUploadDTO res = new ResUploadDTO();
+
+    res.setFileUrl(fileUrl);
+    res.setUploadedAt(Instant.now());
+
+    // Return path to file
+    return ResponseEntity.status(201).body(res);
+  }
+
+  @PostMapping("upload")
+  @ApiMessage(message = "Upload file")
+  public ResponseEntity<Object> uploadFile(
+      @RequestParam("file") MultipartFile file,
+      @RequestParam("folder") String folder) throws URISyntaxException, IOException {
+
+    // Check if file is empty
+    if (file == null || file.isEmpty()) {
+      throw new UploadException("File is empty, please select a file to upload");
+    }
+
+    // check file size > 5MB
+    if (file.getSize() > 5 * 1024 * 1024) {
+      throw new UploadException("File size is too large, please select a file smaller than 5MB");
+    }
+
+    // Create folder if not exist
+    uploadService.createUploadFolder(uploadUri + folder);
+
+    // Store file
+    String fileName = uploadService.store(file, folder);
+    String fileUrl = serverUrl + contextPath + "/storage/file/download?fileName=" + fileName + "&folder=" + folder;
 
     ResUploadDTO res = new ResUploadDTO();
 
