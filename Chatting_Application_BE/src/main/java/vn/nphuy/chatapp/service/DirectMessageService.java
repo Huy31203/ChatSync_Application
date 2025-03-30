@@ -1,6 +1,5 @@
 package vn.nphuy.chatapp.service;
 
-import org.hibernate.Session;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -8,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
+import vn.nphuy.chatapp.domain.Conversation;
 import vn.nphuy.chatapp.domain.DirectMessage;
 import vn.nphuy.chatapp.domain.response.Meta;
 import vn.nphuy.chatapp.domain.response.ResultPaginationDTO;
@@ -17,18 +17,18 @@ import vn.nphuy.chatapp.util.specification.DirectMessageSpecifications;
 @Service
 @RequiredArgsConstructor
 public class DirectMessageService {
+  private final ConversationService conversationService;
   private final DirectMessageRepository directMessageRepository;
   private final EntityManager entityManager;
 
-  public ResultPaginationDTO getAllDirectMessagesByConversationId(Pageable pageable, String conversationId) {
-    Session session = entityManager.unwrap(Session.class);
-    session.enableFilter("deletedDirectMessagesFilter");
+  public ResultPaginationDTO getAllDirectMessagesByConversation(Specification<DirectMessage> spec, Pageable pageable,
+      Conversation conversation) {
 
-    Specification<DirectMessage> spec = DirectMessageSpecifications.hasConversationId(conversationId);
+    Specification<DirectMessage> combinedSpec = spec
+        .and(DirectMessageSpecifications.hasConversationId(conversation.getId()))
+        .or(DirectMessageSpecifications.hasConversationId(conversation.getRelatedConversation().getId()));
 
-    Page<DirectMessage> directMessages = directMessageRepository.findAll(spec, pageable);
-
-    session.disableFilter("deletedDirectMessagesFilter");
+    Page<DirectMessage> directMessages = directMessageRepository.findAll(combinedSpec, pageable);
 
     ResultPaginationDTO result = new ResultPaginationDTO();
     Meta meta = new Meta();

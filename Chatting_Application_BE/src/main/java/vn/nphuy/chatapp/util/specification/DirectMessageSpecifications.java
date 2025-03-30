@@ -13,9 +13,7 @@ public class DirectMessageSpecifications {
   public static Specification<DirectMessage> hasConversationId(String conversationId) {
     return (root, query, criteriaBuilder) ->
     // Build the where condition to get all channels in a profile by conversationId
-    criteriaBuilder.and(
-        criteriaBuilder.equal(root.join("conversation").get("id"), conversationId),
-        criteriaBuilder.equal(root.get("deleted"), false));
+    criteriaBuilder.equal(root.join("conversation").get("id"), conversationId);
   }
 
 }

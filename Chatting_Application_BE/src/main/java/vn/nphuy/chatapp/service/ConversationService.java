@@ -71,7 +71,7 @@ public class ConversationService {
   }
 
   public Conversation getConversationById(String conversationId) {
-    return conversationRepository.findById(conversationId).orElse(null);
+    return conversationRepository.findOneById(conversationId).orElse(null);
   }
 
   public Conversation getConversationBySenderIdAndReceiverId(String senderId, String receiverId) {

@@ -205,16 +205,34 @@ public class ServerController {
     Member sender = memberService.getMemberById(reqConversation.getSenderId());
     Member receiver = memberService.getMemberById(reqConversation.getReceiverId());
 
+    if (sender.getServer().getId() != receiver.getServer().getId()) {
+      throw new NotAllowedException("You're only allowed to create conversations in same server");
+    }
+
     Conversation conversation = new Conversation();
     conversation.setSender(sender);
     conversation.setReceiver(receiver);
-    
 
     Conversation result = conversationService.createConversation(conversation);
 
     if (result == null) {
       throw new ServerErrorException("Failed to create conversation");
     }
+
+    Conversation reverseConversation = new Conversation();
+    reverseConversation.setSender(receiver);
+    reverseConversation.setReceiver(sender);
+
+    // Set the bidirectional relationship using relatedConversation (owning side)
+    reverseConversation.setRelatedConversation(result);
+
+    Conversation reverseResult = conversationService.createConversation(reverseConversation);
+    if (reverseResult == null) {
+      throw new ServerErrorException("Failed to create conversation");
+    }
+
+    // Complete the bidirectional relationship
+    result.setRelatedConversation(reverseResult);
 
     ResConversationDTO resConversation = modelMapper.map(result, ResConversationDTO.class);
 

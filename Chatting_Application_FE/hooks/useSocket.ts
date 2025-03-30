@@ -127,8 +127,6 @@ export const useSocket = ({
     }
 
     const subscription = clientRef.current.subscribe(destination, (message) => {
-      console.log('Received message:', { destination, message });
-
       const payload = message.body ? JSON.parse(message.body) : {};
       callback(payload);
     });

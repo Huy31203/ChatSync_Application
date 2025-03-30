@@ -18,8 +18,6 @@ import lombok.Setter;
 @Entity
 @Table(name = "messages")
 @SQLDelete(sql = "UPDATE messages SET deleted = true WHERE id=?")
-@FilterDef(name = "deletedMessagesFilter")
-@Filter(name = "deletedMessagesFilter", condition = "deleted = false")
 @Getter
 @Setter
 public class Message extends AbstractEntity {

@@ -6,13 +6,10 @@ import java.util.List;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import vn.nphuy.chatapp.util.constant.MemberRoleEnum;
 
 @Getter
 @Setter
@@ -28,6 +25,12 @@ public class ResConversationDTO {
   private ResMemberDTO receiver;
 
   private List<ResDirectMessageDTO> directMessages;
+
+  @JsonIgnoreProperties({ "relatedConversation", "inverseConversation" })
+  private ResConversationDTO relatedConversation;
+
+  @JsonIgnoreProperties({ "relatedConversation", "inverseConversation" })
+  private ResConversationDTO inverseConversation;
 
   private Instant createdAt;
 

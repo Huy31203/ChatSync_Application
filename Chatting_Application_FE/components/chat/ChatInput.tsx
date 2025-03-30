@@ -2,25 +2,25 @@
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Plus, SendIcon } from 'lucide-react';
-import { ChangeEvent, useCallback, useEffect, useRef, useState } from 'react';
+import { ChangeEvent, useCallback, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
 
 import { Form, FormControl, FormField, FormItem } from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
+import { FilePreview } from '@/components/upload/FilePreview';
 import { useSocket } from '@/hooks/useSocket';
 import uploadService from '@/services/uploadService';
 import { IChannel, IConversation } from '@/types';
 import logError from '@/utils';
 
-import { Input } from '../ui/input';
-import { FilePreview } from '../upload/FilePreview';
+import { EmojiPicker } from './EmojiPicker';
 
 interface ChatInputProps {
   name: string;
   type: 'channel' | 'conversation';
   channel?: IChannel;
-  conversationMeOther?: IConversation;
-  conversationOtherMe?: IConversation;
+  conversation?: IConversation;
 }
 
 const formSchema = z
@@ -35,84 +35,39 @@ const formSchema = z
 
 type FormValues = z.infer<typeof formSchema>;
 
-export const ChatInput = ({ name, type, channel, conversationMeOther, conversationOtherMe }: ChatInputProps) => {
-  // Socket connection logic
-  const [reconnectAttempt, setReconnectAttempt] = useState(0);
-  const [isReconnecting, setIsReconnecting] = useState(false);
-  const reconnectTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
+export const ChatInput = ({ name, type, channel, conversation }: ChatInputProps) => {
   const handleConnect = useCallback(() => {
-    console.log('Connected to chat server');
-    // Reset reconnection state when successfully connected
-    setReconnectAttempt(0);
-    setIsReconnecting(false);
   }, []);
 
   const handleError = useCallback((error) => {
     logError(error);
   }, []);
 
-  const { connect, isConnected, subscribe, send } = useSocket({
+  const { send } = useSocket({
     onConnect: handleConnect,
     onError: handleError,
   });
 
-  // Reconnection mechanism
-  const attemptReconnect = useCallback(() => {
-    if (isConnected || isReconnecting) return;
+  // useEffect(() => {
+  //   if (!isConnected) return;
 
-    setIsReconnecting(true);
+  //   const subscriptionUrl =
+  //     type === 'channel'
+  //       ? `/topic/channels/${channel.id}`
+  //       : `/topic/conversations/${conversation.relatedConversation.id}`;
 
-    // Exponential backoff strategy: 2^n * 1000 ms, capped at 30 seconds
-    const delay = Math.min(Math.pow(2, reconnectAttempt) * 1000, 30000);
+  //   // Subscribe to a topic
+  //   const subscription = subscribe(subscriptionUrl, (message) => {
+  //     // Handle received message
+  //     console.log('Received message:', message);
+  //     // message is already parsed from JSON
+  //   });
 
-    console.log(`Attempting to reconnect in ${delay / 1000} seconds...`);
-
-    // Clear any existing timeout
-    if (reconnectTimeoutRef.current) {
-      clearTimeout(reconnectTimeoutRef.current);
-    }
-
-    reconnectTimeoutRef.current = setTimeout(() => {
-      console.log(`Reconnection attempt ${reconnectAttempt + 1}`);
-      connect();
-      setReconnectAttempt((prev) => prev + 1);
-      setIsReconnecting(false);
-    }, delay);
-  }, [isConnected, reconnectAttempt, isReconnecting, connect]);
-
-  // Watch for connection status changes
-  useEffect(() => {
-    if (!isConnected) {
-      attemptReconnect();
-    }
-
-    // Cleanup timeout on unmount
-    return () => {
-      if (reconnectTimeoutRef.current) {
-        clearTimeout(reconnectTimeoutRef.current);
-      }
-    };
-  }, [isConnected, attemptReconnect]);
-
-  useEffect(() => {
-    if (!isConnected) return;
-
-    const subscriptionUrl =
-      type === 'channel' ? `/topic/channels/${channel.id}` : `/topic/conversations/${conversationOtherMe.id}`;
-
-    // Subscribe to a topic
-    const subscription = subscribe(subscriptionUrl, (message) => {
-      // Handle received message
-      console.log('Received message:', message);
-      // message is already parsed from JSON
-    });
-
-    // Clean up subscription when component unmounts
-    return () => {
-      subscription.unsubscribe();
-    };
-  }, [isConnected]);
+  //   // Clean up subscription when component unmounts
+  //   return () => {
+  //     subscription.unsubscribe();
+  //   };
+  // }, [isConnected]);
 
   // Form handling logic
   const [showAttachments, setShowAttachments] = useState(false);
@@ -158,7 +113,7 @@ export const ChatInput = ({ name, type, channel, conversationMeOther, conversati
   async function onSubmit(values: FormValues) {
     // Handle form submission logic here
     try {
-      console.log('Form submitted:', values);
+      // console.log('Form submitted:', values);
       const data = {
         content: values.content,
         fileUrls: [],
@@ -182,7 +137,7 @@ export const ChatInput = ({ name, type, channel, conversationMeOther, conversati
       if (type === 'channel') {
         send(`/app/channels/${channel.id}`, JSON.stringify(data));
       } else {
-        send(`/app/conversations/${conversationMeOther.id}`, JSON.stringify(data));
+        send(`/app/conversations/${conversation.id}`, JSON.stringify(data));
       }
 
       form.reset();
@@ -198,9 +153,9 @@ export const ChatInput = ({ name, type, channel, conversationMeOther, conversati
         {showAttachments && attachments.length > 0 && (
           <div className="px-4 pt-2">
             <div className="bg-neutral-100 dark:bg-zinc-800 rounded-md p-3">
-              <div className="flex flex-wrap gap-4">
+              <div className="flex p-2 gap-4 overflow-x-auto">
                 {attachments.map((file, index) => (
-                  <FilePreview key={file.name || file.lastModified} file={file} onRemove={() => removeFile(index)} />
+                  <FilePreview key={file.name || index.toString()} file={file} onRemove={() => removeFile(index)} />
                 ))}
               </div>
             </div>
@@ -232,10 +187,21 @@ export const ChatInput = ({ name, type, channel, conversationMeOther, conversati
                           form.handleSubmit(onSubmit)();
                         }
                       }}
-                      className="ps-[45px] pe-9 !py-6 bg-neutral-200 dark:bg-zinc-900 focus-visible:ring-0 focus-visible:ring-offset-0"
+                      className="ps-[45px] pe-24 !py-6 bg-neutral-200 dark:bg-zinc-900 focus-visible:ring-0 focus-visible:ring-offset-0"
                       placeholder={type == 'channel' ? `Message to #${name}` : `Message to @${name}`}
                       {...field}
                     />
+                    <div
+                      className="text-muted-foreground/80 hover:text-foreground focus-visible:border-ring focus-visible:ring-ring/50 absolute inset-y-0 end-10 
+                              flex h-full w-9 items-center justify-center rounded-e-md transition-[color,box-shadow] outline-none focus:z-10 focus-visible:ring-[3px] 
+                              disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 duration-500 -translate-y-[1px]"
+                    >
+                      <EmojiPicker
+                        onEmojiClick={(emoji: string) => {
+                          field.onChange(`${field.value}${emoji}`);
+                        }}
+                      />
+                    </div>
                     <button
                       className="text-muted-foreground/80 hover:text-foreground focus-visible:border-ring focus-visible:ring-ring/50 absolute inset-y-0 end-1 
                               flex h-full w-9 items-center justify-center rounded-e-md transition-[color,box-shadow] outline-none focus:z-10 focus-visible:ring-[3px] 

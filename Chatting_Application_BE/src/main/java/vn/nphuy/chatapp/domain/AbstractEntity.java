@@ -1,8 +1,13 @@
 package vn.nphuy.chatapp.domain;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import jakarta.persistence.*;
 import java.time.Instant;
+
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.MappedSuperclass;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -18,7 +23,6 @@ public abstract class AbstractEntity {
 
     private Instant updatedAt;
 
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private boolean deleted = false;
 
     @PrePersist
