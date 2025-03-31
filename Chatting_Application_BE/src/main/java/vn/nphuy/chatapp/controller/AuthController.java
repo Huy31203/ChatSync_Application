@@ -261,7 +261,7 @@ public class AuthController {
   public ResponseEntity<Object> refreshToken(@CookieValue(name = "refreshToken") String refreshToken) {
     log.info(">> Start refresh token with: {}", refreshToken);
     // Check valid and decode refresh token
-    Jwt decodedToken = securityUtil.checkValidRefreshToken(refreshToken);
+    Jwt decodedToken = securityUtil.checkValidToken(refreshToken);
     String email = decodedToken.getSubject();
 
     log.info(">> token: {}", refreshToken);

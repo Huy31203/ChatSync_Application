@@ -2,8 +2,6 @@ package vn.nphuy.chatapp.domain;
 
 import java.util.List;
 
-import org.hibernate.annotations.Filter;
-import org.hibernate.annotations.FilterDef;
 import org.hibernate.annotations.SQLDelete;
 
 import jakarta.persistence.CollectionTable;
@@ -20,8 +18,6 @@ import lombok.Setter;
 @Entity
 @Table(name = "direct_messages")
 @SQLDelete(sql = "UPDATE direct_messages SET deleted = true WHERE id=?")
-@FilterDef(name = "deletedDirectMessagesFilter")
-@Filter(name = "deletedDirectMessagesFilter", condition = "deleted = false")
 @Getter
 @Setter
 public class DirectMessage extends AbstractEntity {

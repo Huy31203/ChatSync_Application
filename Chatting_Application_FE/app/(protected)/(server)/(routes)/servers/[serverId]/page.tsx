@@ -1,8 +1,10 @@
 'use client';
 
-import { useSearchParams } from 'next/navigation';
-import { useEffect } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { useContext, useEffect } from 'react';
 import { toast } from 'react-toastify';
+
+import { ServerContext } from '@/contexts/ServerContext';
 
 interface ServerPageProps {
   params: { serverId: string };
@@ -10,6 +12,8 @@ interface ServerPageProps {
 
 const ServerPage = ({ params }: ServerPageProps) => {
   const searchParams = useSearchParams();
+  const { server, loading } = useContext(ServerContext);
+  const router = useRouter();
 
   const newMenber = searchParams.get('new') === 'true';
 
@@ -23,6 +27,12 @@ const ServerPage = ({ params }: ServerPageProps) => {
       window.history.replaceState({}, '', url.toString());
     }
   }, [newMenber]);
+
+  useEffect(() => {
+    if (!loading && server) {
+      router.push(`/servers/${server.id}/channels/${server.channels[0]?.id}`);
+    }
+  }, [loading, server]);
 
   return null;
 };

@@ -10,8 +10,15 @@ const nextConfig = {
         protocol: 'https',
         hostname: '**',
       },
+      {
+        protocol: 'http',
+        hostname: 'localhost',
+        port: '8080',
+        pathname: '/api/storage/file/**',
+      },
     ],
-    domains: ['localhost'],
+    loader: 'custom',
+    loaderFile: './lib/imageLoader.ts',
   },
   webpack: (config) => {
     config.resolve = {

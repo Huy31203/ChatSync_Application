@@ -27,4 +27,6 @@ public class ResDirectMessageDTO {
   private Instant createdAt;
 
   private Instant updatedAt;
+
+  private boolean deleted;
 }

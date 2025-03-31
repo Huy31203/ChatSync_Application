@@ -36,8 +36,7 @@ const formSchema = z
 type FormValues = z.infer<typeof formSchema>;
 
 export const ChatInput = ({ name, type, channel, conversation }: ChatInputProps) => {
-  const handleConnect = useCallback(() => {
-  }, []);
+  const handleConnect = useCallback(() => {}, []);
 
   const handleError = useCallback((error) => {
     logError(error);
@@ -47,27 +46,6 @@ export const ChatInput = ({ name, type, channel, conversation }: ChatInputProps)
     onConnect: handleConnect,
     onError: handleError,
   });
-
-  // useEffect(() => {
-  //   if (!isConnected) return;
-
-  //   const subscriptionUrl =
-  //     type === 'channel'
-  //       ? `/topic/channels/${channel.id}`
-  //       : `/topic/conversations/${conversation.relatedConversation.id}`;
-
-  //   // Subscribe to a topic
-  //   const subscription = subscribe(subscriptionUrl, (message) => {
-  //     // Handle received message
-  //     console.log('Received message:', message);
-  //     // message is already parsed from JSON
-  //   });
-
-  //   // Clean up subscription when component unmounts
-  //   return () => {
-  //     subscription.unsubscribe();
-  //   };
-  // }, [isConnected]);
 
   // Form handling logic
   const [showAttachments, setShowAttachments] = useState(false);

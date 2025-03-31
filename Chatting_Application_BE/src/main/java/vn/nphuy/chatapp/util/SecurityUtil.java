@@ -129,28 +129,15 @@ public class SecurityUtil {
                 keyBytes, 0, keyBytes.length, SecurityUtil.JWT_ALGORITHM.getName());
     }
 
-    public Jwt checkValidRefreshToken(String refreshToken) {
+    public Jwt checkValidToken(String token) {
         NimbusJwtDecoder jwtDecoder =
                 NimbusJwtDecoder.withSecretKey(getSecretKey())
                         .macAlgorithm(SecurityUtil.JWT_ALGORITHM)
                         .build();
         try {
-            return jwtDecoder.decode(refreshToken);
+            return jwtDecoder.decode(token);
         } catch (Exception e) {
             log.error((">>> Refresh token error: " + e.getMessage()));
-            throw e;
-        }
-    }
-
-    public void checkValidResetToken(String resetToken) {
-        NimbusJwtDecoder jwtDecoder =
-                NimbusJwtDecoder.withSecretKey(getSecretKey())
-                        .macAlgorithm(SecurityUtil.JWT_ALGORITHM)
-                        .build();
-        try {
-            jwtDecoder.decode(resetToken);
-        } catch (Exception e) {
-            log.error((">>> Reset token error: " + e.getMessage()));
             throw e;
         }
     }

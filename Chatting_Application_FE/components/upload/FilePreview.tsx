@@ -1,6 +1,10 @@
 import { File as FileIcon, X } from 'lucide-react';
+import Image from 'next/image';
+import Link from 'next/link';
 import { useEffect, useState } from 'react';
 
+import { useCookies } from '@/contexts/CookieContext';
+import { createImageLoader } from '@/lib/imageLoader';
 import { cn } from '@/lib/utils';
 
 interface FilePreviewProps {
@@ -12,11 +16,14 @@ interface FilePreviewProps {
 
 export const FilePreview = ({ file, url, removeable = true, onRemove }: FilePreviewProps) => {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const { cookie } = useCookies();
+
+  const customImageLoader = createImageLoader(cookie);
 
   // Check if file exists before accessing its properties
   const isImage = file ? file.type.startsWith('image/') : url ? isImageUrl(url) : false;
 
-  console.log('isImage', isImage);
+  const isShowingName = file != null || (url && !isImage);
 
   // Generate preview URL for images
   useEffect(() => {
@@ -29,8 +36,6 @@ export const FilePreview = ({ file, url, removeable = true, onRemove }: FilePrev
     }
   }, [file, url, isImage]);
 
-  console.log('previewUrl', previewUrl);
-
   const fileName =
     file?.name ||
     (url
@@ -40,24 +45,38 @@ export const FilePreview = ({ file, url, removeable = true, onRemove }: FilePrev
         url.split('/').pop()?.split('?')[0] ||
         'File'
       : 'File');
+
+  const fileExt = fileName.split('.').pop()?.toUpperCase() || 'FILE';
+
   const fileSize = file?.size || 0;
 
   return (
-    <div
-      onClick={() => {
-        if (url) {
-          // Navigate to the URL when clicked
-          window.open(url, '_blank');
-        }
-      }}
-      className={cn('relative group', { 'cursor-pointer': !!url })}
+    <Link
+      href={previewUrl || ''}
+      target="_blank"
+      className={cn('group relative flex items-center', removeable && 'group-hover:opacity-100')}
     >
       <div className="flex flex-col bg-white dark:bg-zinc-700 rounded-md overflow-hidden border border-neutral-300 dark:border-zinc-600 w-[120px]">
-        <div className="h-[80px] flex items-center justify-center bg-neutral-200 dark:bg-zinc-800">
+        <div
+          className={cn(
+            'flex items-center justify-center bg-neutral-200 dark:bg-zinc-800',
+            isShowingName ? 'h-[80px]' : 'h-[110px]'
+          )}
+        >
           {isImage && previewUrl ? (
-            <img src={previewUrl} alt={fileName} className="h-full w-full object-cover" />
+            <Image
+              loader={customImageLoader}
+              width={500}
+              height={500}
+              src={previewUrl}
+              alt={fileName}
+              className="h-full w-full object-cover"
+            />
           ) : (
-            <FileIcon className="h-10 w-10 text-neutral-500 dark:text-neutral-400" />
+            <>
+              <FileIcon className="h-10 w-10 text-neutral-500 dark:text-neutral-400" />
+              <p className="text-lg text-neutral-500 dark:text-neutral-400">{fileExt}</p>
+            </>
           )}
 
           {removeable && (
@@ -71,14 +90,16 @@ export const FilePreview = ({ file, url, removeable = true, onRemove }: FilePrev
           )}
         </div>
 
-        <div className="p-2">
-          <p className="text-xs font-medium truncate" title={fileName}>
-            {fileName}
-          </p>
-          <p className="text-xs text-neutral-500 dark:text-neutral-400">{file ? formatFileSize(fileSize) : ''}</p>
-        </div>
+        {isShowingName && (
+          <div className="p-2">
+            <p className="text-xs font-medium truncate" title={fileName}>
+              {fileName}
+            </p>
+            <p className="text-xs text-neutral-500 dark:text-neutral-400">{file ? formatFileSize(fileSize) : ''}</p>
+          </div>
+        )}
       </div>
-    </div>
+    </Link>
   );
 };
 

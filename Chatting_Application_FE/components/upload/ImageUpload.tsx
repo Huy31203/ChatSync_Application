@@ -6,6 +6,8 @@ import type React from 'react';
 import { useRef, useState, type ChangeEvent } from 'react';
 
 import { Button } from '@/components/ui/button';
+import { useCookies } from '@/contexts/CookieContext';
+import { createImageLoader } from '@/lib/imageLoader';
 import { cn } from '@/lib/utils';
 
 interface ImageUploadProps {
@@ -23,10 +25,14 @@ export default function ImageUpload({
   maxSizeMB = 5,
   acceptedFileTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'],
 }: ImageUploadProps) {
+  const { cookie } = useCookies();
+
   const [isDragging, setIsDragging] = useState(false);
   const [preview, setPreview] = useState<string | null>(typeof value === 'string' ? value : null);
   const [error, setError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const customImageLoader = createImageLoader(cookie);
 
   const maxSizeBytes = maxSizeMB * 1024 * 1024;
 
@@ -119,7 +125,8 @@ export default function ImageUpload({
         <div className="w-fit h-fit flex justify-center items-center rounded-full border">
           <div className="relative aspect-video w-fit rounded-full">
             <Image
-              src={preview || '/placeholder.svg'}
+              loader={customImageLoader}
+              src={preview}
               alt="Preview"
               className="rounded-full h-[100px] w-[100px]"
               width={100}

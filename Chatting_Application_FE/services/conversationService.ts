@@ -25,4 +25,16 @@ export const conversationService = {
       `${API_URL.CONVERSATIONS}/${conversationId}/messages?page=${page}&size=${size}&sort=${sort}`
     );
   },
+
+  async updateMessageInConversation(
+    conversationId: string,
+    messageId: string,
+    data: Partial<IDirectMessage>
+  ): Promise<ApiResponse<IDirectMessage>> {
+    return await apiClient.patch(`${API_URL.CONVERSATIONS}/${conversationId}/messages/${messageId}`, data);
+  },
+
+  async deleteMessageInConversation(conversationId: string, messageId: string): Promise<ApiResponse<void>> {
+    return await apiClient.delete(`${API_URL.CONVERSATIONS}/${conversationId}/messages/${messageId}`);
+  },
 };

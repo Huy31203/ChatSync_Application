@@ -5,7 +5,7 @@ import SockJS from 'sockjs-client';
 import { useCookies } from '@/contexts/CookieContext';
 import logError from '@/utils';
 
-import { useToken } from './useToken';
+import { useRefresh } from './useRefesh';
 
 interface UseSocketProps {
   url?: string;
@@ -25,7 +25,7 @@ export const useSocket = ({
   onDisconnect,
 }: UseSocketProps) => {
   const { cookie } = useCookies();
-  const { isTokenExpired, refreshToken } = useToken();
+  const { isTokenExpired, refreshToken } = useRefresh();
 
   // Stabilize headers with useMemo
   const stableHeaders = useMemo(() => {
@@ -144,7 +144,7 @@ export const useSocket = ({
 
   const send = useCallback((destination: string, body: any, headers: Record<string, string> = {}) => {
     if (!clientRef.current?.connected) {
-      logError('Cannot send message: client not connected');
+      logError('Cannot send message: try to refresh page');
       return;
     }
 

@@ -5,6 +5,8 @@ import Link from 'next/link';
 import { useParams } from 'next/navigation';
 
 import { ActionTooltip } from '@/components/ActionTooltip';
+import { useCookies } from '@/contexts/CookieContext';
+import { createImageLoader } from '@/lib/imageLoader';
 import { cn } from '@/lib/utils';
 
 interface NavigationItemProps {
@@ -15,6 +17,9 @@ interface NavigationItemProps {
 
 export const NavigationItem = ({ id, name, imageUrl }: NavigationItemProps) => {
   const params = useParams();
+  const { cookie } = useCookies();
+
+  const customImageLoader = createImageLoader(cookie);
 
   return (
     <ActionTooltip side="right" align="center" label={name}>
@@ -34,7 +39,7 @@ export const NavigationItem = ({ id, name, imageUrl }: NavigationItemProps) => {
           )}
         >
           {imageUrl ? (
-            <Image fill src={imageUrl} alt="Server" />
+            <Image loader={customImageLoader} fill src={imageUrl} alt="Server" />
           ) : (
             <div className="absolute inset-0 flex items-center justify-center bg-primary/10 text-primary font-semibold text-xl">
               {name[0].toUpperCase()}

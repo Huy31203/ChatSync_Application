@@ -3,11 +3,12 @@ import { useCallback, useState } from 'react';
 
 import { useCookies } from '@/contexts/CookieContext';
 import { getNewToken } from '@/lib/action';
+import { authService } from '@/services/authService';
 import logError from '@/utils';
 
-export const useToken = () => {
+export const useRefresh = () => {
   const router = useRouter();
-  const { cookie, setCookie } = useCookies();
+  const { cookie } = useCookies();
   const [isRefreshing, setIsRefreshing] = useState(false);
 
   // Function to check if token is expired
@@ -31,11 +32,17 @@ export const useToken = () => {
 
     try {
       setIsRefreshing(true);
+
       const newToken = await getNewToken();
 
-      setCookie(newToken);
+      if (newToken !== cookie) {
+        return newToken;
+      }
 
-      return newToken;
+      await authService.refresh();
+      const refreshedToken = await getNewToken();
+
+      return refreshedToken;
     } catch (error) {
       logError(error);
       router.push('/login');

@@ -14,8 +14,8 @@ import logError from '@/utils';
 import { ChatItem } from './ChatItem';
 import { ChatWelcome } from './ChatWelcome';
 
-const BATCH_SIZE = 10;
-const DATE_FORMAT = 'd MMM yyyy, HH:mm';
+const BATCH_SIZE = 20;
+const DATE_FORMAT = 'd/MM/yyyy, HH:mm';
 
 interface ChatMessagesProps {
   name: string;
@@ -25,7 +25,7 @@ interface ChatMessagesProps {
 }
 
 export const ChatMessages = ({ name, channel, conversation, type }: ChatMessagesProps) => {
-  const { profile, loading } = useAuth();
+  const { profile } = useAuth();
 
   const [messages, setMessages] = useState<IDirectMessage[]>([]);
   const [messagesPage, setMessagesPage] = useState(1);
@@ -43,10 +43,15 @@ export const ChatMessages = ({ name, channel, conversation, type }: ChatMessages
     logError(error);
   }, []);
 
-  const { isConnected, subscribe } = useSocket({
+  const { isConnected, subscribe, send } = useSocket({
     onConnect: handleConnect,
     onError: handleError,
   });
+
+  // Helper function to update messages
+  const updateMessages = (prevMessages: IDirectMessage[], newMessage: IDirectMessage) => {
+    return prevMessages.map((msg) => (msg.id === newMessage.id ? newMessage : msg));
+  };
 
   // Socket connection for real-time messages
   useEffect(() => {
@@ -64,8 +69,12 @@ export const ChatMessages = ({ name, channel, conversation, type }: ChatMessages
       // Handle received message
       // message is already parsed from JSON
       setMessages((prevMessages) => {
-        const newMessages = [message, ...prevMessages];
-        return newMessages;
+        // Check if message exists within the state updater function
+        if (!prevMessages.find((m) => m.id === message.id)) {
+          return [message, ...prevMessages];
+        } else {
+          return updateMessages(prevMessages, message);
+        }
       });
     });
 
@@ -74,8 +83,12 @@ export const ChatMessages = ({ name, channel, conversation, type }: ChatMessages
       // Handle received message
       // message is already parsed from JSON
       setMessages((prevMessages) => {
-        const newMessages = [message, ...prevMessages];
-        return newMessages;
+        // Check if message exists within the state updater function
+        if (!prevMessages.find((m) => m.id === message.id)) {
+          return [message, ...prevMessages];
+        } else {
+          return updateMessages(prevMessages, message);
+        }
       });
     });
 
@@ -140,7 +153,7 @@ export const ChatMessages = ({ name, channel, conversation, type }: ChatMessages
     }
   };
 
-  console.log(!isLoading && messages.length === 0);
+  console.log('Message:', messages);
 
   return (
     <div id="divRef" ref={innerRef} className="h-full flex flex-1 flex-col-reverse py-4 overflow-y-auto">
@@ -174,11 +187,15 @@ export const ChatMessages = ({ name, channel, conversation, type }: ChatMessages
                   key={`${message.id}-${idx}`}
                   content={message.content}
                   fileUrls={message.fileUrls}
+                  type={type}
                   sender={message.conversation.sender}
                   currentMember={currentMember}
+                  messageId={message.id}
+                  chatId={message.conversation.id}
                   timestamp={format(new Date(message.createdAt), DATE_FORMAT)}
                   deleted={message.deleted}
                   isUpdated={message.updatedAt !== null}
+                  sendMessage={send}
                 />
               ))}
             </InfiniteScroll>

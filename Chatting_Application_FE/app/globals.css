@@ -97,4 +97,18 @@ body,
     color: white;
     caret-color: black;
   }
+  ::-webkit-scrollbar-track {
+    border-radius: 10px;
+    background-color: var(--foreground);
+  }
+
+  ::-webkit-scrollbar {
+    width: 9px;
+    background-color: var(--background);
+  }
+
+  ::-webkit-scrollbar-thumb {
+    border-radius: 10px;
+    background-color: #525252;
+  }
 }

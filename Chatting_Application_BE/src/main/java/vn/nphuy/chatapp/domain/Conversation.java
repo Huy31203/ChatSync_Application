@@ -67,9 +67,4 @@ public class Conversation extends AbstractEntity {
         : null;
   }
 
-  public List<DirectMessage> getDirectMessages() {
-    return directMessages != null
-        ? directMessages.stream().filter(message -> !message.isDeleted()).toList()
-        : List.of();
-  }
 }

@@ -16,4 +16,5 @@ export interface IDirectMessage extends IBaseModel {
   content?: string;
   fileUrls?: string[];
   conversation: IConversation;
+  deleted: boolean;
 }

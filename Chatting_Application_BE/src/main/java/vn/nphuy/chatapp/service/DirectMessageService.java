@@ -1,5 +1,7 @@
 package vn.nphuy.chatapp.service;
 
+import java.util.ArrayList;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -46,7 +48,7 @@ public class DirectMessageService {
   }
 
   public DirectMessage getDirectMessageById(String directMessageId) {
-    return directMessageRepository.findById(directMessageId).orElse(null);
+    return directMessageRepository.findOneById(directMessageId).orElse(null);
   }
 
   public DirectMessage createDirectMessage(DirectMessage directMessage) {
@@ -61,18 +63,21 @@ public class DirectMessageService {
 
     existingDirectMessage.setContent(
         null != directMessage.getContent() ? directMessage.getContent() : existingDirectMessage.getContent());
-    existingDirectMessage.setFileUrls(
-        directMessage.getFileUrls().isEmpty() ? directMessage.getFileUrls() : existingDirectMessage.getFileUrls());
 
     return directMessageRepository.save(existingDirectMessage);
   }
 
-  public boolean deleteDirectMessage(String directMessageId) {
-    if (directMessageRepository.existsById(directMessageId)) {
-      directMessageRepository.deleteById(directMessageId);
-      return true;
-    } else {
+  public boolean deleteDirectMessage(DirectMessage directMessage) {
+    DirectMessage existingDirectMessage = directMessageRepository.findById(directMessage.getId()).orElse(null);
+    if (existingDirectMessage == null) {
       return false;
     }
+
+    existingDirectMessage.setContent("This message was deleted");
+    existingDirectMessage.setFileUrls(new ArrayList<>());
+    existingDirectMessage.setDeleted(true);
+
+    directMessageRepository.save(existingDirectMessage);
+    return true;
   }
 }

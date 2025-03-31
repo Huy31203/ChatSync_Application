@@ -7,6 +7,7 @@ import java.util.List;
 import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.data.mapping.PropertyReferenceException;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -97,7 +98,7 @@ public class GlobalExceptionHandler {
         } else {
             res.setMessage(ex.getMessage());
         }
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(res);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).contentType(MediaType.APPLICATION_JSON).body(res);
     }
 
     @ExceptionHandler(value = { MethodArgumentNotValidException.class })

@@ -20,7 +20,7 @@ export const memberService = {
     return await apiClient.patch(`${API_URL.SERVERS}/${serverId}/members/${memberId}`, data);
   },
 
-  async deleteMember(serverId: string, memberId: string): Promise<ApiResponse<IServer>> {
+  async deleteMember(serverId: string, memberId: string): Promise<ApiResponse<void>> {
     return await apiClient.delete(`${API_URL.SERVERS}/${serverId}/members/${memberId}`);
   },
 };
