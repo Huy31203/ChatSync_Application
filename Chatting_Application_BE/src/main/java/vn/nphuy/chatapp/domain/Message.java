@@ -1,12 +1,14 @@
 package vn.nphuy.chatapp.domain;
 
-import org.hibernate.annotations.Filter;
-import org.hibernate.annotations.FilterDef;
+import java.util.List;
+
 import org.hibernate.annotations.SQLDelete;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
+import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
+import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
@@ -25,18 +27,25 @@ public class Message extends AbstractEntity {
   @Column(columnDefinition = "MEDIUMTEXT")
   private String content;
 
-  private String fileUrl;
+  @ElementCollection
+  @CollectionTable(name = "message_file_urls", joinColumns = @JoinColumn(name = "message_id"))
+  @Column(name = "file_url")
+  private List<String> fileUrls;
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "member_id")
+  @JoinColumn(name = "sender_id")
   @JsonManagedReference("member-message")
-  private Member member;
+  private Member sender;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "channel_id")
   private Channel channel;
 
-  public Member getMember() {
-    return member != null && !member.isDeleted() ? member : null;
+  public Member getSender() {
+    return sender != null && !sender.isDeleted() ? sender : null;
+  }
+
+  public Channel getChannel() {
+    return channel != null && !channel.isDeleted() ? channel : null;
   }
 }

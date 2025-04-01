@@ -6,7 +6,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class ReqUpdateDirectMessage {
+public class ReqUpdateDirectMessageDTO {
   @NotBlank(message = "content is required")
   private String content;
 }

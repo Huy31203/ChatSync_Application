@@ -39,13 +39,8 @@ const ConversationIdPage = async ({ params }: { params: { serverId: string; memb
 
   return (
     <div className="flex flex-col h-full">
-      <ChatHeader
-        type="conversation"
-        serverId={serverId}
-        name={otherMember.profile.name}
-        imageUrl={otherMember.profile.avatarUrl}
-      />
-      <ChatMessages conversation={conversation} name={receiver.profile.name} type="conversation" />
+      <ChatHeader type="conversation" name={otherMember.profile.name} imageUrl={otherMember.profile.avatarUrl} />
+      <ChatMessages serverId={serverId} conversation={conversation} name={receiver.profile.name} type="conversation" />
       <ChatInput name={otherMember.profile.name} type="conversation" conversation={conversation} />
     </div>
   );

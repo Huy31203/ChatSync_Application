@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -16,25 +17,35 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.turkraft.springfilter.boot.Filter;
+
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import vn.nphuy.chatapp.domain.Channel;
 import vn.nphuy.chatapp.domain.Conversation;
+import vn.nphuy.chatapp.domain.DirectMessage;
 import vn.nphuy.chatapp.domain.Member;
+import vn.nphuy.chatapp.domain.Message;
 import vn.nphuy.chatapp.domain.Profile;
 import vn.nphuy.chatapp.domain.Server;
 import vn.nphuy.chatapp.domain.request.ReqChannelDTO;
 import vn.nphuy.chatapp.domain.request.ReqConversationDTO;
 import vn.nphuy.chatapp.domain.request.ReqServerDTO;
+import vn.nphuy.chatapp.domain.request.ReqUpdateDirectMessageDTO;
 import vn.nphuy.chatapp.domain.request.ReqUpdateMemberDTO;
+import vn.nphuy.chatapp.domain.request.ReqUpdateMessageDTO;
 import vn.nphuy.chatapp.domain.response.ResChannelDTO;
 import vn.nphuy.chatapp.domain.response.ResConversationDTO;
+import vn.nphuy.chatapp.domain.response.ResDirectMessageDTO;
+import vn.nphuy.chatapp.domain.response.ResMessageDTO;
 import vn.nphuy.chatapp.domain.response.ResServerDTO;
 import vn.nphuy.chatapp.domain.response.ResultPaginationDTO;
 import vn.nphuy.chatapp.service.ChannelService;
 import vn.nphuy.chatapp.service.ConversationService;
+import vn.nphuy.chatapp.service.DirectMessageService;
 import vn.nphuy.chatapp.service.MemberService;
+import vn.nphuy.chatapp.service.MessageService;
 import vn.nphuy.chatapp.service.ServerService;
 import vn.nphuy.chatapp.util.SecurityUtil;
 import vn.nphuy.chatapp.util.annotation.ApiMessage;
@@ -53,32 +64,11 @@ public class ServerController {
   private final ChannelService channelService;
   private final MemberService memberService;
   private final ConversationService conversationService;
+  private final DirectMessageService directMessageService;
+  private final MessageService messageService;
   private final ModelMapper modelMapper;
   private final SecurityUtil securityUtil;
   // private final RateLimitService rateLimitService;
-
-  // @GetMapping("/servers")
-  // @ApiMessage(message = "Fetch all servers")
-  // public ResponseEntity<Object> getAllServers(@Filter Specification<Server>
-  // spec,
-  // Pageable pageable) {
-
-  // ResultPaginationDTO results = serverService.getAllServers(spec, pageable);
-
-  // // Map Server entities to ResServerDTO objects
-  // if (results.getData() != null) {
-  // @SuppressWarnings("unchecked")
-  // List<Server> servers = (List<Server>) results.getData();
-
-  // List<ResServerDTO> serverDTOs = servers.stream()
-  // .map(server -> modelMapper.map(server, ResServerDTO.class))
-  // .toList();
-
-  // results.setData(serverDTOs);
-  // }
-
-  // return ResponseEntity.ok(results);
-  // }
 
   @GetMapping("/servers/current-profile")
   @ApiMessage(message = "Fetch all servers by current profile")
@@ -125,6 +115,29 @@ public class ServerController {
     return ResponseEntity.ok(resServer);
   }
 
+  @GetMapping("/servers/{serverId}/channels/{channelId}")
+  @ApiMessage(message = "Fetch channel by id")
+  public ResponseEntity<Object> getChannelById(@PathVariable("serverId") String serverId,
+      @PathVariable("channelId") String channelId) {
+
+    String profileId = securityUtil.getCurrentProfile().getId();
+    Member member = memberService.getMemberByProfileIdAndServerId(profileId, serverId);
+
+    if (member == null) {
+      throw new NotAllowedException("You are not a member of that server");
+    }
+
+    Channel result = channelService.getChannelById(channelId);
+
+    if (result == null) {
+      throw new ResourceNotFoundException("Channel not found with id: " + channelId);
+    }
+
+    ResChannelDTO resChannel = modelMapper.map(result, ResChannelDTO.class);
+
+    return ResponseEntity.ok(resChannel);
+  }
+
   @GetMapping("/servers/{serverId}/conversations/sender/{senderId}/receiver/{receiverId}")
   @ApiMessage(message = "Get all conversations by memberId")
   public ResponseEntity<Object> getConversationByMemberId(@PathVariable("serverId") String serverId,
@@ -145,6 +158,88 @@ public class ServerController {
     ResConversationDTO resConversation = modelMapper.map(result, ResConversationDTO.class);
 
     return ResponseEntity.ok().body(resConversation);
+  }
+
+  @GetMapping("/servers/{serverId}/conversations/{conversationid}/messages")
+  @ApiMessage(message = "Get all messages in a conversation")
+  public ResponseEntity<Object> getAllConversationMessages(@PathVariable("serverId") String serverId,
+      @PathVariable("conversationid") String conversationId,
+      @Filter Specification<DirectMessage> spec,
+      Pageable pageable) {
+    log.info("Getting all messages in Conversation: {}", conversationId);
+
+    String profileId = securityUtil.getCurrentProfile().getId();
+    Member member = memberService.getMemberByProfileIdAndServerId(profileId, serverId);
+
+    if (member == null) {
+      throw new NotAllowedException("You are not a member of that server");
+    }
+
+    Conversation conversation = conversationService.getConversationById(conversationId);
+    if (conversation == null) {
+      throw new ResourceNotFoundException("Conversation not found with id: " + conversationId);
+    }
+
+    ResultPaginationDTO results = directMessageService.getAllDirectMessagesByConversation(spec, pageable, conversation);
+
+    if (results == null) {
+      throw new ResourceNotFoundException("Messages not found with id: " + conversationId);
+    }
+
+    // Map entities to Response objects
+    if (results.getData() != null) {
+      @SuppressWarnings("unchecked")
+      List<DirectMessage> messages = (List<DirectMessage>) results.getData();
+
+      List<ResDirectMessageDTO> directMessageDTOs = messages.stream()
+          .map(directMessage -> modelMapper.map(directMessage, ResDirectMessageDTO.class))
+          .toList();
+
+      results.setData(directMessageDTOs);
+    }
+
+    return ResponseEntity.ok(results);
+  }
+
+  @GetMapping("/servers/{serverId}/channels/{channelId}/messages")
+  @ApiMessage(message = "Get all messages in a channel")
+  public ResponseEntity<Object> getAllChannelMessages(@PathVariable("serverId") String serverId,
+      @PathVariable("channelId") String channelId,
+      @Filter Specification<Message> spec,
+      Pageable pageable) {
+    log.info("Getting all messages in Channel: {}", channelId);
+
+    String profileId = securityUtil.getCurrentProfile().getId();
+    Member member = memberService.getMemberByProfileIdAndServerId(profileId, serverId);
+
+    if (member == null) {
+      throw new NotAllowedException("You are not a member of that server");
+    }
+
+    Channel channel = channelService.getChannelById(channelId);
+    if (channel == null) {
+      throw new ResourceNotFoundException("Channel not found with id: " + channelId);
+    }
+
+    ResultPaginationDTO results = messageService.getAllMessagesByChannelId(spec, pageable, channelId);
+
+    if (results == null) {
+      throw new ResourceNotFoundException("Messages not found with Channel: " + channelId);
+    }
+
+    // Map entities to Response objects
+    if (results.getData() != null) {
+      @SuppressWarnings("unchecked")
+      List<Message> messages = (List<Message>) results.getData();
+
+      List<ResMessageDTO> messageDTOs = messages.stream()
+          .map(message -> modelMapper.map(message, ResMessageDTO.class))
+          .toList();
+
+      results.setData(messageDTOs);
+    }
+
+    return ResponseEntity.ok(results);
   }
 
   @PostMapping("/servers")
@@ -357,6 +452,102 @@ public class ServerController {
     return ResponseEntity.ok(resServer);
   }
 
+  @PatchMapping("servers/{serverId}/conversations/{conversationId}/messages/{messageId}")
+  @ApiMessage(message = "Update direct message by id")
+  public ResponseEntity<Object> updateConversationMessage(@PathVariable("serverId") String serverId,
+      @PathVariable("conversationId") String conversationId,
+      @PathVariable("messageId") String messageId, @RequestBody @Valid ReqUpdateDirectMessageDTO reqDirectMessage) {
+    log.info("Updating message:{} in Conversation: {}", messageId, conversationId);
+
+    String profileId = securityUtil.getCurrentProfile().getId();
+    Member member = memberService.getMemberByProfileIdAndServerId(profileId, serverId);
+
+    if (member == null) {
+      throw new NotAllowedException("You are not a member of that server");
+    }
+
+    Conversation conversation = conversationService.getConversationById(conversationId);
+    if (conversation == null) {
+      throw new ResourceNotFoundException("Conversation not found with id: " + conversationId);
+    }
+
+    DirectMessage directMessage = directMessageService.getDirectMessageById(messageId);
+    if (directMessage == null) {
+      throw new ResourceNotFoundException("Direct message not found with id: " + messageId);
+    }
+
+    // Check if the member is the sender of the message
+    if (!directMessage.getConversation().getSender().getId().equals(member.getId())) {
+      throw new NotAllowedException("You are not allowed to edit this message");
+    }
+
+    // Check if the message has any file URLs
+    if (!directMessage.getFileUrls().isEmpty()) {
+      throw new NotAllowedException("You are not allowed to edit message with file attached");
+    }
+
+    // Check if the message is deleted
+    if (directMessage.isDeleted()) {
+      throw new NotAllowedException("You are not allowed to edit deleted message");
+    }
+
+    directMessage.setContent(reqDirectMessage.getContent());
+
+    DirectMessage updatedDirectMessage = directMessageService.updateDirectMessage(directMessage);
+
+    ResDirectMessageDTO resDirectMessage = modelMapper.map(updatedDirectMessage, ResDirectMessageDTO.class);
+
+    return ResponseEntity.ok(resDirectMessage);
+  }
+
+  @PatchMapping("servers/{serverId}/channels/{channelId}/messages/{messageId}")
+  @ApiMessage(message = "Update message by id")
+  public ResponseEntity<Object> updateChannelMessage(@PathVariable("serverId") String serverId,
+      @PathVariable("channelId") String channelId,
+      @PathVariable("messageId") String messageId, @RequestBody @Valid ReqUpdateMessageDTO reqMessage) {
+    log.info("Updating message: {} in Channel: {}", messageId, channelId);
+
+    String profileId = securityUtil.getCurrentProfile().getId();
+    Member member = memberService.getMemberByProfileIdAndServerId(profileId, serverId);
+
+    if (member == null) {
+      throw new NotAllowedException("You are not a member of that server");
+    }
+
+    Channel channel = channelService.getChannelById(channelId);
+    if (channel == null) {
+      throw new ResourceNotFoundException("Channel not found with id: " + channelId);
+    }
+
+    Message message = messageService.getMessageById(messageId);
+    if (message == null) {
+      throw new ResourceNotFoundException("Message not found with id: " + messageId);
+    }
+
+    // Check if the member is the sender of the message
+    if (!message.getSender().getId().equals(member.getId())) {
+      throw new NotAllowedException("You are not allowed to edit this message");
+    }
+
+    // Check if the message has any file URLs
+    if (!message.getFileUrls().isEmpty()) {
+      throw new NotAllowedException("You are not allowed to edit message with file attached");
+    }
+
+    // Check if the message is deleted
+    if (message.isDeleted()) {
+      throw new NotAllowedException("You are not allowed to edit deleted message");
+    }
+
+    message.setContent(reqMessage.getContent());
+
+    Message updatedMessage = messageService.updateMessage(message);
+
+    ResMessageDTO resMessage = modelMapper.map(updatedMessage, ResMessageDTO.class);
+
+    return ResponseEntity.ok(resMessage);
+  }
+
   @DeleteMapping("servers/{id}/leave")
   @ApiMessage(message = "Leave server by id")
   public ResponseEntity<Object> leaveServer(@PathVariable("id") String id) {
@@ -441,5 +632,83 @@ public class ServerController {
     ResServerDTO resServer = modelMapper.map(server, ResServerDTO.class);
 
     return ResponseEntity.ok().body(resServer);
+  }
+
+  @DeleteMapping("servers/{serverId}/conversations/{conversationId}/messages/{messageId}")
+  @ApiMessage(message = "Delete a message in a conversation")
+  public ResponseEntity<Void> deleteConversationMessage(@PathVariable("serverId") String serverId,
+      @PathVariable("conversationId") String conversationId,
+      @PathVariable("messageId") String messageId) {
+    log.info("Deleting message:{} in Conversation: {}", messageId, conversationId);
+
+    String profileId = securityUtil.getCurrentProfile().getId();
+    Member member = memberService.getMemberByProfileIdAndServerId(profileId, serverId);
+
+    if (member == null) {
+      throw new NotAllowedException("You are not a member of that server");
+    }
+
+    Conversation conversation = conversationService.getConversationById(conversationId);
+    if (conversation == null) {
+      throw new ResourceNotFoundException("Conversation not found with id: " + conversationId);
+    }
+
+    DirectMessage directMessage = directMessageService.getDirectMessageById(messageId);
+    if (directMessage == null) {
+      throw new ResourceNotFoundException("Direct message not found with id: " + messageId);
+    }
+
+    // Check if the member is the sender of the message or has admin role
+    // or is a moderator and the sender is not admin
+    if (!directMessage.getConversation().getSender().getId().equals(member.getId())
+        && !member.getMemberRole().equals(MemberRoleEnum.ADMIN)
+        && !(member.getMemberRole().equals(MemberRoleEnum.MODERATOR)
+            && !directMessage.getConversation().getSender().getMemberRole().equals(MemberRoleEnum.ADMIN))) {
+      throw new NotAllowedException("You are not allowed to delete this message");
+    }
+
+    boolean isDeleted = directMessageService.deleteDirectMessage(directMessage.getId());
+
+    if (!isDeleted) {
+      throw new ResourceNotFoundException("Failed to delete direct message with id: " + messageId);
+    }
+
+    return ResponseEntity.ok().body(null);
+  }
+
+  @DeleteMapping("servers/{serverId}/channels/{channelId}/messages/{messageId}")
+  @ApiMessage(message = "Delete message by id")
+  public ResponseEntity<Void> deleteMessage(@PathVariable("serverId") String serverId,
+      @PathVariable("channelId") String channelId,
+      @PathVariable("messageId") String messageId) {
+    log.info("Deleting message: {} in Channel: {}", messageId, channelId);
+
+    String profileId = securityUtil.getCurrentProfile().getId();
+    Member member = memberService.getMemberByProfileIdAndServerId(profileId, serverId);
+
+    if (member == null) {
+      throw new NotAllowedException("You are not a member of that server");
+    }
+
+    Channel channel = channelService.getChannelById(channelId);
+    if (channel == null) {
+      throw new ResourceNotFoundException("Channel not found with id: " + channelId);
+    }
+
+    Message message = messageService.getMessageById(messageId);
+    if (message == null) {
+      throw new ResourceNotFoundException("Message not found with id: " + messageId);
+    }
+
+    // Check if the member is the sender of the message or has admin/moderator role
+    if (!message.getSender().getId().equals(member.getId())
+        && !member.getMemberRole().equals(MemberRoleEnum.ADMIN)
+        && !member.getMemberRole().equals(MemberRoleEnum.MODERATOR)) {
+      throw new NotAllowedException("You are not allowed to delete this message");
+    }
+
+    messageService.deleteMessage(message.getId());
+
+    return ResponseEntity.ok().body(null);
   }
 }

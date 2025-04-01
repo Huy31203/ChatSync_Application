@@ -11,18 +11,10 @@ public class MessageSpecifications {
   }
 
   public static Specification<Message> hasMemberId(String memberId) {
-    return (root, query, criteriaBuilder) ->
-    // Build the where condition to get all channels in a profile by memberId
-    criteriaBuilder.and(
-        criteriaBuilder.equal(root.join("member").get("id"), memberId),
-        criteriaBuilder.equal(root.get("deleted"), false));
+    return (root, query, criteriaBuilder) -> criteriaBuilder.equal(root.join("member").get("id"), memberId);
   }
 
   public static Specification<Message> hasChannelId(String channelId) {
-    return (root, query, criteriaBuilder) ->
-    // Build the where condition to get all channels in a profile by channelId
-    criteriaBuilder.and(
-        criteriaBuilder.equal(root.join("channel").get("id"), channelId),
-        criteriaBuilder.equal(root.get("deleted"), false));
+    return (root, query, criteriaBuilder) -> criteriaBuilder.equal(root.join("channel").get("id"), channelId);
   }
 }

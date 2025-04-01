@@ -230,6 +230,8 @@ public class AuthController {
     Profile profile = securityUtil.getCurrentProfile();
     ResProfileDTO resProfile = modelMapper.map(profile, ResProfileDTO.class);
 
+    log.info(">> Current profile: {}", resProfile);
+
     String profileJson;
     try {
       ObjectMapper objectMapper = new ObjectMapper();

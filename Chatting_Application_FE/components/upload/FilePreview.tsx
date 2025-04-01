@@ -51,55 +51,105 @@ export const FilePreview = ({ file, url, removeable = true, onRemove }: FilePrev
   const fileSize = file?.size || 0;
 
   return (
-    <Link
-      href={previewUrl || ''}
-      target="_blank"
-      className={cn('group relative flex items-center', removeable && 'group-hover:opacity-100')}
-    >
-      <div className="flex flex-col bg-white dark:bg-zinc-700 rounded-md overflow-hidden border border-neutral-300 dark:border-zinc-600 w-[120px]">
-        <div
-          className={cn(
-            'flex items-center justify-center bg-neutral-200 dark:bg-zinc-800',
-            isShowingName ? 'h-[80px]' : 'h-[110px]'
-          )}
+    <>
+      {url && url.length > 0 ? (
+        <Link
+          href={previewUrl || ''}
+          target="_blank"
+          className={cn('group relative flex items-center', removeable && 'group-hover:opacity-100')}
         >
-          {isImage && previewUrl ? (
-            <Image
-              loader={customImageLoader}
-              width={500}
-              height={500}
-              src={previewUrl}
-              alt={fileName}
-              className="h-full w-full object-cover"
-            />
-          ) : (
-            <>
-              <FileIcon className="h-10 w-10 text-neutral-500 dark:text-neutral-400" />
-              <p className="text-lg text-neutral-500 dark:text-neutral-400">{fileExt}</p>
-            </>
-          )}
-
-          {removeable && (
-            <button
-              onClick={onRemove}
-              className="absolute -top-1 -right-2 bg-red-500 hover:bg-red-600 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
-              aria-label="Remove file"
+          <div className="flex flex-col bg-white dark:bg-zinc-700 rounded-md overflow-hidden border border-neutral-300 dark:border-zinc-600 w-[120px]">
+            <div
+              className={cn(
+                'flex items-center justify-center bg-neutral-200 dark:bg-zinc-800',
+                isShowingName ? 'h-[80px]' : 'h-[110px]'
+              )}
             >
-              <X size={14} />
-            </button>
-          )}
-        </div>
+              {isImage && previewUrl ? (
+                <Image
+                  loader={customImageLoader}
+                  width={500}
+                  height={500}
+                  src={previewUrl}
+                  alt={fileName}
+                  className="h-full w-full object-cover"
+                />
+              ) : (
+                <>
+                  <FileIcon className="h-10 w-10 text-neutral-500 dark:text-neutral-400" />
+                  <p className="text-lg text-neutral-500 dark:text-neutral-400">{fileExt}</p>
+                </>
+              )}
 
-        {isShowingName && (
-          <div className="p-2">
-            <p className="text-xs font-medium truncate" title={fileName}>
-              {fileName}
-            </p>
-            <p className="text-xs text-neutral-500 dark:text-neutral-400">{file ? formatFileSize(fileSize) : ''}</p>
+              {removeable && (
+                <button
+                  onClick={onRemove}
+                  className="absolute -top-1 -right-2 bg-red-500 hover:bg-red-600 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                  aria-label="Remove file"
+                >
+                  <X size={14} />
+                </button>
+              )}
+            </div>
+
+            {isShowingName && (
+              <div className="p-2">
+                <p className="text-xs font-medium truncate" title={fileName}>
+                  {fileName}
+                </p>
+                <p className="text-xs text-neutral-500 dark:text-neutral-400">{file ? formatFileSize(fileSize) : ''}</p>
+              </div>
+            )}
           </div>
-        )}
-      </div>
-    </Link>
+        </Link>
+      ) : (
+        <div className={cn('group relative flex items-center', removeable && 'group-hover:opacity-100')}>
+          <div className="flex flex-col bg-white dark:bg-zinc-700 rounded-md overflow-hidden border border-neutral-300 dark:border-zinc-600 w-[120px]">
+            <div
+              className={cn(
+                'flex items-center justify-center bg-neutral-200 dark:bg-zinc-800',
+                isShowingName ? 'h-[80px]' : 'h-[110px]'
+              )}
+            >
+              {isImage && previewUrl ? (
+                <Image
+                  loader={customImageLoader}
+                  width={500}
+                  height={500}
+                  src={previewUrl}
+                  alt={fileName}
+                  className="h-full w-full object-cover"
+                />
+              ) : (
+                <>
+                  <FileIcon className="h-10 w-10 text-neutral-500 dark:text-neutral-400" />
+                  <p className="text-lg text-neutral-500 dark:text-neutral-400">{fileExt}</p>
+                </>
+              )}
+
+              {removeable && (
+                <button
+                  onClick={onRemove}
+                  className="absolute -top-1 -right-2 bg-red-500 hover:bg-red-600 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                  aria-label="Remove file"
+                >
+                  <X size={14} />
+                </button>
+              )}
+            </div>
+
+            {isShowingName && (
+              <div className="p-2">
+                <p className="text-xs font-medium truncate" title={fileName}>
+                  {fileName}
+                </p>
+                <p className="text-xs text-neutral-500 dark:text-neutral-400">{file ? formatFileSize(fileSize) : ''}</p>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+    </>
   );
 };
 

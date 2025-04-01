@@ -8,13 +8,12 @@ import { UserAvatar } from '../UserAvatar';
 import { SocketIndicator } from '../indicator/SocketIndicator';
 
 interface ChatHeaderProps {
-  serverId: string;
   name: string;
   type: 'channel' | 'conversation';
   imageUrl?: string;
 }
 
-export const ChatHeader = ({ serverId, name, type, imageUrl }: ChatHeaderProps) => {
+export const ChatHeader = ({ name, type, imageUrl }: ChatHeaderProps) => {
   return (
     <div
       className="text-md font-semibold px-3   flex items-center h-12

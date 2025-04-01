@@ -1,6 +1,7 @@
 package vn.nphuy.chatapp.service;
 
-import org.hibernate.Session;
+import java.util.ArrayList;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -20,15 +21,11 @@ public class MessageService {
   private final MessageRepository messageRepository;
   private final EntityManager entityManager;
 
-  public ResultPaginationDTO getAllMessagesByMemberId(Pageable pageable, String memberId) {
-    Session session = entityManager.unwrap(Session.class);
-    session.enableFilter("deletedMessagesFilter");
+  public ResultPaginationDTO getAllMessagesByMemberId(Specification<Message> spec, Pageable pageable,
+      String memberId) {
+    Specification<Message> compinedSpec = spec.and(MessageSpecifications.hasMemberId(memberId));
 
-    Specification<Message> spec = MessageSpecifications.hasMemberId(memberId);
-
-    Page<Message> messages = messageRepository.findAll(spec, pageable);
-
-    session.disableFilter("deletedMessagesFilter");
+    Page<Message> messages = messageRepository.findAll(compinedSpec, pageable);
 
     ResultPaginationDTO result = new ResultPaginationDTO();
     Meta meta = new Meta();
@@ -45,15 +42,11 @@ public class MessageService {
     return result;
   }
 
-  public ResultPaginationDTO getAllMessagesByChannelId(Pageable pageable, String channelId) {
-    Session session = entityManager.unwrap(Session.class);
-    session.enableFilter("deletedMessagesFilter");
+  public ResultPaginationDTO getAllMessagesByChannelId(Specification<Message> spec, Pageable pageable,
+      String channelId) {
+    Specification<Message> compinedSpec = spec.and(MessageSpecifications.hasChannelId(channelId));
 
-    Specification<Message> spec = MessageSpecifications.hasChannelId(channelId);
-
-    Page<Message> messages = messageRepository.findAll(spec, pageable);
-
-    session.disableFilter("deletedMessagesFilter");
+    Page<Message> messages = messageRepository.findAll(compinedSpec, pageable);
 
     ResultPaginationDTO result = new ResultPaginationDTO();
     Meta meta = new Meta();
@@ -71,7 +64,7 @@ public class MessageService {
   }
 
   public Message getMessageById(String messageId) {
-    return messageRepository.findById(messageId).orElse(null);
+    return messageRepository.findOneById(messageId).orElse(null);
   }
 
   public Message createMessage(Message message) {
@@ -85,17 +78,21 @@ public class MessageService {
     }
 
     existingMessage.setContent(null != message.getContent() ? message.getContent() : existingMessage.getContent());
-    existingMessage.setFileUrl(null != message.getFileUrl() ? message.getFileUrl() : existingMessage.getFileUrl());
 
     return messageRepository.save(existingMessage);
   }
 
   public boolean deleteMessage(String messageId) {
-    if (messageRepository.existsById(messageId)) {
-      messageRepository.deleteById(messageId);
-      return true;
-    } else {
+    Message existingMessage = messageRepository.findOneById(messageId).orElse(null);
+    if (existingMessage == null) {
       return false;
     }
+
+    existingMessage.setContent("This message was deleted");
+    existingMessage.setFileUrls(new ArrayList<>());
+    existingMessage.setDeleted(true);
+
+    messageRepository.save(existingMessage);
+    return true;
   }
 }

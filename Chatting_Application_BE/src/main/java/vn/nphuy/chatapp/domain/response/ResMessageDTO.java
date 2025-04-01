@@ -9,26 +9,27 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import vn.nphuy.chatapp.util.constant.ChannelTypeEnum;
 
 @Getter
 @Setter
-@NoArgsConstructor
 @AllArgsConstructor
-public class ResChannelDTO {
+@NoArgsConstructor
+public class ResMessageDTO {
   private String id;
 
-  private String name;
+  private String content;
 
-  private ChannelTypeEnum type;
+  private List<String> fileUrls;
 
-  @JsonIgnoreProperties("channels")
-  private ResServerDTO server;
+  @JsonIgnoreProperties({ "messages", "server" })
+  private ResChannelDTO channel;
 
-  @JsonIgnoreProperties("channel")
-  private List<ResMessageDTO> messages;
+  @JsonIgnoreProperties({ "messages", "server" })
+  private ResMemberDTO sender;
 
   private Instant createdAt;
 
   private Instant updatedAt;
+
+  private boolean deleted;
 }

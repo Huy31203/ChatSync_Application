@@ -32,6 +32,9 @@ public class ResMemberDTO {
     @JsonBackReference
     private List<ResConversationDTO> conversationReceived;
 
+    @JsonIgnoreProperties("sender")
+    private List<ResMessageDTO> messages;
+
     private Instant createdAt;
 
     private Instant updatedAt;

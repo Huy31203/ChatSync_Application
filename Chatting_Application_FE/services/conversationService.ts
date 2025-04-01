@@ -16,25 +16,36 @@ export const conversationService = {
   },
 
   async getAllMessagesByConversationId(
+    serverId: string,
     conversationId: string,
     page = 1,
     size = 20,
     sort = 'createdAt,desc'
   ): Promise<ApiResponseWithPagination<IDirectMessage[]>> {
     return await apiClient.get(
-      `${API_URL.CONVERSATIONS}/${conversationId}/messages?page=${page}&size=${size}&sort=${sort}`
+      `${API_URL.SERVERS}/${serverId}/conversations/${conversationId}/messages?page=${page}&size=${size}&sort=${sort}`
     );
   },
 
   async updateMessageInConversation(
+    serverId: string,
     conversationId: string,
     messageId: string,
     data: Partial<IDirectMessage>
   ): Promise<ApiResponse<IDirectMessage>> {
-    return await apiClient.patch(`${API_URL.CONVERSATIONS}/${conversationId}/messages/${messageId}`, data);
+    return await apiClient.patch(
+      `${API_URL.SERVERS}/${serverId}/conversations/${conversationId}/messages/${messageId}`,
+      data
+    );
   },
 
-  async deleteMessageInConversation(conversationId: string, messageId: string): Promise<ApiResponse<void>> {
-    return await apiClient.delete(`${API_URL.CONVERSATIONS}/${conversationId}/messages/${messageId}`);
+  async deleteMessageInConversation(
+    serverId: string,
+    conversationId: string,
+    messageId: string
+  ): Promise<ApiResponse<void>> {
+    return await apiClient.delete(
+      `${API_URL.SERVERS}/${serverId}/conversations/${conversationId}/messages/${messageId}`
+    );
   },
 };

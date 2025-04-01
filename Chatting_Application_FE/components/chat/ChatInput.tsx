@@ -9,6 +9,7 @@ import * as z from 'zod';
 import { Form, FormControl, FormField, FormItem } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { FilePreview } from '@/components/upload/FilePreview';
+import { useAuth } from '@/hooks/useAuth';
 import { useSocket } from '@/hooks/useSocket';
 import uploadService from '@/services/uploadService';
 import { IChannel, IConversation } from '@/types';
@@ -46,6 +47,8 @@ export const ChatInput = ({ name, type, channel, conversation }: ChatInputProps)
     onConnect: handleConnect,
     onError: handleError,
   });
+
+  const { profile } = useAuth();
 
   // Form handling logic
   const [showAttachments, setShowAttachments] = useState(false);
@@ -91,30 +94,51 @@ export const ChatInput = ({ name, type, channel, conversation }: ChatInputProps)
   async function onSubmit(values: FormValues) {
     // Handle form submission logic here
     try {
-      // console.log('Form submitted:', values);
-      const data = {
-        content: values.content,
-        fileUrls: [],
-      };
-
-      if (values.attachments && values.attachments.length > 0) {
-        const uploadPromises = attachments.map(async (file) => {
-          const isImage = file.type.startsWith('image/');
-          if (isImage) {
-            const { fileUrl } = await uploadService.uploadImage(file);
-            return fileUrl;
-          } else {
-            const { fileUrl } = await uploadService.uploadFile(file);
-            return fileUrl;
-          }
-        });
-
-        data.fileUrls = await Promise.all(uploadPromises);
-      }
-
       if (type === 'channel') {
+        const data = {
+          content: values.content,
+          fileUrls: [],
+          senderId: profile.members.find((m) => m.server.id === channel.server.id).id,
+          channelId: channel.id,
+        };
+
+        if (values.attachments && values.attachments.length > 0) {
+          const uploadPromises = attachments.map(async (file) => {
+            const isImage = file.type.startsWith('image/');
+            if (isImage) {
+              const { fileUrl } = await uploadService.uploadImage(file);
+              return fileUrl;
+            } else {
+              const { fileUrl } = await uploadService.uploadFile(file);
+              return fileUrl;
+            }
+          });
+
+          data.fileUrls = await Promise.all(uploadPromises);
+        }
+
         send(`/app/channels/${channel.id}`, JSON.stringify(data));
       } else {
+        const data = {
+          content: values.content,
+          fileUrls: [],
+        };
+
+        if (values.attachments && values.attachments.length > 0) {
+          const uploadPromises = attachments.map(async (file) => {
+            const isImage = file.type.startsWith('image/');
+            if (isImage) {
+              const { fileUrl } = await uploadService.uploadImage(file);
+              return fileUrl;
+            } else {
+              const { fileUrl } = await uploadService.uploadFile(file);
+              return fileUrl;
+            }
+          });
+
+          data.fileUrls = await Promise.all(uploadPromises);
+        }
+
         send(`/app/conversations/${conversation.id}`, JSON.stringify(data));
       }
 

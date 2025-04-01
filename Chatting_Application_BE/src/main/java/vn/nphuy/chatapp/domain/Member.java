@@ -41,7 +41,7 @@ public class Member extends AbstractEntity {
     @JoinColumn(name = "server_id")
     private Server server;
 
-    @OneToMany(mappedBy = "member", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "sender", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JsonBackReference("member-message")
     private List<Message> messages;
 

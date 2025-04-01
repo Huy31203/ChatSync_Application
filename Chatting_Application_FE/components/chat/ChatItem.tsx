@@ -12,6 +12,7 @@ import { Form, FormControl, FormDescription, FormField, FormItem } from '@/compo
 import { Input } from '@/components/ui/input';
 import { UserAvatar } from '@/components/UserAvatar';
 import { roleIconMap } from '@/constants/IconMap';
+import { channelService } from '@/services/channelService';
 import { conversationService } from '@/services/conversationService';
 import { IMember } from '@/types';
 import logError from '@/utils';
@@ -37,6 +38,7 @@ interface ChatItemProps {
   currentMember: IMember;
   messageId: string;
   chatId: string;
+  serverId: string;
   timestamp: string;
   deleted?: boolean;
   isUpdated?: boolean;
@@ -55,6 +57,7 @@ export const ChatItem = ({
   currentMember,
   messageId,
   chatId,
+  serverId,
   timestamp,
   deleted = false,
   isUpdated = false,
@@ -69,10 +72,6 @@ export const ChatItem = ({
       content: content,
     },
   });
-
-  if (deleted) {
-    console.log(content, fileUrls);
-  }
 
   const icon = roleIconMap[sender.memberRole];
 
@@ -107,21 +106,26 @@ export const ChatItem = ({
   // Handle form submission
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
-      // console.log('form submitted:', values);
       const data = {
         content: values.content,
       };
-      const res = await conversationService.updateMessageInConversation(chatId, messageId, data);
-
-      const newMessage = {
-        id: res.result.id,
-        content: res.result.content,
-      };
 
       if (type === 'channel') {
-        sendMessage(`/app/channels/${chatId}/messages/${messageId}/Edit`, JSON.stringify(newMessage));
+        const res = await channelService.updateMessageInChannel(serverId, chatId, messageId, data);
+
+        const newMessage = {
+          content: res.result.content,
+        };
+
+        sendMessage(`/app/channels/${chatId}/messages/${messageId}/Get`, JSON.stringify(newMessage));
       } else {
-        sendMessage(`/app/conversations/${chatId}/messages/${messageId}/Edit`, JSON.stringify(newMessage));
+        const res = await conversationService.updateMessageInConversation(serverId, chatId, messageId, data);
+
+        const newMessage = {
+          content: res.result.content,
+        };
+
+        sendMessage(`/app/conversations/${chatId}/messages/${messageId}/Get`, JSON.stringify(newMessage));
       }
 
       toast.success('Message updated successfully!');
@@ -134,18 +138,24 @@ export const ChatItem = ({
 
   async function handleDelete() {
     try {
-      await conversationService.deleteMessageInConversation(chatId, messageId);
-
-      console.log('Message deleted:', messageId);
-
-      const newMessage = {
-        content: 'This message was deleted',
-      };
-
       if (type === 'channel') {
-        sendMessage(`/app/channels/${chatId}/messages/${messageId}/Edit`, JSON.stringify(newMessage));
+        await channelService.deleteMessageInChannel(serverId, chatId, messageId);
+
+        const newMessage = {
+          content: 'This message was deleted',
+          fileUrls: [],
+        };
+
+        sendMessage(`/app/channels/${chatId}/messages/${messageId}/Get`, JSON.stringify(newMessage));
       } else {
-        sendMessage(`/app/conversations/${chatId}/messages/${messageId}/Edit`, JSON.stringify(newMessage));
+        await conversationService.deleteMessageInConversation(serverId, chatId, messageId);
+
+        const newMessage = {
+          content: 'This message was deleted',
+          fileUrls: [],
+        };
+
+        sendMessage(`/app/conversations/${chatId}/messages/${messageId}/Get`, JSON.stringify(newMessage));
       }
 
       toast.success('Message deleted successfully!');

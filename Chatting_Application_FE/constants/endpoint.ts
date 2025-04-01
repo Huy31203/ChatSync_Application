@@ -4,5 +4,4 @@ export const API_URL = {
   UPLOADS: 'storage/file',
   SERVERS: 'v1/servers',
   CHANNELS: 'v1/channels',
-  CONVERSATIONS: 'v1/conversations',
 };

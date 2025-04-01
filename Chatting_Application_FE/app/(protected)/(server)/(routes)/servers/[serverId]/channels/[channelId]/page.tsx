@@ -1,10 +1,11 @@
 import { redirect } from 'next/navigation';
 
 import { ChatHeader } from '@/components/chat/ChatHeader';
+import { ChatInput } from '@/components/chat/ChatInput';
+import { ChatMessages } from '@/components/chat/ChatMessages';
 import { API_URL } from '@/constants/endpoint';
-import { getProfileFromCookie } from '@/lib/action';
 import http from '@/lib/http';
-import { ApiResponse, IServer } from '@/types';
+import { ApiResponse, IChannel } from '@/types';
 
 interface ChannelIdPageProps {
   params: {
@@ -14,15 +15,14 @@ interface ChannelIdPageProps {
 }
 
 const ChannelIdPage = async ({ params }: ChannelIdPageProps) => {
-  const profile = await getProfileFromCookie();
-
   const { serverId, channelId } = await params;
-  const res = await http.get<IServer>(`${API_URL.SERVERS}/${serverId}`);
-  const payload = res.payload as ApiResponse<IServer>;
 
-  const server = payload.result;
+  const res = await http.get<IChannel>(`${API_URL.SERVERS}/${serverId}/channels/${channelId}`);
+  const payload = res.payload as ApiResponse<IChannel>;
 
-  const channel = server.channels.find((channel) => channel.id === channelId);
+  const channel = payload.result;
+
+  console.log('channel', channel);
 
   if (!channel) {
     redirect(`/servers/${serverId}`);
@@ -30,7 +30,9 @@ const ChannelIdPage = async ({ params }: ChannelIdPageProps) => {
 
   return (
     <div className="flex flex-col h-full">
-      <ChatHeader serverId={serverId} name={channel.name} type="channel" />
+      <ChatHeader type="channel" name={channel.name} />
+      <ChatMessages serverId={serverId} channel={channel} name={channel.name} type="channel" />
+      <ChatInput name={channel.name} type="channel" channel={channel} />
     </div>
   );
 };

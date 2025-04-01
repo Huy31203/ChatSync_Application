@@ -23,7 +23,7 @@ public class ResProfileDTO {
 
     private boolean havePassword;
 
-    @JsonIgnoreProperties("profile")
+    @JsonIgnoreProperties({ "profile", "messages", "conversationSended", "conversationReceived" })
     private List<ResMemberDTO> members;
 
     @JsonIgnoreProperties("profile")

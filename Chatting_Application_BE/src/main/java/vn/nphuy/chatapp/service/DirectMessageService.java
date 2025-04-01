@@ -67,8 +67,8 @@ public class DirectMessageService {
     return directMessageRepository.save(existingDirectMessage);
   }
 
-  public boolean deleteDirectMessage(DirectMessage directMessage) {
-    DirectMessage existingDirectMessage = directMessageRepository.findById(directMessage.getId()).orElse(null);
+  public boolean deleteDirectMessage(String directMessageId) {
+    DirectMessage existingDirectMessage = directMessageRepository.findOneById(directMessageId).orElse(null);
     if (existingDirectMessage == null) {
       return false;
     }

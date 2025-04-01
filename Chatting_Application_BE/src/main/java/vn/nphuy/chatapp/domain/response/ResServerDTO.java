@@ -22,7 +22,7 @@ public class ResServerDTO {
     @JsonIgnoreProperties("server")
     private List<ResMemberDTO> members;
 
-    @JsonIgnoreProperties("server")
+    @JsonIgnoreProperties({ "server", "messages" })
     private List<ResChannelDTO> channels;
 
     private Instant createdAt;
