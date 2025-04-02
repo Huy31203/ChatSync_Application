@@ -151,19 +151,6 @@ public class AuthController {
   // throw new BadRequestException("Email is invalid");
   // }
 
-  // User profile = profileService.getUserByUserName(email);
-  // if (profile != null) {
-  // // Create reset token
-  // String resetToken = securityUtil.createResetToken(email, profile);
-  // profileService.updateUserResetToken(email, resetToken);
-
-  // // Send email
-  // emailService.sendPasswordResetEmail(email, resetToken);
-  // }
-
-  // return ResponseEntity.ok().body(null);
-  // }
-
   // @PostMapping("reset-password")
   // @ApiMessage(message = "Reset password")
   // public ResponseEntity<Void> resetPassword(@RequestBody ReqResetPasswordDTO
@@ -268,11 +255,10 @@ public class AuthController {
 
     log.info(">> token: {}", refreshToken);
 
-    // Bucket bucket = rateLimitService.resolveRefreshBucket(email);
-    // if (!bucket.tryConsume(1)) {
-    // throw new TooManyRequestsException("Too many refresh attempts, please try
-    // again later");
-    // }
+    Bucket bucket = rateLimitService.resolveRefreshBucket(email);
+    if (!bucket.tryConsume(1)) {
+      throw new TooManyRequestsException("Too many refresh attempts, please try again later");
+    }
 
     // Check profile by email + refresh token
     Profile profile = refreshService.getProfileByRefreshTokenAndEmail(refreshToken, email);

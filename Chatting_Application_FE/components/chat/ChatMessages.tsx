@@ -116,6 +116,7 @@ export const ChatMessages = ({ name, serverId, channel, conversation, type }: Ch
       const res = await channelService.getAllMessagesByChannelId(serverId, channel.id, messagesPage, BATCH_SIZE);
 
       setMessages(res.result.data);
+      setHasMoreMessages(res.result.meta.totalPages > 1);
 
       setIsLoading(false);
     };
@@ -129,6 +130,7 @@ export const ChatMessages = ({ name, serverId, channel, conversation, type }: Ch
       );
 
       setMessages(res.result.data);
+      setHasMoreMessages(res.result.meta.totalPages > 1);
 
       setIsLoading(false);
     };
@@ -148,8 +150,6 @@ export const ChatMessages = ({ name, serverId, channel, conversation, type }: Ch
 
   // Load more messages when scrolling up
   const loadMoreMessages = async () => {
-    console.log('loadMoreMessages', loadingMore, hasMoreMessages);
-
     if (loadingMore || !hasMoreMessages) return;
 
     setLoadingMore(true);
@@ -198,12 +198,7 @@ export const ChatMessages = ({ name, serverId, channel, conversation, type }: Ch
           ) : (
             <InfiniteScroll
               dataLength={messages.length}
-              next={() => {
-                if (innerRef.current) {
-                  innerRef.current.scrollIntoView({ behavior: 'instant' });
-                }
-                loadMoreMessages();
-              }}
+              next={loadMoreMessages}
               hasMore={hasMoreMessages}
               loader={<></>}
               style={{ display: 'flex', flexDirection: 'column-reverse' }}
@@ -225,7 +220,7 @@ export const ChatMessages = ({ name, serverId, channel, conversation, type }: Ch
                   timestamp={format(new Date(message.createdAt), DATE_FORMAT)}
                   deleted={message.deleted}
                   isUpdated={message.updatedAt !== null}
-                  sendMessage={send}
+                  send={send}
                 />
               ))}
             </InfiniteScroll>

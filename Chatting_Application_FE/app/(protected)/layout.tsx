@@ -20,19 +20,19 @@ const ProtectedLayout = async ({ children }: { children: React.ReactNode }) => {
   const accessToken = cookieStore.get('accessToken')?.value;
 
   return (
-    <ServersProvider servers={servers}>
-      <div className="h-full">
-        <div
-          className="hidden md:flex h-full w-[72px]
+    <CookieProvider cookie={accessToken}>
+      <ServersProvider servers={servers}>
+        <div className="h-full">
+          <div
+            className="hidden md:flex h-full w-[72px]
 			z-30 flex-col fixed inset-y-0"
-        >
-          <NavigationSidebar />
+          >
+            <NavigationSidebar />
+          </div>
+          <main className="md:pl-[72px] h-full">{children}</main>
         </div>
-        <main className="md:pl-[72px] h-full">
-          <CookieProvider cookie={accessToken}>{children}</CookieProvider>
-        </main>
-      </div>
-    </ServersProvider>
+      </ServersProvider>
+    </CookieProvider>
   );
 };
 

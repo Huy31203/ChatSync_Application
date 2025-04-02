@@ -43,9 +43,6 @@ class SecurityConfiguration {
     @Value("${nphuy.jwt.base64-secret}")
     private String jwtKey;
 
-    private static final String[] AUTH_WHITELIST_GET = {
-    };
-
     @Bean
     PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
@@ -96,9 +93,9 @@ class SecurityConfiguration {
         http.cors(Customizer.withDefaults())
                 .csrf(c -> c.disable())
                 .authorizeHttpRequests(
-                        authz -> authz.requestMatchers(GlobalUtil.AUTH_WHITELIST)
+                        authz -> authz.requestMatchers(GlobalUtil.AUTH_WHITELISTS)
                                 .permitAll()
-                                .requestMatchers(HttpMethod.GET, AUTH_WHITELIST_GET)
+                                .requestMatchers(HttpMethod.GET, GlobalUtil.GET_WHITELISTS)
                                 .permitAll()
                                 .anyRequest()
                                 .authenticated())

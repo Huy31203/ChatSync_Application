@@ -1,3 +1,5 @@
+'use client';
+
 import { Client, Frame } from '@stomp/stompjs';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import SockJS from 'sockjs-client';
@@ -142,7 +144,7 @@ export const useSocket = ({
     };
   }, []);
 
-  const send = useCallback((destination: string, body: any, headers: Record<string, string> = {}) => {
+  const send = useCallback((destination: string, body?: any, headers: Record<string, string> = {}) => {
     if (!clientRef.current?.connected) {
       logError('Cannot send message: try to refresh page');
       return;
@@ -150,8 +152,29 @@ export const useSocket = ({
 
     console.log('Sending message:', { destination, body, headers });
 
-    clientRef.current?.publish({ destination, headers, body: typeof body === 'string' ? body : JSON.stringify(body) });
+    clientRef.current?.publish({ destination, headers, body: typeof body === 'string' ? body : null });
   }, []);
+
+  /**
+   * Helper to send audio call signaling messages.
+   * These messages include SDP offers, answers, ICE candidates, etc.
+   */
+  const sendAudioSignal = useCallback(
+    (destination: string, signalData: any) => {
+      send(destination, JSON.stringify(signalData));
+    },
+    [send]
+  );
+
+  /**
+   * Helper to subscribe to a destination specifically for audio signals.
+   */
+  const subscribeToAudioSignal = useCallback(
+    (destination: string, callback: (signalData: any) => void) => {
+      return subscribe(destination, callback);
+    },
+    [subscribe]
+  );
 
   return {
     isConnected,
@@ -160,5 +183,7 @@ export const useSocket = ({
     disconnect,
     subscribe,
     send,
+    sendAudioSignal,
+    subscribeToAudioSignal,
   };
 };

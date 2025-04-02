@@ -1,6 +1,6 @@
 'use client';
 
-import { Edit, Hash, Lock, Mic, Trash, Video } from 'lucide-react';
+import { Edit, Hash, Lock, Mic, Trash } from 'lucide-react';
 import { useParams } from 'next/navigation';
 import React from 'react';
 
@@ -19,7 +19,6 @@ interface ServerChannelProps {
 const iconMap = {
   [ChannelTypeEnum.TEXT]: Hash,
   [ChannelTypeEnum.AUDIO]: Mic,
-  [ChannelTypeEnum.VIDEO]: Video,
 };
 
 export const ServerChannel = ({ channel, server, role }: ServerChannelProps) => {

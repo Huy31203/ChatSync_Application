@@ -15,7 +15,7 @@ const uploadService = {
     formData.append('file', file);
     formData.append('folder', 'images');
 
-    const res: ApiResponse<UploadResponse> = await apiClient.post(`${API_URL.UPLOADS}/image`, formData, {
+    const res: ApiResponse<UploadResponse> = await apiClient.post(`${API_URL.UPLOADS}/image/upload`, formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
@@ -29,7 +29,7 @@ const uploadService = {
     formData.append('file', file);
     formData.append('folder', 'files');
 
-    const res: ApiResponse<UploadResponse> = await apiClient.post(`${API_URL.UPLOADS}/upload`, formData, {
+    const res: ApiResponse<UploadResponse> = await apiClient.post(`${API_URL.UPLOADS}/file/upload`, formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },

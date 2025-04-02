@@ -3,6 +3,7 @@ package vn.nphuy.chatapp.controller;
 import org.modelmapper.ModelMapper;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -14,13 +15,12 @@ import lombok.extern.slf4j.Slf4j;
 import vn.nphuy.chatapp.domain.Channel;
 import vn.nphuy.chatapp.domain.Member;
 import vn.nphuy.chatapp.domain.Message;
+import vn.nphuy.chatapp.domain.SignalMessage;
 import vn.nphuy.chatapp.domain.request.ReqMessageDTO;
-import vn.nphuy.chatapp.domain.request.ReqUpdateMessageDTO;
 import vn.nphuy.chatapp.domain.response.ResMessageDTO;
 import vn.nphuy.chatapp.service.ChannelService;
 import vn.nphuy.chatapp.service.MemberService;
 import vn.nphuy.chatapp.service.MessageService;
-import vn.nphuy.chatapp.util.SecurityUtil;
 import vn.nphuy.chatapp.util.annotation.ApiMessage;
 import vn.nphuy.chatapp.util.error.ResourceNotFoundException;
 
@@ -32,8 +32,6 @@ public class ChannelController {
   private final MessageService messageService;
   private final MemberService memberService;
   private final ModelMapper modelMapper;
-  private final SecurityUtil securityUtil;
-  // private final RateLimitService rateLimitService;
 
   @MessageMapping("/channels/{id}")
   @SendTo("/topic/channels/{id}")
@@ -70,8 +68,7 @@ public class ChannelController {
   @ApiMessage(message = "Send Get message to channel")
   @Transactional
   public ResMessageDTO sendEditMessage(@DestinationVariable("channelId") String channelid,
-      @DestinationVariable("messageId") String messageId,
-      @RequestBody @Valid ReqUpdateMessageDTO reqMessage) {
+      @DestinationVariable("messageId") String messageId) {
     log.info("Sending Get message to Channel Id: {}", channelid);
 
     Channel channel = channelService.getChannelById(channelid);
@@ -87,5 +84,19 @@ public class ChannelController {
     }
 
     return modelMapper.map(message, ResMessageDTO.class);
+  }
+
+  @MessageMapping("/channels/{channelId}/signal")
+  @SendTo("/topic/channels/{channelId}/signal")
+  public SignalMessage processGroupSignal(@DestinationVariable("channelId") String channelid,
+      @Payload SignalMessage message) {
+    Channel channel = channelService.getChannelById(channelid);
+
+    if (channel == null) {
+      throw new ResourceNotFoundException("Channel not found with id: " + channelid);
+    }
+
+    // and handle joining/leaving logic if needed.
+    return message;
   }
 }

@@ -39,7 +39,7 @@ export const NavigationItem = ({ id, name, imageUrl }: NavigationItemProps) => {
           )}
         >
           {imageUrl ? (
-            <Image loader={customImageLoader} fill src={imageUrl} alt="Server" />
+            <Image sizes="75" loader={customImageLoader} fill src={imageUrl} alt="Server" />
           ) : (
             <div className="absolute inset-0 flex items-center justify-center bg-primary/10 text-primary font-semibold text-xl">
               {name[0].toUpperCase()}

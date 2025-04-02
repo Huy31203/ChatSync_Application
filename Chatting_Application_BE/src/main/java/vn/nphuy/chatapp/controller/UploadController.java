@@ -30,7 +30,7 @@ import vn.nphuy.chatapp.util.error.UploadException;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("storage/file")
+@RequestMapping("storage")
 public class UploadController {
   private final UploadService uploadService;
 
@@ -79,7 +79,7 @@ public class UploadController {
         .body(resource);
   }
 
-  @PostMapping("image")
+  @PostMapping("image/upload")
   @ApiMessage(message = "Upload image")
   public ResponseEntity<Object> uploadImage(
       @RequestParam("file") MultipartFile file,
@@ -110,7 +110,7 @@ public class UploadController {
 
     // Store file
     String fileName = uploadService.store(file, folder);
-    String fileUrl = serverUrl + contextPath + "/storage/file/image?fileName=" + fileName + "&folder=" + folder;
+    String fileUrl = serverUrl + contextPath + "/storage/image?fileName=" + fileName + "&folder=" + folder;
 
     ResUploadDTO res = new ResUploadDTO();
 
@@ -121,7 +121,7 @@ public class UploadController {
     return ResponseEntity.status(201).body(res);
   }
 
-  @PostMapping("upload")
+  @PostMapping("file/upload")
   @ApiMessage(message = "Upload file")
   public ResponseEntity<Object> uploadFile(
       @RequestParam("file") MultipartFile file,
@@ -153,7 +153,7 @@ public class UploadController {
     return ResponseEntity.status(201).body(res);
   }
 
-  @GetMapping("download")
+  @GetMapping("file/download")
   @ApiMessage(message = "Download file")
   public ResponseEntity<Resource> downloadFile(
       @RequestParam("fileName") String fileName,

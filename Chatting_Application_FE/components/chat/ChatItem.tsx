@@ -42,7 +42,7 @@ interface ChatItemProps {
   timestamp: string;
   deleted?: boolean;
   isUpdated?: boolean;
-  sendMessage: (destination: string, body: any, headers?: Record<string, string>) => void;
+  send: (destination: string, body?: any, headers?: Record<string, string>) => void;
 }
 
 const formSchema = z.object({
@@ -61,7 +61,7 @@ export const ChatItem = ({
   timestamp,
   deleted = false,
   isUpdated = false,
-  sendMessage,
+  send,
 }: ChatItemProps) => {
   const [isEditing, setIsEditing] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -111,21 +111,13 @@ export const ChatItem = ({
       };
 
       if (type === 'channel') {
-        const res = await channelService.updateMessageInChannel(serverId, chatId, messageId, data);
+        await channelService.updateMessageInChannel(serverId, chatId, messageId, data);
 
-        const newMessage = {
-          content: res.result.content,
-        };
-
-        sendMessage(`/app/channels/${chatId}/messages/${messageId}/Get`, JSON.stringify(newMessage));
+        send(`/app/channels/${chatId}/messages/${messageId}/Get`);
       } else {
-        const res = await conversationService.updateMessageInConversation(serverId, chatId, messageId, data);
+        await conversationService.updateMessageInConversation(serverId, chatId, messageId, data);
 
-        const newMessage = {
-          content: res.result.content,
-        };
-
-        sendMessage(`/app/conversations/${chatId}/messages/${messageId}/Get`, JSON.stringify(newMessage));
+        send(`/app/conversations/${chatId}/messages/${messageId}/Get`);
       }
 
       toast.success('Message updated successfully!');
@@ -141,21 +133,11 @@ export const ChatItem = ({
       if (type === 'channel') {
         await channelService.deleteMessageInChannel(serverId, chatId, messageId);
 
-        const newMessage = {
-          content: 'This message was deleted',
-          fileUrls: [],
-        };
-
-        sendMessage(`/app/channels/${chatId}/messages/${messageId}/Get`, JSON.stringify(newMessage));
+        send(`/app/channels/${chatId}/messages/${messageId}/Get`);
       } else {
         await conversationService.deleteMessageInConversation(serverId, chatId, messageId);
 
-        const newMessage = {
-          content: 'This message was deleted',
-          fileUrls: [],
-        };
-
-        sendMessage(`/app/conversations/${chatId}/messages/${messageId}/Get`, JSON.stringify(newMessage));
+        send(`/app/conversations/${chatId}/messages/${messageId}/Get`);
       }
 
       toast.success('Message deleted successfully!');

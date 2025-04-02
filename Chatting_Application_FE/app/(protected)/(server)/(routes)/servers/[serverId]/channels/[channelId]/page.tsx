@@ -1,11 +1,12 @@
 import { redirect } from 'next/navigation';
 
+import { AudioCall } from '@/components/audio/AudioCall';
 import { ChatHeader } from '@/components/chat/ChatHeader';
 import { ChatInput } from '@/components/chat/ChatInput';
 import { ChatMessages } from '@/components/chat/ChatMessages';
 import { API_URL } from '@/constants/endpoint';
 import http from '@/lib/http';
-import { ApiResponse, IChannel } from '@/types';
+import { ApiResponse, ChannelTypeEnum, IChannel } from '@/types';
 
 interface ChannelIdPageProps {
   params: {
@@ -30,9 +31,18 @@ const ChannelIdPage = async ({ params }: ChannelIdPageProps) => {
 
   return (
     <div className="flex flex-col h-full">
-      <ChatHeader type="channel" name={channel.name} />
-      <ChatMessages serverId={serverId} channel={channel} name={channel.name} type="channel" />
-      <ChatInput name={channel.name} type="channel" channel={channel} />
+      {channel.type === ChannelTypeEnum.TEXT ? (
+        <>
+          <ChatHeader type="channel" name={channel.name} />
+          <ChatMessages serverId={serverId} channel={channel} name={channel.name} type="channel" />
+          <ChatInput name={channel.name} type="channel" channel={channel} />
+        </>
+      ) : (
+        <>
+          <ChatHeader type="channel" name={channel.name} />
+          <AudioCall channelId={channelId} />
+        </>
+      )}
     </div>
   );
 };

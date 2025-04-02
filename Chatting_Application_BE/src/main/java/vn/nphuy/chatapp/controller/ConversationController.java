@@ -14,7 +14,6 @@ import lombok.extern.slf4j.Slf4j;
 import vn.nphuy.chatapp.domain.Conversation;
 import vn.nphuy.chatapp.domain.DirectMessage;
 import vn.nphuy.chatapp.domain.request.ReqDirectMessageDTO;
-import vn.nphuy.chatapp.domain.request.ReqUpdateDirectMessageDTO;
 import vn.nphuy.chatapp.domain.response.ResDirectMessageDTO;
 import vn.nphuy.chatapp.service.ConversationService;
 import vn.nphuy.chatapp.service.DirectMessageService;
@@ -59,8 +58,7 @@ public class ConversationController {
   @ApiMessage(message = "Send Get message to conversation")
   @Transactional
   public ResDirectMessageDTO sendEditMessage(@DestinationVariable("conversationId") String conversationid,
-      @DestinationVariable("messageId") String messageId,
-      @RequestBody @Valid ReqUpdateDirectMessageDTO reqDirectMessage) {
+      @DestinationVariable("messageId") String messageId) {
     log.info("Sending Get message to Conversation Id: {}", conversationid);
 
     Conversation conversation = conversationService.getConversationById(conversationid);

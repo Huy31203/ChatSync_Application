@@ -35,7 +35,7 @@ public class GlobalUtil {
         return tmpList;
     }
 
-    public static final String[] AUTH_WHITELIST = {
+    public static final String[] AUTH_WHITELISTS = {
             "/v1/auth/login",
             "/v1/auth/register",
             "/v1/auth/forgot-password",
@@ -44,5 +44,9 @@ public class GlobalUtil {
             "/v3/api-docs/**",
             "/swagger-ui/**",
             "/swagger-ui.html",
+    };
+
+    public static final String[] GET_WHITELISTS = {
+            "/storage/**",
     };
 }
