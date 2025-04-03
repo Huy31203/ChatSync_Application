@@ -2,7 +2,6 @@ import { IBaseModel, IMember, IServer } from '.';
 
 export enum ChannelTypeEnum {
   TEXT = 'TEXT',
-  AUDIO = 'AUDIO',
 }
 
 export interface IChannel extends IBaseModel {

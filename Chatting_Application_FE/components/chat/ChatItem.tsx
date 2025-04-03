@@ -1,7 +1,7 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Edit, Trash } from 'lucide-react';
+import { Edit, SendIcon, Trash } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
@@ -158,25 +158,25 @@ export const ChatItem = ({
           <div className="flex flex-col w-full">
             <div className="flex items-center gap-x-2">
               <div className="flex items-center">
-                <p className="text-sm font-semibold hover:underline cursor-pointer text-zinc-900 dark:text-zinc-100">
+                <p className="text-sm font-semibold hover:underline cursor-pointer text-zinc-900 dark:text-gray-100">
                   {sender.profile.name}
                 </p>
                 <ActionTooltip label={sender.memberRole} side="top">
                   {icon}
                 </ActionTooltip>
               </div>
-              <p className="text-xs text-zinc-500 dark:text-zinc-400">{timestamp}</p>
+              <p className="text-xs text-zinc-500 dark:text-gray-400">{timestamp}</p>
             </div>
             <div className="flex flex-col gap-y-2 mt-1">
               {!isEditing && (
                 <p
-                  className={`text-sm text-zinc-800 dark:text-zinc-200 ${
-                    deleted ? 'text-xs italic text-zinc-600 dark:text-zinc-400' : ''
+                  className={`text-sm text-zinc-800 dark:text-gray-200 ${
+                    deleted ? 'text-xs italic text-zinc-600 dark:text-gray-400' : ''
                   }`}
                 >
                   {deleted ? 'This message was deleted' : content}
                   {isUpdated && !deleted && (
-                    <span className="text-xs text-zinc-500 dark:text-zinc-400 ml-2">{'(edited)'}</span>
+                    <span className="text-xs text-zinc-500 dark:text-gray-400 ml-2">{'(edited)'}</span>
                   )}
                 </p>
               )}
@@ -198,21 +198,26 @@ export const ChatItem = ({
                       <FormItem className="flex-1">
                         <FormControl>
                           <Input
-                            className="dark:bg-zinc-700 focus-visible:ring-0 focus-visible:ring-offset-0"
+                            className="dark:bg-gray-900/60  dark:text-white 
+                          placeholder:text-gray-500 focus:border-sky-500 focus:ring-sky-500/30"
                             autoFocus
                             placeholder="Type your message..."
                             {...field}
                           />
                         </FormControl>
                         <FormDescription className="text-xs text-zinc-500 dark:text-zinc-400">
-                          Press <span className="font-semibold">Enter</span> to save,{' '}
-                          <span className="font-semibold">Esc</span> to cancel
+                          Press <span className="font-semibold dark:text-gray-300">Enter</span> to save,{' '}
+                          <span className="font-semibold dark:text-gray-300">Esc</span> to cancel
                         </FormDescription>
                       </FormItem>
                     )}
                   />
-                  <Button type="submit" variant="primary">
-                    Save
+                  <Button
+                    type="submit"
+                    className="bg-sky-500 hover:bg-sky-600 text-white !py-2 !pr-2.5 !pl-2 font-medium rounded-full transition-all duration-200 shadow-lg shadow-sky-500/25 w-10 h-10"
+                    variant="primary"
+                  >
+                    <SendIcon className="w-4 h-4" aria-hidden="true" />
                   </Button>
                 </form>
               </Form>
@@ -225,11 +230,11 @@ export const ChatItem = ({
               <ActionTooltip label="Edit" side="top">
                 <button
                   onClick={() => setIsEditing(!isEditing)}
-                  className="border rounded-sm p-1 bg-white dark:bg-zinc-800"
+                  className="border rounded-sm p-1 bg-white dark:bg-gray-800"
                 >
                   <Edit
-                    className="cursor-pointer ml-auto w-4 h-4 text-zinc-500 dark:bg-zinc-800
-                hover:text-zinc-600 dark:hover:text-zinc-300 transition duration-500"
+                    className="cursor-pointer ml-auto w-4 h-4 text-gray-400 dark:bg-gray-800
+                hover:text-zinc-600 dark:hover:text-gray-200 transition duration-500"
                   />
                 </button>
               </ActionTooltip>
@@ -237,11 +242,11 @@ export const ChatItem = ({
             <ActionTooltip label="Delete" side="top">
               <button
                 onClick={() => setIsDeleting(!isDeleting)}
-                className="border rounded-sm p-1 bg-white dark:bg-zinc-800"
+                className="border rounded-sm p-1 bg-white dark:bg-gray-800"
               >
                 <Trash
-                  className="cursor-pointer ml-auto w-4 h-4 text-zinc-500 dark:bg-zinc-800
-              hover:text-zinc-600 dark:hover:text-zinc-300 transition duration-500"
+                  className="cursor-pointer ml-auto w-4 h-4 text-gray-400 dark:bg-gray-800
+              hover:text-zinc-600 dark:hover:text-gray-200 transition duration-500"
                 />
               </button>
             </ActionTooltip>
@@ -255,7 +260,9 @@ export const ChatItem = ({
             <AlertDialogDescription>Bạn sẽ không thể khôi phục lại tin nhắn đã xóa!</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel onClick={() => setIsDeleting(false)}>Hủy</AlertDialogCancel>
+            <AlertDialogCancel className="rounded-md" onClick={() => setIsDeleting(false)}>
+              Hủy
+            </AlertDialogCancel>
             <AlertDialogAction onClick={handleDelete}>Đồng ý</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

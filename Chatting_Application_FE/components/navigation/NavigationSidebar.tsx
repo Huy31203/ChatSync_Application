@@ -36,16 +36,13 @@ export const NavigationSidebar = () => {
   }, [serversLoading, servers]);
 
   return (
-    <div
-      className="space-y-4 flex flex-col items-center h-full text-primary w-full
-          dark:bg-[#1E1F22] bg-[#E3E5E8] py-3"
-    >
+    <div className="space-y-4 flex flex-col items-center h-full text-primary w-full bg-[#E3E5E8] dark:bg-gradient-to-b dark:from-gray-900 dark:to-gray-800 py-3">
       {!loading && profile && serverList && (
         <>
           <NavigationAction servers={serverList} setServers={setServerList} />
           {serverList.length > 0 && (
             <Separator
-              className="h-[2px] bg-zinc-300
+              className="h-[2px] bg-gray-300
             dark:gb-zinc-700 rounded-md w-10 mx-auto"
             />
           )}

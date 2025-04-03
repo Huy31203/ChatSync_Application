@@ -1,6 +1,11 @@
 import { API_URL } from '@/constants/endpoint';
 import { ApiResponse, IProfile } from '@/types';
-import { LoginCredentials, RegisterCredentials } from '@/types/auth';
+import {
+  ForgotPasswordCredentials,
+  LoginCredentials,
+  RegisterCredentials,
+  ResetPasswordCredentials,
+} from '@/types/auth';
 import { BE_URL } from '@/utils';
 
 import apiClient from './apiClient';
@@ -20,6 +25,14 @@ export const authService = {
 
   changePassword: async (data: { oldPassword: string; newPassword: string }) => {
     await apiClient.post(`${API_URL.AUTH}/change-password`, data);
+  },
+
+  forgotPassword: async (data: ForgotPasswordCredentials) => {
+    await apiClient.post(`${API_URL.AUTH}/forgot-password`, data);
+  },
+
+  resetPassword: async (data: ResetPasswordCredentials) => {
+    await apiClient.post(`${API_URL.AUTH}/reset-password`, data);
   },
 
   refresh: async (): Promise<any> => {

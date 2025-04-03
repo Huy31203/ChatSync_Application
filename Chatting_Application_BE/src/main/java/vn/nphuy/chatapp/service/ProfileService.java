@@ -66,11 +66,10 @@ public class ProfileService {
         return profileRepository.existsByEmail(email);
     }
 
-    // public Profile getProfileByResetTokenAndEmail(String resetToken, String
-    // email) {
-    // return profileRepository.findByPasswordResetTokenAndEmail(resetToken,
-    // email).orElse(null);
-    // }
+    public Profile getProfileByResetTokenAndEmail(String resetToken, String email) {
+        return profileRepository.findOneByResetTokenAndEmail(resetToken,
+                email).orElse(null);
+    }
 
     public Profile updateProfile(Profile profile) {
         Profile existingProfile = this.getProfileById(profile.getId());
@@ -92,13 +91,13 @@ public class ProfileService {
         }
     }
 
-    // public void updateProfileResetToken(String email, String refreshToken) {
-    // Profile profile = profileRepository.findByEmail(email);
-    // if (profile != null) {
-    // profile.setPasswordResetToken(refreshToken);
-    // profileRepository.save(profile);
-    // }
-    // }
+    public void updateProfileResetToken(String email, String refreshToken) {
+        Profile profile = profileRepository.findOneByEmailAndDeletedFalse(email).orElse(null);
+        if (profile != null) {
+            profile.setResetToken(refreshToken);
+            profileRepository.save(profile);
+        }
+    }
 
     public void updateProfilePassword(String email, String password) {
         Profile profile = profileRepository.findOneByEmailAndDeletedFalse(email).orElse(null);

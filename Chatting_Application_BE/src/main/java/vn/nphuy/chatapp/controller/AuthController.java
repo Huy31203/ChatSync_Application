@@ -22,21 +22,26 @@ import org.springframework.web.bind.annotation.RestController;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.github.bucket4j.Bucket;
+import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import vn.nphuy.chatapp.domain.Profile;
 import vn.nphuy.chatapp.domain.request.ReqChangePasswordDTO;
+import vn.nphuy.chatapp.domain.request.ReqForgotPasswordDTO;
 import vn.nphuy.chatapp.domain.request.ReqLoginDTO;
 import vn.nphuy.chatapp.domain.request.ReqRegisterDTO;
+import vn.nphuy.chatapp.domain.request.ReqResetPasswordDTO;
 import vn.nphuy.chatapp.domain.response.ResLoginDTO;
 import vn.nphuy.chatapp.domain.response.ResProfileDTO;
 import vn.nphuy.chatapp.domain.response.ResRegisterDTO;
+import vn.nphuy.chatapp.service.EmailService;
 import vn.nphuy.chatapp.service.ProfileService;
 import vn.nphuy.chatapp.service.RateLimitService;
 import vn.nphuy.chatapp.service.RefreshService;
 import vn.nphuy.chatapp.util.SecurityUtil;
 import vn.nphuy.chatapp.util.annotation.ApiMessage;
+import vn.nphuy.chatapp.util.constant.GlobalUtil;
 import vn.nphuy.chatapp.util.error.BadRequestException;
 import vn.nphuy.chatapp.util.error.ServerErrorException;
 import vn.nphuy.chatapp.util.error.TokenInvalidException;
@@ -54,7 +59,7 @@ public class AuthController {
   private final RefreshService refreshService;
   private final ModelMapper modelMapper;
   private final RateLimitService rateLimitService;
-  // private final EmailService emailService;
+  private final EmailService emailService;
 
   @Value("${nphuy.jwt.access-token-validity-in-seconds}")
   private long accessTokenValidity;
@@ -141,43 +146,57 @@ public class AuthController {
     return ResponseEntity.status(201).body(res);
   }
 
-  // @PostMapping("forgot-password")
-  // @ApiMessage(message = "Request to reset password")
-  // public ResponseEntity<Void> forgotPassword(@RequestParam(name = "email")
-  // String email) {
-  // // check valid email by regex
-  // boolean valid = GlobalUtil.checkValidEmail(email);
-  // if (!valid) {
-  // throw new BadRequestException("Email is invalid");
-  // }
+  @PostMapping("forgot-password")
+  @ApiMessage(message = "Request to reset password")
+  public ResponseEntity<Void> forgotPassword(@RequestBody @Valid ReqForgotPasswordDTO reqForgotPassword) {
+    // check valid email by regex
+    String email = reqForgotPassword.getEmail();
 
-  // @PostMapping("reset-password")
-  // @ApiMessage(message = "Reset password")
-  // public ResponseEntity<Void> resetPassword(@RequestBody ReqResetPasswordDTO
-  // resetCred) {
-  // // Check valid email
-  // String email = resetCred.getEmail();
-  // String token = resetCred.getToken();
-  // String newPassword = resetCred.getNewPassword();
+    boolean valid = GlobalUtil.checkValidEmail(email);
+    if (!valid) {
+      throw new BadRequestException("Email is invalid");
+    }
 
-  // boolean valid = GlobalUtil.checkValidEmail(email);
-  // if (!valid) {
-  // throw new BadRequestException("Email is invalid");
-  // }
+    Profile profile = profileService.getProfileByEmail(email);
+    if (profile != null) {
+      // Create reset token
+      String resetToken = securityUtil.createResetToken(email, profile);
+      profileService.updateProfileResetToken(email, resetToken);
 
-  // // Check valid reset token
-  // securityUtil.checkValidResetToken(token);
-  // User profile = profileService.getUserByResetTokenAndEmail(token, email);
-  // if (profile == null) {
-  // throw new TokenInvalidException("Refresh token is invalid");
-  // }
+      // Send email
+      emailService.sendPasswordResetEmail(email, resetToken);
+    }
 
-  // String hashPassword = passwordEncoder.encode(newPassword);
-  // profileService.updateUserPassword(email, hashPassword);
-  // profileService.updateUserResetToken(email, null);
+    return ResponseEntity.ok().body(null);
+  }
 
-  // return ResponseEntity.ok().body(null);
-  // }
+  @PostMapping("reset-password")
+  @ApiMessage(message = "Reset password")
+  @Transactional(rollbackOn = Exception.class)
+  public ResponseEntity<Void> resetPassword(@RequestBody ReqResetPasswordDTO resetCred) {
+    // Check valid email
+    String email = resetCred.getEmail();
+    String token = resetCred.getToken();
+    String newPassword = resetCred.getNewPassword();
+
+    boolean valid = GlobalUtil.checkValidEmail(email);
+    if (!valid) {
+      throw new BadRequestException("Email is invalid");
+    }
+
+    // Check valid reset token
+    securityUtil.checkValidToken(token);
+    Profile profile = profileService.getProfileByResetTokenAndEmail(token, email);
+    if (profile == null) {
+      throw new TokenInvalidException("Refresh token is invalid");
+    }
+
+    String hashPassword = passwordEncoder.encode(newPassword);
+    profileService.updateProfilePassword(email, hashPassword);
+    profileService.updateProfileResetToken(email, null);
+
+    return ResponseEntity.ok().body(null);
+  }
 
   @PostMapping("change-password")
   @ApiMessage(message = "Change current profille password")
@@ -324,9 +343,17 @@ public class AuthController {
         .secure(activeProfile.equals("prod"))
         .build();
 
+    // Clear profile cookie
+    ResponseCookie resProfileCookie = ResponseCookie.from("profile", "")
+        .httpOnly(true)
+        .path("/")
+        .secure(activeProfile.equals("prod"))
+        .build();
+
     return ResponseEntity.ok()
         .header(HttpHeaders.SET_COOKIE, resAccessCookie.toString())
         .header(HttpHeaders.SET_COOKIE, resRefreshCookie.toString())
+        .header(HttpHeaders.SET_COOKIE, resProfileCookie.toString())
         .body(null);
   }
 }

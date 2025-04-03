@@ -39,3 +39,7 @@ out/
 ### Env files ###
 .env
 .env.*
+
+### Log files ###
+*.log
+*.log.*

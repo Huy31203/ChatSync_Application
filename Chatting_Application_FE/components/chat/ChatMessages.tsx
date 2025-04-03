@@ -40,8 +40,6 @@ export const ChatMessages = ({ name, serverId, channel, conversation, type }: Ch
       ? profile?.members.find((m) => m.server.id === channel?.server.id)
       : profile?.members.find((m) => m.server.id === conversation?.sender.server.id);
 
-  console.log(channel);
-
   const innerRef = useRef<HTMLDivElement>(null);
 
   const handleConnect = useCallback(() => {}, []);
@@ -109,6 +107,14 @@ export const ChatMessages = ({ name, serverId, channel, conversation, type }: Ch
       subscriptionOther.unsubscribe();
     };
   }, [conversation, isConnected, type]);
+
+  // Add this useEffect to scroll to bottom after initial load
+  useEffect(() => {
+    // When loading completes and messages are available
+    if (!isLoading && innerRef.current) {
+      window.scrollTo(0, 4000);
+    }
+  }, [isLoading, messages]);
 
   // Initial message loading
   useEffect(() => {
@@ -185,14 +191,17 @@ export const ChatMessages = ({ name, serverId, channel, conversation, type }: Ch
   };
 
   return (
-    <div id="divRef" ref={innerRef} className="h-full flex flex-1 flex-col-reverse py-4 overflow-y-auto">
+    <div
+      id="divRef"
+      ref={innerRef}
+      className="dark:bg-gradient-to-b from-gray-900 to-gray-800 h-full flex flex-1 flex-col-reverse py-4 overflow-y-auto"
+    >
       {isLoading ? (
         <div className="flex-1 flex items-center justify-center">
           <Spinner size="lg" />
         </div>
       ) : (
         <>
-          {' '}
           {messages.length === 0 ? (
             <ChatWelcome name={name} type={type} />
           ) : (

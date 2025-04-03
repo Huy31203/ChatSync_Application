@@ -13,6 +13,8 @@ public interface ProfileRepository extends JpaRepository<Profile, String>, JpaSp
 
     Optional<Profile> findOneByEmailAndDeletedFalse(String email);
 
+    Optional<Profile> findOneByResetTokenAndEmail(String resetToken, String email);
+
     boolean existsByEmail(String email);
 
     List<Profile> findByIdIn(List<String> id);

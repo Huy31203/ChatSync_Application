@@ -84,28 +84,28 @@ public class SecurityUtil {
         return jwtEncoder.encode(JwtEncoderParameters.from(jwsHeader, claims)).getTokenValue();
     }
 
-    // public String createResetToken(String email, User user) {
-    //   Instant now = Instant.now();
-    //   Instant validity = now.plus(jwtResetExpiration, ChronoUnit.SECONDS);
+    public String createResetToken(String email, Profile profile) {
+        Instant now = Instant.now();
+        Instant validity = now.plus(jwtResetExpiration, ChronoUnit.SECONDS);
 
-    //   // @formatter:off
-    //   JwtClaimsSet claims = JwtClaimsSet.builder()
-    //       .issuedAt(now)
-    //       .expiresAt(validity)
-    //       .subject(email)
-    //       .claim("user", user.getName())
-    //       .build();
+      // @formatter:off
+        JwtClaimsSet claims = JwtClaimsSet.builder()
+            .issuedAt(now)
+            .expiresAt(validity)
+            .subject(email)
+            .claim("profile", profile.getEmail())
+            .build();
 
-    //   JwsHeader jwsHeader = JwsHeader.with(JWT_ALGORITHM).build();
-    //   return jwtEncoder.encode(JwtEncoderParameters.from(jwsHeader, claims)).getTokenValue();
-    // }
-
-    public Profile getCurrentProfile() {
-      Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-      return profileService.getProfileByEmail(authentication.getName());
+        JwsHeader jwsHeader = JwsHeader.with(JWT_ALGORITHM).build();
+        return jwtEncoder.encode(JwtEncoderParameters.from(jwsHeader, claims)).getTokenValue();
     }
 
-    public static Optional<String> getCurrentUserLogin() {
+    public Profile getCurrentProfile() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        return profileService.getProfileByEmail(authentication.getName());
+    }
+
+    public static Optional<String> getCurrentProfileLogin() {
         SecurityContext securityContext = SecurityContextHolder.getContext();
         return Optional.ofNullable(extractPrincipal(securityContext.getAuthentication()));
     }
@@ -137,7 +137,7 @@ public class SecurityUtil {
         try {
             return jwtDecoder.decode(token);
         } catch (Exception e) {
-            log.error((">>> Refresh token error: " + e.getMessage()));
+            log.error((">>> token error: " + e.getMessage()));
             throw e;
         }
     }

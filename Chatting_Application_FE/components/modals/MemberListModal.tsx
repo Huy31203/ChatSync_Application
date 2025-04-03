@@ -118,17 +118,18 @@ export const MemberListModal = () => {
 
         <div className="px-4 mt-2">
           <div className="relative">
-            <Search className="absolute left-2 top-3 h-4 w-4 text-black" />
+            <Search className="absolute left-2 top-3 h-4 w-4 text-gray-500" />
             <Input
               placeholder="Search members..."
-              className="pl-8 dark:bg-zinc-700 border-[1px] focus-visible:ring-0 focus-visible:ring-offset-0"
+              className="pl-8 dark:bg-gray-900/60  dark:text-white 
+                      placeholder:text-gray-500 focus:border-sky-500 focus:ring-sky-500/30"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
         </div>
 
-        <ScrollArea className="mt-4 max-h-[400px] pr-6">
+        <ScrollArea className="px-5 mt-4 max-h-[400px]">
           {filteredMembers?.length === 0 ? (
             <p className="text-center p-4">No members found</p>
           ) : (

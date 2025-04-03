@@ -44,10 +44,9 @@ export const ServerHeader = ({ servers, setServers, server, setServer, role }: S
     <DropdownMenu>
       <DropdownMenuTrigger className="focus:outline-none" asChild>
         <button
-          className="w-full text-md font-semibold px-3 flex items-center h-12 border-neutral-200
-          dark:border-neutral-800 border-b-2
-          hover:bg-zinc-700/10
-          dark:hover:bg-zinc-700/50 transition"
+          className="w-full text-md font-semibold px-3 flex items-center h-12 border-gray-200
+          border-b-2 hover:bg-gray-700/10 dark:border-gray-700
+          dark:hover:bg-gray-700/50 transition"
         >
           {server.name}
           <ChevronDown className="h-5 w-5 ml-auto" />
@@ -55,12 +54,12 @@ export const ServerHeader = ({ servers, setServers, server, setServer, role }: S
       </DropdownMenuTrigger>
       <DropdownMenuContent
         className="w-56 text-xs font-normal
-        dark:bg-zinc-900
+        dark:bg-gray-900
         dark:text-neutral-400 space-y-[2px]"
       >
         <DropdownMenuItem
           onClick={() => onOpen('invite', { server })}
-          className="text-indigo-600 dark:text-indigo-400 px-3 py-2 text-sm cursor-pointer"
+          className="text-indigo-600 dark:hover:bg-gray-800 dark:text-indigo-400 px-3 py-2 text-sm cursor-pointer"
         >
           Invite Friends
           <UserPlus className="h-4 w-4 ml-auto" />
@@ -69,7 +68,7 @@ export const ServerHeader = ({ servers, setServers, server, setServer, role }: S
         {isAdmin && (
           <DropdownMenuItem
             onClick={() => onOpen('editServer', { server, servers })}
-            className="px-3 py-2 text-sm cursor-pointer"
+            className="px-3 py-2 text-sm cursor-pointer dark:hover:bg-gray-800"
           >
             Server Settings
             <Settings className="h-4 w-4 ml-auto" />
@@ -77,7 +76,10 @@ export const ServerHeader = ({ servers, setServers, server, setServer, role }: S
         )}
 
         {isAdmin && (
-          <DropdownMenuItem onClick={() => onOpen('members', { server })} className="px-3 py-2 text-sm cursor-pointer">
+          <DropdownMenuItem
+            onClick={() => onOpen('members', { server })}
+            className="px-3 py-2 text-sm cursor-pointer dark:hover:bg-gray-800"
+          >
             Manage Members
             <User className="h-4 w-4 ml-auto" />
           </DropdownMenuItem>
@@ -86,7 +88,7 @@ export const ServerHeader = ({ servers, setServers, server, setServer, role }: S
         {isModerator && (
           <DropdownMenuItem
             onClick={() => onOpen('createChannel', { server })}
-            className="px-3 py-2 text-sm cursor-pointer"
+            className="px-3 py-2 text-sm cursor-pointer dark:hover:bg-gray-800"
           >
             Create Channel
             <PlusCircle className="h-4 w-4 ml-auto" />
@@ -98,7 +100,7 @@ export const ServerHeader = ({ servers, setServers, server, setServer, role }: S
         {isAdmin && (
           <DropdownMenuItem
             onClick={() => onOpen('deleteServer', { server, servers })}
-            className="text-rose-500 px-3 py-2 text-sm cursor-pointer"
+            className="text-rose-500 px-3 py-2 text-sm cursor-pointer dark:hover:bg-gray-800"
           >
             Delete Server
             <Trash className="h-4 w-4 ml-auto" />
@@ -108,7 +110,7 @@ export const ServerHeader = ({ servers, setServers, server, setServer, role }: S
         {!isAdmin && (
           <DropdownMenuItem
             onClick={() => onOpen('leaveServer', { server, servers })}
-            className="text-rose-500 px-3 py-2 text-sm cursor-pointer"
+            className="text-rose-500 px-3 py-2 text-sm cursor-pointer dark:hover:bg-gray-800"
           >
             Leave Server
             <LogOut className="h-4 w-4 ml-auto" />

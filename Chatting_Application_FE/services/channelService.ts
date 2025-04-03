@@ -1,5 +1,5 @@
 import { API_URL } from '@/constants/endpoint';
-import { ApiResponse, ApiResponseWithPagination, IChannel, IMessage } from '@/types';
+import { ApiResponse, ApiResponseWithPagination, IChannel, IMessage, IServer } from '@/types';
 
 import apiClient from './apiClient';
 
@@ -41,7 +41,7 @@ export const channelService = {
     return await apiClient.patch(`${API_URL.SERVERS}/${serverId}/channels/${channelId}/messages/${messageId}`, data);
   },
 
-  async deleteChannel(serverId: string, channelId: string): Promise<void> {
+  async deleteChannel(serverId: string, channelId: string): Promise<IServer> {
     return await apiClient.delete(`${API_URL.SERVERS}/${serverId}/channels/${channelId}`);
   },
 

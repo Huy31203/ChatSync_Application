@@ -24,7 +24,7 @@ export function EditProfileModal() {
         </DialogHeader>
 
         <Tabs defaultValue="details" className="mt-6">
-          <TabsList className="grid w-full max-w-md grid-cols-2">
+          <TabsList className="grid w-full max-w-md dark:bg-gray-900 grid-cols-2">
             <TabsTrigger value="details">Profile Details</TabsTrigger>
             <TabsTrigger value="password">Change Password</TabsTrigger>
           </TabsList>

@@ -6,20 +6,16 @@ import { usePathname } from 'next/navigation';
 import { NavigationSidebar } from '@/components/navigation/NavigationSidebar';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 
-import { ServerSidebar } from '../server/ServerSidebar';
-
 export const GlobalMobileToggle = () => {
   const pathName = usePathname();
   const isServer = pathName.includes('/servers');
-  const isChannel = pathName.includes('/channels');
-  const isConversation = pathName.includes('/conversations');
 
   return (
     <>
-      {!isChannel && !isConversation && (
+      {!isServer && (
         <div
           className="md:hidden text-md font-semibold px-3 flex items-center h-12
-                    border-neutral-200 dark:border-neutral-800 border-b-2"
+                    border-gray-200  border-b-2"
         >
           <Sheet>
             <SheetTrigger
@@ -32,7 +28,6 @@ export const GlobalMobileToggle = () => {
               <div className="w-[72px]">
                 <NavigationSidebar />
               </div>
-              {isServer && <ServerSidebar />}
             </SheetContent>
           </Sheet>
         </div>

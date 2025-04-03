@@ -9,6 +9,16 @@ export interface RegisterCredentials {
   password: string;
 }
 
+export interface ForgotPasswordCredentials {
+  email: string;
+}
+
+export interface ResetPasswordCredentials {
+  email: string;
+  token: string;
+  newPassword: string;
+}
+
 export interface AuthResponse {
   accessToken: string;
 }

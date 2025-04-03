@@ -1,10 +1,9 @@
-import { Hash, Mic, ShieldAlert, ShieldCheck } from 'lucide-react';
+import { Hash, ShieldAlert, ShieldCheck } from 'lucide-react';
 
 import { ChannelTypeEnum, MemberRoleEnum } from '@/types';
 
 export const channelIconMap = {
   [ChannelTypeEnum.TEXT]: <Hash className="h-4 w-4 mr-2" />,
-  [ChannelTypeEnum.AUDIO]: <Mic className="h-4 w-4 mr-2" />,
 };
 
 export const roleIconMap = {

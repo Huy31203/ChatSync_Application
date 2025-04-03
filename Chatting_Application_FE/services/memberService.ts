@@ -12,6 +12,10 @@ export const memberService = {
     return await apiClient.get(`${API_URL.CHANNELS}/${memberId}`);
   },
 
+  async getCurrentMember(serverId: string): Promise<ApiResponse<IMember>> {
+    return await apiClient.get(`${API_URL.SERVERS}/${serverId}/members/current-profile`);
+  },
+
   async createMember(serverId: string, data: Partial<IMember>): Promise<ApiResponse<IMember>> {
     return await apiClient.post(`${API_URL.SERVERS}/${serverId}/members`, data);
   },
@@ -20,7 +24,7 @@ export const memberService = {
     return await apiClient.patch(`${API_URL.SERVERS}/${serverId}/members/${memberId}`, data);
   },
 
-  async deleteMember(serverId: string, memberId: string): Promise<ApiResponse<void>> {
+  async deleteMember(serverId: string, memberId: string): Promise<ApiResponse<IServer>> {
     return await apiClient.delete(`${API_URL.SERVERS}/${serverId}/members/${memberId}`);
   },
 };

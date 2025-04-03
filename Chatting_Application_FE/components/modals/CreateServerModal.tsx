@@ -115,9 +115,8 @@ export const CreateServerModal = () => {
                     <FormControl>
                       <Input
                         disabled={isLoading}
-                        className="dark:bg-zinc-700
-												focus-visible:ring-0
-												focus-visible:ring-offset-0"
+                        className="dark:bg-gray-900/60  dark:text-white 
+                      placeholder:text-gray-500 focus:border-sky-500 focus:ring-sky-500/30"
                         placeholder="Enter Server name"
                         {...field}
                       ></Input>
@@ -127,8 +126,12 @@ export const CreateServerModal = () => {
                 )}
               />
             </div>
-            <DialogFooter className="p-6">
-              <Button variant="primary" disabled={isLoading}>
+            <DialogFooter className="px-6 pb-6">
+              <Button
+                variant="primary"
+                disabled={isLoading}
+                className="w-full bg-sky-500 hover:bg-sky-600 text-white font-medium py-2.5 transition-all duration-200 shadow-lg shadow-sky-500/25"
+              >
                 Create
               </Button>
             </DialogFooter>

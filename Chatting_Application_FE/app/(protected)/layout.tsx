@@ -2,6 +2,7 @@ import { cookies } from 'next/headers';
 import React from 'react';
 
 import { NavigationSidebar } from '@/components/navigation/NavigationSidebar';
+import { GlobalMobileToggle } from '@/components/toggles/GlobalMobileToggle';
 import { API_URL } from '@/constants/endpoint';
 import { CookieProvider } from '@/contexts/CookieContext';
 import { ServersProvider } from '@/contexts/ServersContext';
@@ -29,7 +30,10 @@ const ProtectedLayout = async ({ children }: { children: React.ReactNode }) => {
           >
             <NavigationSidebar />
           </div>
-          <main className="md:pl-[72px] h-full">{children}</main>
+          <main className="md:pl-[72px] h-full">
+            <GlobalMobileToggle />
+            {children}
+          </main>
         </div>
       </ServersProvider>
     </CookieProvider>

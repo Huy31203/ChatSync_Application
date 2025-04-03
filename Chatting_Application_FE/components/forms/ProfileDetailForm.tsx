@@ -1,6 +1,7 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
+import { MailIcon, User } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
@@ -96,11 +97,17 @@ export function ProfileDetailsForm({ profile }: ProfileDetailsFormProps) {
               <FormItem>
                 <FormLabel>Full Name</FormLabel>
                 <FormControl>
-                  <Input
-                    className="dark:bg-zinc-700 focus-visible:ring-0 focus-visible:ring-offset-0"
-                    disabled={form.formState.isSubmitting}
-                    {...field}
-                  />
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                      <User className="h-5 w-5 text-gray-500" />
+                    </div>
+                    <Input
+                      className="pl-10 dark:bg-gray-900/60  dark:text-white 
+                      placeholder:text-gray-500 focus:border-sky-500 focus:ring-sky-500/30"
+                      disabled={form.formState.isSubmitting}
+                      {...field}
+                    />
+                  </div>
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -114,13 +121,19 @@ export function ProfileDetailsForm({ profile }: ProfileDetailsFormProps) {
               <FormItem>
                 <FormLabel>Email</FormLabel>
                 <FormControl>
-                  <Input
-                    className="dark:bg-zinc-700 focus-visible:ring-0 focus-visible:ring-offset-0"
-                    type="email"
-                    readOnly
-                    disabled={form.formState.isSubmitting}
-                    {...field}
-                  />
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                      <MailIcon className="h-5 w-5 text-gray-500" />
+                    </div>
+                    <Input
+                      className="pl-10 dark:bg-gray-900/60  dark:text-white 
+                    placeholder:text-gray-500"
+                      type="email"
+                      readOnly
+                      disabled={form.formState.isSubmitting}
+                      {...field}
+                    />
+                  </div>
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -128,7 +141,11 @@ export function ProfileDetailsForm({ profile }: ProfileDetailsFormProps) {
           />
 
           <div className="flex justify-end gap-2 !mt-10">
-            <Button disabled={form.formState.isSubmitting} type="submit">
+            <Button
+              disabled={form.formState.isSubmitting}
+              type="submit"
+              className="bg-sky-500 hover:bg-sky-600 text-white font-medium py-2.5 transition-all duration-200 shadow-lg shadow-sky-500/25"
+            >
               Save Changes
             </Button>
           </div>

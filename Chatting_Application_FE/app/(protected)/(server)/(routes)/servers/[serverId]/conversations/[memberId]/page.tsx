@@ -6,7 +6,7 @@ import { ChatMessages } from '@/components/chat/ChatMessages';
 import { API_URL } from '@/constants/endpoint';
 import { getProfileFromCookie } from '@/lib/action';
 import http from '@/lib/http';
-import { ApiResponse, IConversation } from '@/types';
+import { ApiResponse, IConversation, IMember } from '@/types';
 
 const ConversationIdPage = async ({ params }: { params: { serverId: string; memberId: string } }) => {
   const { serverId, memberId: receiverId } = await params;
@@ -16,10 +16,12 @@ const ConversationIdPage = async ({ params }: { params: { serverId: string; memb
     return redirect('/login');
   }
 
-  const senderId = profile.members.find((m) => m.server.id === serverId).id;
+  const currentMemberRes = await http.get(`${API_URL.SERVERS}/${serverId}/members/current-profile`);
+  const currentMemberPayload = currentMemberRes.payload as ApiResponse<IMember>;
+  const currentMember = currentMemberPayload.result;
 
   const getRes = await http.get<IConversation>(
-    `${API_URL.SERVERS}/${serverId}/conversations/sender/${senderId}/receiver/${receiverId}`
+    `${API_URL.SERVERS}/${serverId}/conversations/sender/${currentMember.id}/receiver/${receiverId}`
   );
   const getPayLoad = getRes.payload as ApiResponse<IConversation>;
 
@@ -27,7 +29,7 @@ const ConversationIdPage = async ({ params }: { params: { serverId: string; memb
   const conversation =
     getPayLoad.result ??
     (await (async () => {
-      const data = { senderId: senderId, receiverId: receiverId };
+      const data = { senderId: currentMember.id, receiverId: receiverId };
       const postRes = await http.post<IConversation>(`${API_URL.SERVERS}/${serverId}/conversations`, data);
       const postPayload = postRes.payload as ApiResponse<IConversation>;
       return postPayload.result;

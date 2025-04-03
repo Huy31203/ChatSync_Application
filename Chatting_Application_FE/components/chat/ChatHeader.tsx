@@ -16,8 +16,8 @@ interface ChatHeaderProps {
 export const ChatHeader = ({ name, type, imageUrl }: ChatHeaderProps) => {
   return (
     <div
-      className="text-md font-semibold px-3   flex items-center h-12
-      border-neutral-200 dark:border-neutral-800 border-b-2"
+      className="text-md font-semibold px-3 flex items-center h-12
+      border-gray-200 dark:border-gray-800 border-b-2"
     >
       <MobileToggle />
       {type === 'channel' && <Hash className="w-5 h-5 text-zinc-500 dark:text-zinc-400 mr-2" />}

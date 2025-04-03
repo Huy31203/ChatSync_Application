@@ -9,7 +9,7 @@ export const ChatWelcome = ({ name, type }: ChatWelcomeProps) => {
   return (
     <div className="space-y-2 px-4 mb-4">
       {type === 'channel' && (
-        <div className="w-[75px] h-[75px] rounded-full bg-zinc-500 dark:bg-zinc-700 flex items-center justify-center">
+        <div className="w-[75px] h-[75px] rounded-full bg-gray-500 dark:bg-gray-700 flex items-center justify-center">
           <Hash className="w-12 h-12 text-white" />
         </div>
       )}

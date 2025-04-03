@@ -38,6 +38,7 @@ import vn.nphuy.chatapp.domain.request.ReqUpdateMessageDTO;
 import vn.nphuy.chatapp.domain.response.ResChannelDTO;
 import vn.nphuy.chatapp.domain.response.ResConversationDTO;
 import vn.nphuy.chatapp.domain.response.ResDirectMessageDTO;
+import vn.nphuy.chatapp.domain.response.ResMemberDTO;
 import vn.nphuy.chatapp.domain.response.ResMessageDTO;
 import vn.nphuy.chatapp.domain.response.ResServerDTO;
 import vn.nphuy.chatapp.domain.response.ResultPaginationDTO;
@@ -136,6 +137,22 @@ public class ServerController {
     ResChannelDTO resChannel = modelMapper.map(result, ResChannelDTO.class);
 
     return ResponseEntity.ok(resChannel);
+  }
+
+  @GetMapping("/servers/{serverId}/members/current-profile")
+  @ApiMessage(message = "Fetch member by current profile")
+  public ResponseEntity<Object> getMemberByCurrentProfile(@PathVariable("serverId") String serverId) {
+
+    String profileId = securityUtil.getCurrentProfile().getId();
+    Member member = memberService.getMemberByProfileIdAndServerId(profileId, serverId);
+
+    if (member == null) {
+      throw new NotAllowedException("You are not a member of that server");
+    }
+
+    ResMemberDTO resMember = modelMapper.map(member, ResMemberDTO.class);
+
+    return ResponseEntity.ok(resMember);
   }
 
   @GetMapping("/servers/{serverId}/conversations/sender/{senderId}/receiver/{receiverId}")
@@ -586,7 +603,7 @@ public class ServerController {
 
   @DeleteMapping("/servers/{serverId}/channels/{channelId}")
   @ApiMessage(message = "Delete channel by id")
-  public ResponseEntity<Void> deleteChannel(@PathVariable("serverId") String serverId,
+  public ResponseEntity<Object> deleteChannel(@PathVariable("serverId") String serverId,
       @PathVariable("channelId") String channelId) {
 
     String profileId = securityUtil.getCurrentProfile().getId();
@@ -601,7 +618,11 @@ public class ServerController {
       throw new ResourceNotFoundException("Channel not found with id: " + channelId);
     }
 
-    return ResponseEntity.ok().body(null);
+    Server server = serverService.getServerById(serverId);
+
+    ResServerDTO resServer = modelMapper.map(server, ResServerDTO.class);
+
+    return ResponseEntity.ok().body(resServer);
   }
 
   @DeleteMapping("/servers/{serverId}/members/{memberId}")

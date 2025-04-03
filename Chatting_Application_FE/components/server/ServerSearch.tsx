@@ -56,20 +56,20 @@ export const ServerSearch = ({ data }: ServerSearchProps) => {
   return (
     <>
       <button
-        className="group px-2 py-2 rounded-md flex items-center gap-x-2 w-full hover:bg-zinc-700/10 dark:hover:hover:bg-zinc-700/50 transition"
+        className="group px-2 py-2 rounded-md flex items-center gap-x-2 w-full hover:bg-gray-700/10 dark:hover:bg-gray-700/50 transition"
         onClick={() => setOpen(true)}
       >
         <Search className="w-4 h-4 text-zinc-500 dark:text-zinc-400" />
         <p
-          className="font-semibold text-sm text-zinc-500 dark:text-zinc-400
+          className="font-semibold text-sm text-zinc-500 dark:text-gray-300
           group-hover:text-zinc-600
-          dark:group-hover:text-zinc-300 transition"
+          dark:group-hover:text-gray-200 transition"
         >
           Search
         </p>
         <kbd
           className="pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded border
-          bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground ml-auto"
+          darK:bg-gray-900 px-1.5 font-mono text-[10px] font-medium text-muted-foreground ml-auto"
         >
           <span className="text-xxs">CTRL</span>K
         </kbd>
@@ -85,7 +85,11 @@ export const ServerSearch = ({ data }: ServerSearchProps) => {
               <CommandGroup key={label} heading={label}>
                 {data?.map(({ id, icon, name }) => {
                   return (
-                    <CommandItem key={id} onSelect={() => onClick({ id, type })} className="cursor-pointer">
+                    <CommandItem
+                      key={id}
+                      onSelect={() => onClick({ id, type })}
+                      className="cursor-pointer hover:dark:bg-gray-700 focus:dark:bg-gray-700"
+                    >
                       {icon}
                       <span>{name}</span>
                     </CommandItem>

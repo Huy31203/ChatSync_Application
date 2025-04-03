@@ -67,7 +67,7 @@ export const DeleteChannelModal = () => {
       <DialogContent className="p-0 overflow-hidden">
         <DialogHeader className="pt-8 px-6">
           <DialogTitle className="text-2xl text-center font-bold">Delete Channel</DialogTitle>
-          <DialogDescription className="text-center">
+          <DialogDescription className="text-center !mt-6">
             Are you sure you want to do this? <br />
             <span className="font-semibold text-indigo-500">#{channel?.name}</span> will be permanently deleted.
           </DialogDescription>

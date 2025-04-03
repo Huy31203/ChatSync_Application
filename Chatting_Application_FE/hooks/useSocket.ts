@@ -155,27 +155,6 @@ export const useSocket = ({
     clientRef.current?.publish({ destination, headers, body: typeof body === 'string' ? body : null });
   }, []);
 
-  /**
-   * Helper to send audio call signaling messages.
-   * These messages include SDP offers, answers, ICE candidates, etc.
-   */
-  const sendAudioSignal = useCallback(
-    (destination: string, signalData: any) => {
-      send(destination, JSON.stringify(signalData));
-    },
-    [send]
-  );
-
-  /**
-   * Helper to subscribe to a destination specifically for audio signals.
-   */
-  const subscribeToAudioSignal = useCallback(
-    (destination: string, callback: (signalData: any) => void) => {
-      return subscribe(destination, callback);
-    },
-    [subscribe]
-  );
-
   return {
     isConnected,
     client: clientRef.current,
@@ -183,7 +162,5 @@ export const useSocket = ({
     disconnect,
     subscribe,
     send,
-    sendAudioSignal,
-    subscribeToAudioSignal,
   };
 };

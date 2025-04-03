@@ -3,7 +3,6 @@ package vn.nphuy.chatapp.controller;
 import org.modelmapper.ModelMapper;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -15,7 +14,6 @@ import lombok.extern.slf4j.Slf4j;
 import vn.nphuy.chatapp.domain.Channel;
 import vn.nphuy.chatapp.domain.Member;
 import vn.nphuy.chatapp.domain.Message;
-import vn.nphuy.chatapp.domain.SignalMessage;
 import vn.nphuy.chatapp.domain.request.ReqMessageDTO;
 import vn.nphuy.chatapp.domain.response.ResMessageDTO;
 import vn.nphuy.chatapp.service.ChannelService;
@@ -84,19 +82,5 @@ public class ChannelController {
     }
 
     return modelMapper.map(message, ResMessageDTO.class);
-  }
-
-  @MessageMapping("/channels/{channelId}/signal")
-  @SendTo("/topic/channels/{channelId}/signal")
-  public SignalMessage processGroupSignal(@DestinationVariable("channelId") String channelid,
-      @Payload SignalMessage message) {
-    Channel channel = channelService.getChannelById(channelid);
-
-    if (channel == null) {
-      throw new ResourceNotFoundException("Channel not found with id: " + channelid);
-    }
-
-    // and handle joining/leaving logic if needed.
-    return message;
   }
 }

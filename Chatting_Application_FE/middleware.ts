@@ -8,6 +8,8 @@ export async function middleware(request: NextRequest) {
   if (
     request.nextUrl.pathname.startsWith('/login') ||
     request.nextUrl.pathname.startsWith('/register') ||
+    request.nextUrl.pathname.startsWith('/forgot-password') ||
+    request.nextUrl.pathname.startsWith('/reset-password') ||
     request.nextUrl.pathname.includes('/api/auth/refresh') ||
     request.nextUrl.pathname.includes('/_next') ||
     request.nextUrl.pathname.includes('/favicon.ico')

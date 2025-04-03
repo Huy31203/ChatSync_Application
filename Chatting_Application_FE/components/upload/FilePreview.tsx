@@ -58,10 +58,10 @@ export const FilePreview = ({ file, url, removeable = true, onRemove }: FilePrev
           target="_blank"
           className={cn('group relative flex items-center', removeable && 'group-hover:opacity-100')}
         >
-          <div className="flex flex-col bg-white dark:bg-zinc-700 rounded-md overflow-hidden border border-neutral-300 dark:border-zinc-600 w-[120px]">
+          <div className="flex flex-col bg-white dark:bg-gray-700 rounded-md overflow-hidden border border-gray-300 dark:border-zinc-600 w-[120px]">
             <div
               className={cn(
-                'flex items-center justify-center bg-neutral-200 dark:bg-zinc-800',
+                'flex items-center justify-center bg-neutral-200 dark:bg-gray-800',
                 isShowingName ? 'h-[80px]' : 'h-[110px]'
               )}
             >
@@ -104,10 +104,10 @@ export const FilePreview = ({ file, url, removeable = true, onRemove }: FilePrev
         </Link>
       ) : (
         <div className={cn('group relative flex items-center', removeable && 'group-hover:opacity-100')}>
-          <div className="flex flex-col bg-white dark:bg-zinc-700 rounded-md overflow-hidden border border-neutral-300 dark:border-zinc-600 w-[120px]">
+          <div className="flex flex-col bg-white dark:bg-gray-700 rounded-md overflow-hidden border border-gray-300 dark:border-zinc-600 w-[120px]">
             <div
               className={cn(
-                'flex items-center justify-center bg-neutral-200 dark:bg-zinc-800',
+                'flex items-center justify-center bg-neutral-200 dark:bg-gray-800',
                 isShowingName ? 'h-[80px]' : 'h-[110px]'
               )}
             >

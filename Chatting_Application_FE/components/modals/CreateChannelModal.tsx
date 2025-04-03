@@ -110,9 +110,8 @@ export const CreateChannelModal = () => {
                     <FormControl>
                       <Input
                         disabled={isLoading}
-                        className="dark:bg-zinc-700
-												focus-visible:ring-0
-												focus-visible:ring-offset-0"
+                        className="dark:bg-gray-900/60  dark:text-white 
+                      placeholder:text-gray-500 focus:border-sky-500 focus:ring-sky-500/30"
                         placeholder="Enter Channel name"
                         {...field}
                       ></Input>
@@ -129,7 +128,7 @@ export const CreateChannelModal = () => {
                     <FormLabel className="uppercase text-xs font-semibold">Channel type</FormLabel>
                     <Select disabled={isLoading} onValueChange={field.onChange} defaultValue={field.value}>
                       <FormControl>
-                        <SelectTrigger className="dark:bg-zinc-700 focus:ring-0 ring-offset-0 fucus:ring-offset-0 capitalize outline-none">
+                        <SelectTrigger className="dark:bg-gray-700 focus:ring-0 focus:ring-offset-0 capitalize outline-none">
                           <SelectValue placeholder="Select a channel type" />
                         </SelectTrigger>
                       </FormControl>
@@ -146,8 +145,12 @@ export const CreateChannelModal = () => {
                 )}
               />
             </div>
-            <DialogFooter className="bg-neutral-950 p-6">
-              <Button variant="primary" disabled={isLoading}>
+            <DialogFooter className="px-6 pb-6">
+              <Button
+                variant="primary"
+                disabled={isLoading}
+                className="w-full bg-sky-500 hover:bg-sky-600 text-white font-medium py-2.5 transition-all duration-200 shadow-lg shadow-sky-500/25"
+              >
                 Create
               </Button>
             </DialogFooter>

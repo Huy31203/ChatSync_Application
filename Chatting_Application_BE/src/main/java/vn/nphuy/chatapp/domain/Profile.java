@@ -46,6 +46,9 @@ public class Profile extends AbstractEntity {
 
     private boolean havePassword = true;
 
+    @Column(name = "reset_token", length = 1024, unique = true)
+    private String resetToken;
+
     @OneToMany(mappedBy = "profile", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<Refresh> refreshTokens;
 

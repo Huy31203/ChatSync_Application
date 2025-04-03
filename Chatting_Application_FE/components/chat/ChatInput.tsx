@@ -154,7 +154,7 @@ export const ChatInput = ({ name, type, channel, conversation }: ChatInputProps)
       <form onSubmit={form.handleSubmit(onSubmit)} className="w-full flex flex-col">
         {showAttachments && attachments.length > 0 && (
           <div className="px-4 pt-2">
-            <div className="bg-neutral-100 dark:bg-zinc-800 rounded-md p-3">
+            <div className="bg-neutral-100 dark:bg-gray-900 rounded-md p-3">
               <div className="flex p-2 gap-4 overflow-x-auto">
                 {attachments.map((file, index) => (
                   <FilePreview key={file.name || index.toString()} file={file} onRemove={() => removeFile(index)} />
@@ -189,7 +189,7 @@ export const ChatInput = ({ name, type, channel, conversation }: ChatInputProps)
                           form.handleSubmit(onSubmit)();
                         }
                       }}
-                      className="ps-[45px] pe-24 !py-6 bg-neutral-200 dark:bg-zinc-900 focus-visible:ring-0 focus-visible:ring-offset-0"
+                      className="ps-[45px] pe-24 !py-6 bg-neutral-200 dark:bg-gray-900 border-0 focus-visible:ring-0 focus-visible:ring-offset-0"
                       placeholder={type == 'channel' ? `Message to #${name}` : `Message to @${name}`}
                       {...field}
                     />

@@ -13,7 +13,7 @@ const AuthLayout = async ({ children }: { children: React.ReactNode }) => {
     redirect('/');
   }
 
-  return <section>{children}</section>;
+  return <section className="h-full overflow-auto">{children}</section>;
 };
 
 export default AuthLayout;

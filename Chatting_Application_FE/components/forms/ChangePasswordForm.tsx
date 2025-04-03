@@ -89,7 +89,8 @@ export function ChangePasswordForm({ havePassword }: { havePassword: boolean }) 
                 <FormControl>
                   <div className="relative">
                     <Input
-                      className="dark:bg-zinc-700 focus-visible:ring-0 focus-visible:ring-offset-0"
+                      className="dark:bg-gray-900/60  dark:text-white 
+                      placeholder:text-gray-500 focus:border-sky-500 focus:ring-sky-500/30"
                       type={showPassword ? 'text' : 'password'}
                       {...field}
                     />
@@ -121,7 +122,8 @@ export function ChangePasswordForm({ havePassword }: { havePassword: boolean }) 
               <FormControl>
                 <div className="relative">
                   <Input
-                    className="dark:bg-zinc-700 focus-visible:ring-0 focus-visible:ring-offset-0"
+                    className="dark:bg-gray-900/60  dark:text-white 
+                      placeholder:text-gray-500 focus:border-sky-500 focus:ring-sky-500/30"
                     type={showPassword ? 'text' : 'password'}
                     {...field}
                   />
@@ -156,7 +158,8 @@ export function ChangePasswordForm({ havePassword }: { havePassword: boolean }) 
               <FormControl>
                 <div className="relative">
                   <Input
-                    className="dark:bg-zinc-700 focus-visible:ring-0 focus-visible:ring-offset-0"
+                    className="dark:bg-gray-900/60  dark:text-white 
+                      placeholder:text-gray-500 focus:border-sky-500 focus:ring-sky-500/30"
                     type={showPassword ? 'text' : 'password'}
                     {...field}
                   />
@@ -179,10 +182,12 @@ export function ChangePasswordForm({ havePassword }: { havePassword: boolean }) 
         />
 
         <div className="flex justify-end gap-2 !mt-10">
-          <Button type="button" variant="outline">
-            Cancel
+          <Button
+            className="bg-sky-500 hover:bg-sky-600 text-white font-medium py-2.5 transition-all duration-200 shadow-lg shadow-sky-500/25"
+            type="submit"
+          >
+            Update Password
           </Button>
-          <Button type="submit">Update Password</Button>
         </div>
       </form>
     </Form>
