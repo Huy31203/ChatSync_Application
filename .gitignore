@@ -1,3 +1,4 @@
 .env
+.vscode
 upload/files/*
 upload/images/*
