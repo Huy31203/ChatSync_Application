@@ -1,4 +1,6 @@
-import { API_URL } from '@/constants/endpoint';
+import apiClient from './apiClient';
+
+import { API_URL, BE_URL } from '@/constants/endpoint';
 import { ApiResponse, IProfile } from '@/types';
 import {
   ForgotPasswordCredentials,
@@ -6,9 +8,6 @@ import {
   RegisterCredentials,
   ResetPasswordCredentials,
 } from '@/types/auth';
-import { BE_URL } from '@/utils';
-
-import apiClient from './apiClient';
 
 export const authService = {
   login: async (data: LoginCredentials) => {

@@ -3,10 +3,11 @@
 
 import { cookies, headers } from 'next/headers';
 
-import { ACCESS_TOKEN, PROFILE } from '@/constants';
-import { ApiResponse, ApiResponseWithPagination, IProfile } from '@/types';
-
 import http, { CustomOptions } from './http';
+
+import { ACCESS_TOKEN, PROFILE } from '@/constants';
+import { DOCKER_BE_URL } from '@/constants/endpoint';
+import { ApiResponse, ApiResponseWithPagination, IProfile } from '@/types';
 
 type EntityErrorPayload = {
   message: string;
@@ -56,7 +57,7 @@ const request = async <Response>(
 
   const baseHeaders: { [key: string]: string } = body instanceof FormData ? {} : { 'Content-Type': 'application/json' };
 
-  const baseUrl = options?.baseUrl === undefined ? process.env.NEXT_PUBLIC_API_URL : process.env.NEXT_PUBLIC_API_URL;
+  const baseUrl = options?.baseUrl === undefined ? `${DOCKER_BE_URL}/api` : options?.baseUrl;
 
   const fullUrl = url.startsWith('/') ? `${baseUrl}${url}` : `${baseUrl}/${url}`;
 

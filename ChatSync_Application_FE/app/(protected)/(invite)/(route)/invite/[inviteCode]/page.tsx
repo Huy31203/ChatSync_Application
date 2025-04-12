@@ -5,10 +5,11 @@ import http from '@/lib/http';
 import { ApiResponse, IServer } from '@/types';
 
 interface InviteCodePageProps {
-  params: {
+  params: Promise<{
     inviteCode: string;
-  };
+  }>;
 }
+
 const InviteCodePage = async ({ params }: InviteCodePageProps) => {
   const { inviteCode } = await params;
   if (!inviteCode) return redirect('/');

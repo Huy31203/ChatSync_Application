@@ -4,10 +4,11 @@ import { Client, Frame } from '@stomp/stompjs';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import SockJS from 'sockjs-client';
 
+import { useRefresh } from './useRefesh';
+
+import { BE_URL, SOCKET_CONTEXT } from '@/constants/endpoint';
 import { useCookies } from '@/contexts/CookieContext';
 import logError from '@/utils';
-
-import { useRefresh } from './useRefesh';
 
 interface UseSocketProps {
   url?: string;
@@ -19,7 +20,7 @@ interface UseSocketProps {
 }
 
 export const useSocket = ({
-  url = process.env.NEXT_PUBLIC_SOCKET_URL || 'http://localhost:8080/api/chat',
+  url = BE_URL && SOCKET_CONTEXT ? `${BE_URL}/api/${SOCKET_CONTEXT}` : 'http://localhost:8080/api/chat',
   headers = {},
   autoConnect = true,
   onConnect,

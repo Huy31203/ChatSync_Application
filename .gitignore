@@ -1,1 +1,3 @@
-uploads
+.env
+upload/files/*
+upload/images/*

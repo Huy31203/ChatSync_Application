@@ -17,6 +17,7 @@ import { useRouter } from '@/hooks/useRouter';
 import { cn } from '@/lib/utils';
 import { authService } from '@/services/authService';
 import logError from '@/utils';
+import { BE_URL } from '@/constants/endpoint';
 
 export default function LoginForm() {
   const router = useRouter();
@@ -51,7 +52,7 @@ export default function LoginForm() {
   };
 
   const getProviderLoginUrl = (provider: 'google') => {
-    return process.env.NEXT_PUBLIC_API_URL + `/oauth2/authorization/${provider}`;
+    return BE_URL + `/api/oauth2/authorization/${provider}`;
   };
 
   return (

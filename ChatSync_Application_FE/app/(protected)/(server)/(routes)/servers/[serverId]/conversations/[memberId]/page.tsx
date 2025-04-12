@@ -8,7 +8,7 @@ import { getProfileFromCookie } from '@/lib/action';
 import http from '@/lib/http';
 import { ApiResponse, IConversation, IMember } from '@/types';
 
-const ConversationIdPage = async ({ params }: { params: { serverId: string; memberId: string } }) => {
+const ConversationIdPage = async ({ params }: { params: Promise<{ serverId: string; memberId: string }> }) => {
   const { serverId, memberId: receiverId } = await params;
   const profile = await getProfileFromCookie();
 

@@ -9,10 +9,10 @@ import http from '@/lib/http';
 import { ApiResponse, IChannel } from '@/types';
 
 interface ChannelIdPageProps {
-  params: {
+  params: Promise<{
     serverId: string;
     channelId: string;
-  };
+  }>;
 }
 
 const ChannelIdPage = async ({ params }: ChannelIdPageProps) => {

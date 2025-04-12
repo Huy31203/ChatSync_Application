@@ -2,6 +2,7 @@ import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
 import { ACCESS_TOKEN, REFRESH_TOKEN } from './constants';
+import { BE_URL } from './constants/endpoint';
 
 export async function middleware(request: NextRequest) {
   // Skip middleware for public routes and the refresh endpoint itself
@@ -27,7 +28,7 @@ export async function middleware(request: NextRequest) {
 
   if (!accessToken && refreshToken) {
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/v1/auth/refresh`, {
+      const response = await fetch(`${BE_URL}/api/v1/auth/refresh`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',

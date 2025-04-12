@@ -7,7 +7,13 @@ import { ServerProvider } from '@/contexts/ServerContext';
 import http from '@/lib/http';
 import { ApiResponse, IServer } from '@/types';
 
-const ServerIdLayout = async ({ children, params }: { children: React.ReactNode; params: { serverId: string } }) => {
+const ServerIdLayout = async ({
+  children,
+  params,
+}: {
+  children: React.ReactNode;
+  params: Promise<{ serverId: string }>;
+}) => {
   const { serverId } = await params;
 
   const res = await http.get<IServer>(`${API_URL.SERVERS}/${serverId}`);

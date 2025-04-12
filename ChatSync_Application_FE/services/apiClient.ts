@@ -1,11 +1,12 @@
 import axios from 'axios';
 
-import logError, { BE_URL } from '@/utils';
-
 import { authService } from './authService';
 
+import { BE_URL } from '@/constants/endpoint';
+import logError from '@/utils';
+
 const apiClient = axios.create({
-  baseURL: BE_URL,
+  baseURL: `${BE_URL}/api`,
   headers: {
     'Content-Type': 'application/json',
   },

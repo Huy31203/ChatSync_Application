@@ -1,9 +1,11 @@
 import { ImageLoader } from 'next/image';
 
+import { BE_URL } from '@/constants/endpoint';
+
 // Create a configurable loader that can accept a token
 export const createImageLoader = (token: string): ImageLoader => {
   return ({ src, width, quality }) => {
-    if (src.includes(process.env.NEXT_PUBLIC_BE_URL)) {
+    if (src.includes(BE_URL)) {
       return `${src}&token=${token}&w=${width}&q=${quality || 75}`;
     }
     return `/_next/image?url=${encodeURIComponent(src)}&w=${width}&q=${quality || 75}`;
@@ -12,7 +14,7 @@ export const createImageLoader = (token: string): ImageLoader => {
 
 // Default loader with empty token
 const defaultImageLoader = ({ src, width, quality }: { src: string; width: number; quality?: number }) => {
-  if (src.includes(process.env.NEXT_PUBLIC_BE_URL)) {
+  if (src.includes(BE_URL)) {
     return `${src}&w=${width}&q=${quality || 75}`;
   }
   return `/_next/image?url=${encodeURIComponent(src)}&w=${width}&q=${quality || 75}`;

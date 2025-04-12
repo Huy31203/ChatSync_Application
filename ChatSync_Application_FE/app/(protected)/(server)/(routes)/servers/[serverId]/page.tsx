@@ -6,11 +6,7 @@ import { toast } from 'react-toastify';
 
 import { ServerContext } from '@/contexts/ServerContext';
 
-interface ServerPageProps {
-  params: { serverId: string };
-}
-
-const ServerPage = ({ params }: ServerPageProps) => {
+const ServerPage = () => {
   const searchParams = useSearchParams();
   const { server, loading } = useContext(ServerContext);
   const router = useRouter();
