@@ -5,6 +5,21 @@ import { ACCESS_TOKEN, REFRESH_TOKEN } from './constants';
 import { DOCKER_BE_URL } from './constants/endpoint';
 
 export async function middleware(request: NextRequest) {
+  const res = NextResponse.next();
+
+  // add the CORS headers to the response
+  res.headers.append('Access-Control-Allow-Credentials', 'true');
+  res.headers.append('Access-Control-Allow-Origin', 'chatsync-application.onrender.com'); // replace this your actual origin
+  res.headers.append('Access-Control-Allow-Methods', 'GET,DELETE,PATCH,POST,PUT');
+  res.headers.append(
+    'Access-Control-Allow-Headers',
+    'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version'
+  );
+
+  if (request.method === 'OPTIONS') {
+    return res;
+  }
+
   // Skip middleware for public routes and the refresh endpoint itself
   if (
     request.nextUrl.pathname.startsWith('/login') ||
@@ -15,7 +30,7 @@ export async function middleware(request: NextRequest) {
     request.nextUrl.pathname.includes('/_next') ||
     request.nextUrl.pathname.includes('/favicon.ico')
   ) {
-    return NextResponse.next();
+    return res;
   }
 
   // Get the access token from cookies
@@ -49,6 +64,14 @@ export async function middleware(request: NextRequest) {
       // Create a rewrite response to retry the original request path
       const newResponse = NextResponse.rewrite(new URL(request.url));
 
+      newResponse.headers.append('Access-Control-Allow-Credentials', 'true');
+      newResponse.headers.append('Access-Control-Allow-Origin', 'chatsync-application.onrender.com'); // replace this your actual origin
+      newResponse.headers.append('Access-Control-Allow-Methods', 'GET,DELETE,PATCH,POST,PUT');
+      newResponse.headers.append(
+        'Access-Control-Allow-Headers',
+        'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version'
+      );
+
       // Forward any cookies set by the server (including the new access token)
       response.headers.forEach((value, key) => {
         if (key.toLowerCase() === 'set-cookie') {
@@ -70,7 +93,7 @@ export async function middleware(request: NextRequest) {
     }
   }
 
-  return NextResponse.next();
+  return res;
 }
 
 // Configure which paths should be processed by this middleware
