@@ -1,4 +1,4 @@
-export const BE_URL = 'http://localhost:8080';
+export const BE_URL = 'https://chatsync-application.onrender.com';
 export const DOCKER_BE_URL = 'http://backend-spring:8080';
 export const SOCKET_CONTEXT = 'chat';
 

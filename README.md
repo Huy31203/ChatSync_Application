@@ -32,6 +32,7 @@ ChatSync is a real-time chatting application designed for seamless communication
 - **Shadcn UI:** A set of accessible and customizable UI components.
 - **Axios:** For handling HTTP requests to the backend.
 - **Zustand:** A lightweight state management solution for React.
+- **SockJS:** A JavaScript library that provides a WebSocket-like object in environments that do not support WebSockets, enabling real-time, bidirectional communication.
 
 ### Backend
 
