@@ -6,7 +6,7 @@ import { cookies, headers } from 'next/headers';
 import http, { CustomOptions } from './http';
 
 import { ACCESS_TOKEN, PROFILE } from '@/constants';
-import { DOCKER_BE_URL } from '@/constants/endpoint';
+import { BE_URL } from '@/constants/endpoint';
 import { ApiResponse, ApiResponseWithPagination, IProfile } from '@/types';
 
 type EntityErrorPayload = {
