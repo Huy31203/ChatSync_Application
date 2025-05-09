@@ -108,6 +108,7 @@ public class AuthController {
     // Set cookies
     ResponseCookie resAccessCookie = ResponseCookie.from("accessToken", accessToken)
         .httpOnly(true)
+        .sameSite("None")
         .path("/")
         .secure(activeProfile.equals("prod"))
         .maxAge(accessTokenValidity)
@@ -115,6 +116,7 @@ public class AuthController {
 
     ResponseCookie resRefreshCookie = ResponseCookie.from("refreshToken", refreshToken)
         .httpOnly(true)
+        .sameSite("None")
         .path("/")
         .secure(activeProfile.equals("prod"))
         .maxAge(refreshTokenValidity)
@@ -289,6 +291,7 @@ public class AuthController {
 
     ResponseCookie resProfileCookie = ResponseCookie.from("profile", encodedProfileJson)
         .httpOnly(true)
+        .sameSite("None")
         .path("/")
         .secure(activeProfile.equals("prod"))
         .build();
@@ -339,6 +342,7 @@ public class AuthController {
     // Set cookies
     ResponseCookie resAccessCookie = ResponseCookie.from("accessToken", newAccessToken)
         .httpOnly(true)
+        .sameSite("None")
         .path("/")
         .secure(activeProfile.equals("prod"))
         .maxAge(accessTokenValidity)
@@ -346,6 +350,7 @@ public class AuthController {
 
     ResponseCookie resRefreshCookie = ResponseCookie.from("refreshToken", newRefreshToken)
         .httpOnly(true)
+        .sameSite("None")
         .path("/")
         .secure(activeProfile.equals("prod"))
         .maxAge(refreshTokenValidity)
@@ -372,12 +377,14 @@ public class AuthController {
     // Set cookies
     ResponseCookie resAccessCookie = ResponseCookie.from("accessToken", "")
         .httpOnly(true)
+        .sameSite("None")
         .path("/")
         .secure(activeProfile.equals("prod"))
         .build();
 
     ResponseCookie resRefreshCookie = ResponseCookie.from("refreshToken", "")
         .httpOnly(true)
+        .sameSite("None")
         .path("/")
         .secure(activeProfile.equals("prod"))
         .build();
@@ -385,6 +392,7 @@ public class AuthController {
     // Clear profile cookie
     ResponseCookie resProfileCookie = ResponseCookie.from("profile", "")
         .httpOnly(true)
+        .sameSite("None")
         .path("/")
         .secure(activeProfile.equals("prod"))
         .build();

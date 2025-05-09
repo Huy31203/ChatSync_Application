@@ -131,6 +131,7 @@ public class Oauth2LoginSuccessHandler implements AuthenticationSuccessHandler {
         // Set cookies
         ResponseCookie resAccessCookie = ResponseCookie.from("accessToken", accessToken)
                 .httpOnly(true)
+                .sameSite("None")
                 .path("/")
                 .secure(activeProfile.equals("prod"))
                 .maxAge(accessTokenValidity)
@@ -138,6 +139,7 @@ public class Oauth2LoginSuccessHandler implements AuthenticationSuccessHandler {
 
         ResponseCookie resRefreshCookie = ResponseCookie.from("refreshToken", refreshToken)
                 .httpOnly(true)
+                .sameSite("None")
                 .path("/")
                 .secure(activeProfile.equals("prod"))
                 .maxAge(refreshTokenValidity)
