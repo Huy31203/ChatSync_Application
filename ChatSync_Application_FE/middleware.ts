@@ -2,7 +2,7 @@ import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
 import { ACCESS_TOKEN, REFRESH_TOKEN } from './constants';
-import { BE_URL } from './constants/endpoint';
+import { DOCKER_BE_URL } from './constants/endpoint';
 
 export async function middleware(request: NextRequest) {
   const res = NextResponse.next();
@@ -43,7 +43,7 @@ export async function middleware(request: NextRequest) {
 
   if (!accessToken && refreshToken) {
     try {
-      const response = await fetch(`${BE_URL}/api/v1/auth/refresh`, {
+      const response = await fetch(`${DOCKER_BE_URL}/api/v1/auth/refresh`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
