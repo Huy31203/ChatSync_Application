@@ -9,8 +9,6 @@ const AuthLayout = async ({ children }: { children: React.ReactNode }) => {
   const accessToken = cookieStore.get(ACCESS_TOKEN)?.value;
   const refreshToken = cookieStore.get(REFRESH_TOKEN)?.value;
 
-  console.log(accessToken, refreshToken);
-
   if (accessToken || refreshToken) {
     redirect('/');
   }

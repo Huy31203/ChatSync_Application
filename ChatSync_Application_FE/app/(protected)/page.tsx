@@ -11,8 +11,6 @@ const HomePage = () => {
   const router = useRouter();
   const { profile, loading } = useAuth();
 
-  console.log('Profile:', profile, loading);
-
   useEffect(() => {
     if (!profile && !loading) {
       router.push('/login');
