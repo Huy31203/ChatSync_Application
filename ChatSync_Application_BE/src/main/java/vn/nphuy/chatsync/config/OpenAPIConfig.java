@@ -57,7 +57,7 @@ public class OpenAPIConfig {
                 .servers(
                         List.of(
                                 createServer(
-                                        "http://localhost:8080" + contextPath,
+                                        "https://chatsync-application.onrender.com" + contextPath,
                                         "Server URL in Development environment")))
                 .addSecurityItem(new SecurityRequirement().addList("Bearer Authentication"))
                 .components(
